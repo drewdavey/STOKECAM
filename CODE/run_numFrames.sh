@@ -23,12 +23,8 @@ fdir_log='../../LOG/'$(date +'%Y%m%d')'/'
 if [ ! -d '$fdir_out' ]; then
   sudo mkdir -p $fdir_out
   echo '--Created output folder: ' $fdir_out
-#fi
-#if [ ! -d '$fdir_cam0' ]; then
   sudo mkdir -p $fdir_cam0
   echo '--Created cam0 folder: ' $fdir_cam0
-#fi
-#if [ ! -d '$fdir_cam1' ]; then
   sudo mkdir -p $fdir_cam1
   echo '--Created cam1 folder: ' $fdir_cam1
 fi
