@@ -47,7 +47,7 @@ echo '' |& tee -a $fdir_log$fname_log
 
 
 # Run image collection script
-python3 ../run_files/cam_test1.py $fdir_out $num_frames & 
+python3 numFrames.py $fdir_out $num_frames & 
 
 # Get process ID of the background script we just launched
 #PID=$!
