@@ -38,7 +38,6 @@ if [ ! -d '$fdir_log' ]; then
   echo '--Created folder to write LOG files: ' $fdir_log
 fi 
 
-sudo nano $fdir_log$fname_log
 echo '' |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
 echo '  Output folder:            ' $fdir_out |& tee -a $fdir_log$fname_log
