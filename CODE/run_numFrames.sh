@@ -21,20 +21,20 @@ fdir_cam1='../../DATA/'$(date +'%Y%m%d')'/cam1/'
 fdir_log='../../LOG/'$(date +'%Y%m%d')'/'
 
 if [ ! -d '$fdir_out' ]; then
-  mkdir -p $fdir_out
+  sudo mkdir -p $fdir_out
   echo '--Created output folder: ' $fdir_out
 #fi
 #if [ ! -d '$fdir_cam0' ]; then
-  mkdir -p $fdir_cam0
+  sudo mkdir -p $fdir_cam0
   echo '--Created cam0 folder: ' $fdir_cam0
 #fi
 #if [ ! -d '$fdir_cam1' ]; then
-  mkdir -p $fdir_cam1
+  sudo mkdir -p $fdir_cam1
   echo '--Created cam1 folder: ' $fdir_cam1
 fi
 
 if [ ! -d '$fdir_log' ]; then
-  mkdir -p $fdir_log
+  sudo mkdir -p $fdir_log
   echo '--Created folder to write LOG files: ' $fdir_log
 fi 
 
