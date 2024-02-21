@@ -15,10 +15,10 @@ fi
 fname_log='LOG_'$(date +'%Y%m%d_%H%M%S.txt')''
 
 # Create directory for data and log file export, if necessary
-fdir_out='../DATA/'$(date +'%Y%m%d')'/'
-fdir_cam0='../DATA/'$(date +'%Y%m%d')'/cam0/'
-fdir_cam1='../DATA/'$(date +'%Y%m%d')'/cam1/'
-fdir_log='../LOG/'$(date +'%Y%m%d')'/'
+fdir_out='../../DATA/'$(date +'%Y%m%d')'/'
+fdir_cam0='../../DATA/'$(date +'%Y%m%d')'/cam0/'
+fdir_cam1='../../DATA/'$(date +'%Y%m%d')'/cam1/'
+fdir_log='../../LOG/'$(date +'%Y%m%d')'/'
 
 if [ ! -d '$fdir_out' ]; then
   sudo mkdir $fdir_out
