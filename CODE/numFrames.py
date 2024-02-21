@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from signal import pause
 
-def run(path,num_frames):
+def run(path0,path1,pathLog,num_frames):
 	cam0 = Picamera2(0)
 	cam1 = Picamera2(1)
 	cam0.start()
@@ -17,8 +17,8 @@ def run(path,num_frames):
 		print('----------'+str(i)+'------------')
 		timestamp = datetime.utcnow()
 		tstr = timestamp.strftime('%H%M%S%f')[:-3]
-		cam0.capture_file(path+'cam0/'+tstr+'.jpg')
-		cam1.capture_file(path+'cam1/'+tstr+'.jpg')
+		cam0.capture_file(path0+tstr+'.jpg')
+		cam1.capture_file(path1+tstr+'.jpg')
 		time.sleep(1)
 	
 	cam0.stop()
@@ -26,4 +26,4 @@ def run(path,num_frames):
 		
 
 if __name__ == '__main__':
-    run(sys.argv[1],int(sys.argv[2]))
+    run(sys.argv[1],sys.argv[2],sys.argv[3],int(sys.argv[4]))
