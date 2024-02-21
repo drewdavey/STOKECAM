@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Last updated:
+
 ##################################
 
 # Parse command line input
@@ -8,7 +10,6 @@ if [ $# -eq 0 ]; then
 else
   num_frames=$1
 fi
-
 
 # Output log name
 fname_log='LOG_'$(date +'%Y%m%d_%H%M%S.txt')''
