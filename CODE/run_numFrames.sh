@@ -15,7 +15,7 @@ fi
 fname_log='LOG_'$(date +'%Y%m%d_%H%M%S.txt')''
 
 # Create directory for data and log file export, if necessary
-fdir_out='/home/drew/DATA/'$(date +'%Y%m%d')'/'
+fdir_out='../../DATA/'$(date +'%Y%m%d')'/'
 fdir_cam0=$fdir_out'cam0/'
 fdir_cam1=$fdir_out'cam1/'
 fdir_log='../../LOG/'$(date +'%Y%m%d')'/'
