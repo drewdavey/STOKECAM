@@ -36,7 +36,7 @@ fi
 if [ ! -d '$fdir_log' ]; then
   sudo mkdir $fdir_log
   echo '--Created folder to write LOG files: ' $fdir_log
-fi
+fi 
 
 echo '' |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
