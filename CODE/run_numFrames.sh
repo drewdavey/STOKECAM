@@ -10,6 +10,7 @@ else
 fi
 
 
+
 # Output log name
 fname_log='LOG_'$(date +'%Y%m%d_%H%M%S.txt')''
 
