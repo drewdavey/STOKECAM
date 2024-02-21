@@ -9,7 +9,6 @@ else
   num_frames=$1
 fi
 
-
 cd /home/drew/stereo/run_files/
 
 # Output log name
