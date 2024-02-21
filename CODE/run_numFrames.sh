@@ -9,7 +9,6 @@ else
   num_frames=$1
 fi
 
-#$cd ../run_files/
 
 # Output log name
 fname_log='LOG_'$(date +'%Y%m%d_%H%M%S.txt')''
