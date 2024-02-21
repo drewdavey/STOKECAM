@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Last updated:b
+# Last updated: 2024-02-21
 
 ##################################
 
@@ -38,7 +38,7 @@ if [ ! -d '$fdir_log' ]; then
   echo '--Created folder to write LOG files: ' $fdir_log
 fi 
 
-echo '' |& tee -a $fdir_log$fname_log
+sudo echo '' |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
 echo '  Output folder:            ' $fdir_out |& tee -a $fdir_log$fname_log
 
