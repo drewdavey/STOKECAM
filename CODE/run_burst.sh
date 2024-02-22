@@ -58,18 +58,18 @@ echo '' |& tee -a $fdir_log$fname_log
 # Run image collection script
 python3 burst.py $fdir_cam0 $fdir_cam1 $fdir_log$fname_log $dt $duration & 
 
-#Get stop time
+# Get stop time
 # tstop=$(date -u +"%Y%m%d%H%M%S")
 # echo 'Stop Time: ' $tstop |& tee -a $fdir_log$fname_log
 
 # Get process ID of the background script we just launched
-#PID=$!
-#echo 'Process:' $PID |& tee -a $fdir_log$fname_log
+PID=$!
+echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
 # Wait 
-#sleep $run_time |& tee -a $fdir_log$fname_log
+sleep $duration |& tee -a $fdir_log$fname_log
 
 # Kill the background process
-#kill -INT $PID |& tee -a $fdir_log$fname_log
-#sleep 2
-#echo 'Done collecting images!' |& tee -a $fdir_log$fname_log
+kill -INT $PID |& tee -a $fdir_log$fname_log
+sleep 2
+echo 'Done collecting images!' |& tee -a $fdir_log$fname_log
