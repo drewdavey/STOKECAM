@@ -6,7 +6,7 @@
 # Spaced by [dt] for [duration]
 # Inputs: (1) dt (default = 0) (2) duration (default = 10)
 # Example:
-#   sudo ./run_burst.sh 1 60
+#   sudo ./run_burst.sh 0 60
 ##################################
 
 # Parse command line input
@@ -71,5 +71,3 @@ sleep $duration |& tee -a $fdir_log$fname_log
 
 # Kill the background process
 kill -INT $PID |& tee -a $fdir_log$fname_log
-sleep 2
-echo 'Done collecting images!' |& tee -a $fdir_log$fname_log
