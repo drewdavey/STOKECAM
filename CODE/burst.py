@@ -12,6 +12,8 @@ from gpiozero import Button
 from signal import pause
 from threading import Timer
 
+# add _burst folder for each collection
+
 def run(path0,path1,pathLog,dt,duration):
 	button = Button(17)
 	cam0 = Picamera2(0)

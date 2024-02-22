@@ -25,11 +25,13 @@ def run(path0,path1,pathLog,num_frames):
 	outfile.write('Cam1 Metadata:' + '\n')
 	outfile.write(str(meta1) + '\n')
 
+# add _numFrames folder for each collection
+	
 	for i in range(int(num_frames)):
 		frame = int(i)
 		timestamp = datetime.utcnow()
-		tstr = timestamp.strftime('%H%M%S%f')[:-3]
-		cam0.capture_file(path0+tstr+'.jpg')
+		tstr = timestamp.strftime('%H%M%S%f')[:-3] 
+		cam0.capture_file(path0+tstr+'.jpg') 
 		cam1.capture_file(path1+tstr+'.jpg')
 		# time.sleep(1)
 	

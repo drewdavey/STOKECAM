@@ -9,6 +9,8 @@ from picamera2 import Picamera2
 from datetime import datetime
 from signal import pause
 
+# add _calib folder for each collection
+
 def run(path0,path1,pathLog,num_frames):
 	cam0 = Picamera2(0)
 	cam1 = Picamera2(1)
