@@ -49,7 +49,7 @@ def run(path0,path1,pathLog,dt,duration):
 	# Set a timer to end the program after the specified duration
 	Timer(duration, end_program).start()
 
-	button.when_pressed(capture)
+	button.when_pressed = capture
 	# pause(duration)
 
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
