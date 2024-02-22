@@ -1,4 +1,3 @@
-
 # Last updated: 2024-02-21
 ##################################
 # This script is passed 4 arguments from run_numFrames.sh

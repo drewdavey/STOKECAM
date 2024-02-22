@@ -38,7 +38,6 @@ if [ ! -d '$fdir_log' ]; then
   echo '--Created folder to write LOG files: ' $fdir_log
 fi 
 
-# echo 'Start Time: ' $tnow |& tee -a $fdir_log$fname_log
 echo 'Running numFrames.py [' $num_frames '] frames' |& tee -a $fdir_log$fname_log
 echo '' |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log

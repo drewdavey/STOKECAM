@@ -1,5 +1,8 @@
-## Camera Test
-## Last updated: 2024-02-14
+# Last updated: 2024-02-21
+##################################
+# This script is passed 5 arguments from run_burst.sh
+# Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) dt (5) duration
+##################################
 
 import sys
 from picamera2 import Picamera2
@@ -34,7 +37,7 @@ def run(path0,path1,pathLog,dt,duration):
 
 	button.when_pressed(capture)
 	pause(duration)
-	
+
 	cam0.stop()
 	cam1.stop()
 
