@@ -16,8 +16,8 @@ def run(path0,path1,pathLog,dt,duration):
 	button = Button(17)
 	cam0 = Picamera2(0)
 	cam1 = Picamera2(1)
-	#cam0.start()
-	#cam1.start()
+	cam0.start()
+	cam1.start()
 
 	outfile = open(pathLog, 'a')
 	meta0 = cam0.capture_metadata()
@@ -48,8 +48,8 @@ def run(path0,path1,pathLog,dt,duration):
 	button.when_pressed(capture)
 	# pause(duration)
 
-	# cam0.stop()
-	# cam1.stop()
+	cam0.stop()
+	cam1.stop()
 
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
 	outfile.write('Done collecting images.' + '\n')
