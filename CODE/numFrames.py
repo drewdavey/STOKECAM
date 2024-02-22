@@ -21,10 +21,10 @@ def run(path0,path1,pathLog,num_frames):
 	meta0 = cam0.capture_metadata()
 	meta1 = cam1.capture_metadata()
 	outfile.write('Cam0 Metadata:' + '\n')
-	outfile.write(meta0 + '\n')
+	outfile.write(str(meta0) + '\n')
 	outfile.write('' + '\n')
 	outfile.write('Cam1 Metadata:' + '\n')
-	outfile.write(meta1 + '\n')
+	outfile.write(str(meta1) + '\n')
 
 	for i in range(int(num_frames)):
 		print('----------'+str(i)+'------------')
