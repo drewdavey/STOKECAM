@@ -46,6 +46,8 @@ fi
 
 echo 'Running burst.py' |& tee -a $fdir_log$fname_log
 echo '' |& tee -a $fdir_log$fname_log
+echo '--------------- ENTERING BURST MODE --------------- '
+echo '' |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
 echo '  Output folder:            ' $fdir_out |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
