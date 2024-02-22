@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # Last updated: 2024-02-21
-
+##################################
+# This script calls numFrames.py to collect a specified batch of images
+# Inputs: (1) Number of frames to be collected (default = 5)
+# Example:
+#   sudo ./run_numFrames.sh 10
 ##################################
 
 # Parse command line input
@@ -11,14 +15,17 @@ else
   num_frames=$1
 fi
 
-# Output log name
-fname_log='LOG_'$(date +'%Y%m%d_%H%M%S.txt')''
+#Sets time variables
+tnow=$(date -u +"%Y%m%d%H%M%S")
+
+# Output log file name
+fname_log='LOG_'$(date -u +'%H%M%S_numFrames.txt')''
 
 # Create directory for data and log file export, if necessary
-fdir_out='../../DATA/'$(date +'%Y%m%d')'/'
+fdir_out='../../DATA/'$(date -u +'%Y%m%d')'/'
 fdir_cam0=$fdir_out'cam0/'
 fdir_cam1=$fdir_out'cam1/'
-fdir_log='../../LOG/'$(date +'%Y%m%d')'/'
+fdir_log='../../LOG/'$(date -u +'%Y%m%d')'/'
 
 if [ ! -d '$fdir_out' ]; then
   sudo mkdir -p $fdir_out
@@ -34,16 +41,22 @@ if [ ! -d '$fdir_log' ]; then
   echo '--Created folder to write LOG files: ' $fdir_log
 fi 
 
+echo 'Start Time: ' $tnow |& tee -a $fdir_log$fname_log
+echo 'Running numFrames.py (' $num_frames ') frames' |& tee -a $fdir_log$fname_log
 echo '' |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
 echo '  Output folder:            ' $fdir_out |& tee -a $fdir_log$fname_log
-
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
 echo '' |& tee -a $fdir_log$fname_log
+echo 'Getting camera specs' |& tee -a $fdir_log$fname_log
 
 
 # Run image collection script
 python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_log $num_frames & 
+
+#Get stop time
+tstop=$(date -u +"%Y%m%d%H%M%S")
+echo 'Stop Time: ' $tstop |& tee -a $fdir_log$fname_log
 
 # Get process ID of the background script we just launched
 #PID=$!
