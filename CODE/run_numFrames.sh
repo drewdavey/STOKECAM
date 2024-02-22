@@ -55,8 +55,8 @@ echo '' |& tee -a $fdir_log$fname_log
 python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_log$fname_log $num_frames & 
 
 #Get stop time
-tstop=$(date -u +"%Y%m%d%H%M%S")
-echo 'Stop Time: ' $tstop |& tee -a $fdir_log$fname_log
+# tstop=$(date -u +"%Y%m%d%H%M%S")
+# echo 'Stop Time: ' $tstop |& tee -a $fdir_log$fname_log
 
 # Get process ID of the background script we just launched
 #PID=$!

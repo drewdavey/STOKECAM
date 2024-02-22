@@ -33,7 +33,7 @@ def run(path0,path1,pathLog,num_frames):
 		tstr = timestamp.strftime('%H%M%S%f')[:-3]
 		cam0.capture_file(path0+tstr+'.jpg')
 		cam1.capture_file(path1+tstr+'.jpg')
-		time.sleep(1)
+		#time.sleep(1)
 	
 	cam0.stop()
 	cam1.stop()
