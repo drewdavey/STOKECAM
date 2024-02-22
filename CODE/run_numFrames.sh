@@ -15,9 +15,6 @@ else
   num_frames=$1
 fi
 
-#Sets time variables
-tnow=$(date -u +"%Y%m%d%H%M%S")
-
 # Output log file name
 fname_log='LOG_'$(date -u +'%H%M%S_numFrames.txt')''
 
