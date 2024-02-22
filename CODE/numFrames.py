@@ -20,7 +20,8 @@ def run(path0,path1,pathLog,num_frames):
 	outfile = open(pathLog, 'a')
 	meta0 = cam0.capture_metadata()
 	meta1 = cam1.capture_metadata()
-	outfile.write('Cam0 Metadata:' + '\n')
+	outfile.write('\n' + 'Start Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
+	outfile.write('\n' + 'Cam0 Metadata:' + '\n')
 	outfile.write(str(meta0) + '\n')
 	outfile.write('' + '\n')
 	outfile.write('Cam1 Metadata:' + '\n')
@@ -37,6 +38,7 @@ def run(path0,path1,pathLog,num_frames):
 	cam0.stop()
 	cam1.stop()
 
+	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
 	outfile.write('Done collecting images.' + '\n')
 	outfile.close()
 		

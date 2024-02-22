@@ -41,7 +41,7 @@ if [ ! -d '$fdir_log' ]; then
   echo '--Created folder to write LOG files: ' $fdir_log
 fi 
 
-echo 'Start Time: ' $tnow |& tee -a $fdir_log$fname_log
+# echo 'Start Time: ' $tnow |& tee -a $fdir_log$fname_log
 echo 'Running numFrames.py [' $num_frames '] frames' |& tee -a $fdir_log$fname_log
 echo '' |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
@@ -49,7 +49,7 @@ echo '  Output folder:            ' $fdir_out |& tee -a $fdir_log$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_log$fname_log
 echo '' |& tee -a $fdir_log$fname_log
 echo 'Getting camera specs' |& tee -a $fdir_log$fname_log
-
+echo '' |& tee -a $fdir_log$fname_log
 
 # Run image collection script
 python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_log$fname_log $num_frames & 
