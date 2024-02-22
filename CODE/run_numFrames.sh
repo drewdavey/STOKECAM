@@ -52,7 +52,7 @@ echo 'Getting camera specs' |& tee -a $fdir_log$fname_log
 
 
 # Run image collection script
-python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_log $num_frames & 
+python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_log$fname_log $num_frames & 
 
 #Get stop time
 tstop=$(date -u +"%Y%m%d%H%M%S")
