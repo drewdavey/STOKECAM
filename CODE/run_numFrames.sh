@@ -55,13 +55,11 @@ python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_log$fname_log $num_frames &
 # echo 'Stop Time: ' $tstop |& tee -a $fdir_log$fname_log
 
 # Get process ID of the background script we just launched
-#PID=$!
-#echo 'Process:' $PID |& tee -a $fdir_log$fname_log
+# PID=$!
+# echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
 # Wait 
-#sleep $run_time |& tee -a $fdir_log$fname_log
+# sleep $run_time |& tee -a $fdir_log$fname_log
 
 # Kill the background process
-#kill -INT $PID |& tee -a $fdir_log$fname_log
-#sleep 2
-#echo 'Done collecting images!' |& tee -a $fdir_log$fname_log
+# kill -INT $PID |& tee -a $fdir_log$fname_log
