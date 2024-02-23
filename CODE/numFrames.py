@@ -31,8 +31,11 @@ def run(path0,path1,pathLog,num_frames):
 	for i in range(int(num_frames)):
 		timestamp = datetime.utcnow()
 		tstr = timestamp.strftime('%H%M%S%f')[:-3] 
-		cam0.capture_file(path0+'0_'+tstr+'%06d' % i+1+'.jpg') 
-		cam1.capture_file(path1+'1_'+tstr+'%06d' % i+1+'.jpg')
+		cam0.capture_file(f"{path0}0_{tstr}{i+1:06}.jpg")
+		cam1.capture_file(f"{path1}1_{tstr}{i+1:06}.jpg")
+
+		# cam0.capture_file(path0+'0_'+tstr+'%06d' % i+1+'.jpg') 
+		# cam1.capture_file(path1+'1_'+tstr+'%06d' % i+1+'.jpg')
 		# time.sleep(1)
 	
 	cam0.stop()
