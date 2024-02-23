@@ -11,6 +11,9 @@ from datetime import datetime
 from gpiozero import Button
 from signal import pause
 from threading import Timer
+from functools import partial
+
+i = 0  # Global index variable
 
 def run(path0,path1,pathLog,dt,duration):
 	button = Button(17)
@@ -69,8 +72,7 @@ def run(path0,path1,pathLog,dt,duration):
 	# Set a timer to end the program after the specified duration
 	Timer(duration, end_program).start()
 
-	i = 0 # index
-	button.when_pressed = capture(i)
+	button.when_pressed = lambda: capture(i)
 	# pause(duration)
 
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
