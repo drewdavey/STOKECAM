@@ -1,3 +1,7 @@
 
+# Two windows live stream
+libcamera-hello --width 960 --height 1080 -p 0,0,960,1080 --camera 0 -t 0 & libcamera-hello --width 960 --height 1080 -p 960,0,960,1080 --camera 1 -t 0
 
-./libcamera-hello --width 960 --height 1080 -p 0,0,960,1080 --camera 0 -t 0 & ./libcamera-hello --width 960 --height 1080 -p 960,0,960,1080 --camera 1 -t 0
+
+
+
