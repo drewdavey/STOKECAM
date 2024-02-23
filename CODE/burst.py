@@ -48,7 +48,7 @@ def run(path0,path1,pathLog,dt,duration):
 	outfile.write('\n' + 'Cam1 Config:' + '\n')
 	outfile.write(str(config1) + '\n')
 
-	def capture():
+	def capture(i):
 		cam0.start()
 		cam1.start()
 		while button.is_pressed:
@@ -69,7 +69,8 @@ def run(path0,path1,pathLog,dt,duration):
 	# Set a timer to end the program after the specified duration
 	Timer(duration, end_program).start()
 
-	button.when_pressed = capture
+	i = 0 # index
+	button.when_pressed = capture(i)
 	# pause(duration)
 
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
