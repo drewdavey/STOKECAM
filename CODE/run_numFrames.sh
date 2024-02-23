@@ -10,9 +10,14 @@
 
 # Parse command line input
 if [ $# -eq 0 ]; then
-	num_frames=5
+  num_frames=5
+  dt=0
+elif [ $# -eq 1 ]; then
+  num_frames=$1
+  dt=0
 else
   num_frames=$1
+  dt=$2
 fi
 
 # Output log file name
@@ -48,7 +53,7 @@ echo 'Getting camera specs' |& tee -a $fdir_log$fname_log
 echo '' |& tee -a $fdir_log$fname_log
 
 # Run image collection script
-python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_log$fname_log $num_frames & 
+python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_log$fname_log $num_frames $dt & 
 
 #Get stop time
 # tstop=$(date -u +"%Y%m%d%H%M%S")
