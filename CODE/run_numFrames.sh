@@ -19,7 +19,7 @@ fi
 fname_log='LOG_'$(date -u +'%H%M%S_numFrames.txt')''
 
 # Create directory for data and log file export, if necessary
-fdir_out='../../DATA/'$(date -u +'%Y%m%d')'/'
+fdir_out='../../DATA/'$(date -u +'%Y%m%d')'/'$(date -u +'%H%M%S_numFrames')'/'
 fdir_cam0=$fdir_out'cam0/'
 fdir_cam1=$fdir_out'cam1/'
 fdir_log='../../LOG/'$(date -u +'%Y%m%d')'/'
