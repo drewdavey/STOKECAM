@@ -65,6 +65,8 @@ def run(path0,path1,pathLog,dt,duration):
 		# cam1.stop()
 
 	def end_program():
+		cam0.stop()
+		cam1.stop()
 		cam0.close()
 		cam1.close()
 		exit()
@@ -74,9 +76,8 @@ def run(path0,path1,pathLog,dt,duration):
 
 	button.when_pressed = lambda: capture(i)
 	# pause(duration)
-	
-	cam0.stop()
-	cam1.stop()
+
+
 
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
 	outfile.write('Done collecting images.' + '\n')
