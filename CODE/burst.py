@@ -13,7 +13,7 @@ from signal import pause
 from threading import Timer
 from functools import partial
 
-i = 0  # Global index variable
+i = [0]  # index variable
 
 def run(path0,path1,pathLog,dt,duration):
 	button = Button(17)
@@ -55,7 +55,7 @@ def run(path0,path1,pathLog,dt,duration):
 		cam0.start()
 		cam1.start()
 		while button.is_pressed:
-			i += 1
+			i[0] += 1
 			timestamp = datetime.utcnow()
 			tstr = timestamp.strftime('%H%M%S%f')[:-3]
 			cam0.capture_file(f"{path0}0_{tstr}_{i+1:05}.jpg")
@@ -72,7 +72,7 @@ def run(path0,path1,pathLog,dt,duration):
 	# Set a timer to end the program after the specified duration
 	Timer(duration, end_program).start()
 
-	button.when_pressed = lambda: capture(i)
+	button.when_pressed = capture #lambda: capture(i)
 	# pause(duration)
 
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
