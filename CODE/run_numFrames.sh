@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Last updated: 2024-02-21
+# Last updated: 2024-02-23
 ##################################
 # This script calls numFrames.py to collect a specified batch of images
 # Inputs: (1) Number of frames to be collected (default = 5)

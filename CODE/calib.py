@@ -1,4 +1,4 @@
-# Last updated: 2024-02-21
+# Last updated: 2024-02-23
 ##################################
 # This script is passed 4 arguments from run_calib.sh
 # Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames for calibration
