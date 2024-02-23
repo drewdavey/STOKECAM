@@ -49,7 +49,6 @@ def run(path0,path1,pathLog,dt,duration):
 	outfile.write(str(config1) + '\n')
 
 	def capture():
-		i = 0 # index
 		cam0.start()
 		cam1.start()
 		while button.is_pressed:
