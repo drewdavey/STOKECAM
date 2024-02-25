@@ -1,7 +1,7 @@
 # Last updated: 2024-02-23
 ##################################
-# This script is passed 4 arguments from run_numFrames.sh
-# Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames
+# This script is passed 5 arguments from run_numFrames.sh
+# Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames (5) dt
 ##################################
 
 import sys

@@ -3,9 +3,9 @@
 # Last updated: 2024-02-23
 ##################################
 # This script calls calib.py to collect a specified batch of images
-# Inputs: (1) Number of frames to be collected (default = 10)
+# Inputs: (1) Number of frames for calibration (default = 10) (2) dt (default = 0)
 # Example:
-#   sudo ./run_calib.sh 10
+#   sudo ./run_calib.sh 50 1
 ##################################
 
 # Parse command line input
@@ -68,5 +68,3 @@ python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_log$fname_log $calib_frames $dt &
 
 # Kill the background process
 #kill -INT $PID |& tee -a $fdir_log$fname_log
-#sleep 2
-#echo 'Done collecting images!' |& tee -a $fdir_log$fname_log
