@@ -60,6 +60,10 @@ def run(path0,path1,pathLog,calib_frames,dt):
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
 	outfile.write('Done collecting images.' + '\n')
 	outfile.close()
+
+	cam0.close()
+	cam1.close()
+	exit()
 		
 
 if __name__ == '__main__':
