@@ -37,9 +37,11 @@ def run(path0,path1,pathLog,dt,duration):
 	cam0.start()
 	cam1.start()
 
-	outfile = open(pathLog, 'a')
 	meta0 = cam0.capture_metadata()
 	meta1 = cam1.capture_metadata()
+
+	# Write to log file
+	outfile = open(pathLog, 'a')
 	outfile.write('\n' + 'Start Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
 	outfile.write('\n' + 'Cam0 Metadata:' + '\n')
 	outfile.write(str(meta0) + '\n')
