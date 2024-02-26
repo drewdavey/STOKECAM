@@ -60,6 +60,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
 	outfile.write('Done collecting images.' + '\n')
 	outfile.close()
+
+	exit()
 		
 
 if __name__ == '__main__':
