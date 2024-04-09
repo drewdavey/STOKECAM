@@ -47,7 +47,7 @@ echo 'Getting camera specs' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
 
 # Run image collection script
-python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt &> $fdir_out$fname_log & 
+python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt >> $fdir_out$fname_log 2>&1 &
 
 # Check if the background job was successfully started
 if [ $? -eq 0 ]; then
