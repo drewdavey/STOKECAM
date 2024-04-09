@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Last updated: 2024-02-23
+# Last updated: 2024-04-08
 ##################################
 # This script calls numFrames.py to collect a specified batch of images
 # Inputs: (1) Number of frames to be collected (default = 5) (2) dt (default = 0)
@@ -55,20 +55,15 @@ echo '' |& tee -a $fdir_out$fname_log
 # Run image collection script
 python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt & 
 
-#Get stop time
-# tstop=$(date -u +"%Y%m%d%H%M%S")
-# echo 'Stop Time: ' $tstop |& tee -a $fdir_log$fname_log
+# Check if the background job was successfully started
+if [ $? -eq 0 ]; then
+    # Get process ID of the background script
+    PID=$!
+    echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
-# Get process ID of the background script
-PID=$!
-echo 'Process:' $PID |& tee -a $fdir_log$fname_log
-
-# Wait for the background process to finish
-wait $PID |& tee -a $fdir_log$fname_log
-echo 'Completed Process:' $PID |& tee -a $fdir_log$fname_log
-
-# Wait 
-# sleep $run_time |& tee -a $fdir_log$fname_log
-
-# Kill the background process
-# kill -INT $PID |& tee -a $fdir_log$fname_log
+    # Wait for the background process to finish
+    wait $PID 
+    echo 'Completed Process:' $PID 
+else
+    echo 'Failed to start calib.py' |& tee -a $fdir_log$fname_log
+fi

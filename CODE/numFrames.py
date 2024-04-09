@@ -1,4 +1,4 @@
-# Last updated: 2024-02-23
+# Last updated: 2024-04-08
 ##################################
 # This script is passed 5 arguments from run_numFrames.sh
 # Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames (5) dt

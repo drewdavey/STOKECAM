@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Last updated: 2024-02-23
+# Last updated: 2024-04-08
 ##################################
 # This script calls calib.py to collect a specified batch of images
 # Inputs: (1) Number of frames for calibration (default = 10) (2) dt (default = 0)
@@ -65,26 +65,8 @@ if [ $? -eq 0 ]; then
     echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
     # Wait for the background process to finish
-    wait $PID # |& tee -a $fdir_log$fname_log
-    echo 'Completed Process:' $PID |& tee -a $fdir_log$fname_log
+    wait $PID 
+    echo 'Completed Process:' $PID 
 else
     echo 'Failed to start calib.py' |& tee -a $fdir_log$fname_log
 fi
-
-#Get stop time
-# tstop=$(date -u +"%Y%m%d%H%M%S")
-# echo 'Stop Time: ' $tstop |& tee -a $fdir_out$fname_log
-
-# Get process ID of the background script
-# PID=$!
-# echo 'Process:' $PID |& tee -a $fdir_log$fname_log
-
-# # Wait for the background process to finish
-# wait $PID |& tee -a $fdir_log$fname_log
-# echo 'Completed Process:' $PID |& tee -a $fdir_log$fname_log
-
-# Wait 
-# sleep $run_time |& tee -a $fdir_log$fname_log
-
-# Kill the background process
-# kill -INT $PID |& tee -a $fdir_log$fname_log
