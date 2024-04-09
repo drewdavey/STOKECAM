@@ -39,21 +39,21 @@ fi
 
 echo 'Running numFrames.py [' $num_frames '] frames' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
-echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
+echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
 echo '  Output folder:            ' $fdir_out |& tee -a $fdir_out$fname_log
-echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
+echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
 echo 'Getting camera specs' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
 
 # Run image collection script
-python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt & 
+python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt &> $fdir_out$fname_log & 
 
 # Check if the background job was successfully started
 if [ $? -eq 0 ]; then
     # Get process ID of the background script
     PID=$!
-    echo 'Process:' $PID |& tee -a $fdir_log$fname_log
+    echo 'Started Process:' $PID |& tee -a $fdir_log$fname_log
 
     # Wait for the background process to finish
     wait $PID 

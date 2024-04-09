@@ -39,9 +39,9 @@ fi
 
 echo 'Running calib.py [' $calib_frames '] frames' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
-echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
+echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
 echo '  Output folder:            ' $fdir_out |& tee -a $fdir_out$fname_log
-echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
+echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
 echo 'Getting camera specs' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
@@ -56,7 +56,7 @@ python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt &> 
 if [ $? -eq 0 ]; then
     # Get process ID of the background script
     PID=$!
-    echo 'Process:' $PID |& tee -a $fdir_log$fname_log
+    echo 'Started Process:' $PID |& tee -a $fdir_log$fname_log
 
     # Wait for the background process to finish
     wait $PID 
