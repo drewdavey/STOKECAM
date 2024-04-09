@@ -43,7 +43,7 @@ fi
 #   echo '--Created folder to write LOG files: ' $fdir_log
 # fi 
 
-echo 'Running calib.py [' $num_frames '] frames' |& tee -a $fdir_out$fname_log
+echo 'Running calib.py [' $calib_frames '] frames' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
 echo '  Output folder:            ' $fdir_out |& tee -a $fdir_out$fname_log
@@ -64,7 +64,7 @@ PID=$!
 echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
 # Wait for the background process to finish
-wait $PID |& tee -a $fdir_log$fname_log
+wait -INT $PID |& tee -a $fdir_log$fname_log
 echo 'Completed Process:' $PID |& tee -a $fdir_log$fname_log
 
 # Wait 
