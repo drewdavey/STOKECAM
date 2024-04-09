@@ -20,7 +20,3 @@ else
   # Internet is down, do nothing
   echo "No internet connection."
 fi
-
-
-
-#did it work?

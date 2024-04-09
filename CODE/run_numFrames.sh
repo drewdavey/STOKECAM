@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#did it work?
 # Last updated: 2024-04-08
 ##################################
 # This script calls numFrames.py to collect a specified batch of images
