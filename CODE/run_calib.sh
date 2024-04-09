@@ -56,7 +56,7 @@ echo '' |& tee -a $fdir_out$fname_log
 # python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt & 
 
 # Run image collection script
-python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt #& 
+python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt |& tee -a $fdir_log$fname_log #& 
 
 # Check if the background job was successfully started
 if [ $? -eq 0 ]; then
@@ -70,6 +70,7 @@ if [ $? -eq 0 ]; then
 else
     echo 'Failed to start calib.py' |& tee -a $fdir_log$fname_log
 fi
+
 #Get stop time
 # tstop=$(date -u +"%Y%m%d%H%M%S")
 # echo 'Stop Time: ' $tstop |& tee -a $fdir_out$fname_log
