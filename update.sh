@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script will discard all local changes!!!
+
 # Fetch the latest changes from the remote repository
 git fetch origin
 
