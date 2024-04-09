@@ -56,7 +56,7 @@ echo '' |& tee -a $fdir_out$fname_log
 # python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt & 
 
 # Run image collection script
-python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt &> $fdir_log$fname_log & 
+python3 -u calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt &> $fdir_log$fname_log & 
 
 # Check if the background job was successfully started
 if [ $? -eq 0 ]; then
