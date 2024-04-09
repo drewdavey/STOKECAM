@@ -64,7 +64,7 @@ PID=$!
 echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
 # Wait for the background process to finish
-wait -INT $PID |& tee -a $fdir_log$fname_log
+wait $PID |& tee -a $fdir_log$fname_log
 echo 'Completed Process:' $PID |& tee -a $fdir_log$fname_log
 
 # Wait 
