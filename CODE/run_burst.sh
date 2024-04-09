@@ -56,18 +56,21 @@ echo 'Getting camera specs' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
 
 # Run image collection script
-python3 burst.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $dt $duration & 
+python3 burst.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $dt $duration >> $fdir_out$fname_log 2>&1 &
 
-# Get stop time
-# tstop=$(date -u +"%Y%m%d%H%M%S")
-# echo 'Stop Time: ' $tstop |& tee -a $fdir_out$fname_log
+# Check if the background job was successfully started
+if [ $? -eq 0 ]; then
+    # Get process ID of the background script
+    PID=$!
+    echo 'Started Process:' $PID |& tee -a $fdir_out$fname_log
 
-# Get process ID of the background script
-PID=$!
-echo 'Process:' $PID |& tee -a $fdir_out$fname_log
+    # Wait for the background process to finish
+    # Wait 
+    sleep $duration |& tee -a $fdir_out$fname_log
 
-# Wait 
-sleep $duration |& tee -a $fdir_out$fname_log
-
-# Kill the background process
-kill -INT $PID |& tee -a $fdir_out$fname_log
+    # Kill the background process
+    kill -INT $PID |& tee -a $fdir_out$fname_log 
+    echo 'Completed Process:' $PID 
+else
+    echo 'Failed to start calib.py' |& tee -a $fdir_out$fname_log
+fi

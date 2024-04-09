@@ -53,11 +53,11 @@ python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt >
 if [ $? -eq 0 ]; then
     # Get process ID of the background script
     PID=$!
-    echo 'Started Process:' $PID |& tee -a $fdir_log$fname_log
+    echo 'Started Process:' $PID |& tee -a $fdir_out$fname_log
 
     # Wait for the background process to finish
     wait $PID 
     echo 'Completed Process:' $PID 
 else
-    echo 'Failed to start calib.py' |& tee -a $fdir_log$fname_log
+    echo 'Failed to start calib.py' |& tee -a $fdir_out$fname_log
 fi
