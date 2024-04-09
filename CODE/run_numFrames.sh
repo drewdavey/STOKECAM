@@ -60,9 +60,11 @@ python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt &
 # echo 'Stop Time: ' $tstop |& tee -a $fdir_log$fname_log
 
 # Get process ID of the background script
-# PID=$!
-# echo 'Process:' $PID |& tee -a $fdir_log$fname_log
+PID=$!
+echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
+wait $PID
+echo 'DDOONNEE'
 # Wait 
 # sleep $run_time |& tee -a $fdir_log$fname_log
 
