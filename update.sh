@@ -12,3 +12,5 @@ git reset --hard origin/main
 find . -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod +x {} \;
 
 echo "stereo_repo updated and all scripts are now executable."
+
+#did it work?
