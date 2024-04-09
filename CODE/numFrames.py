@@ -64,7 +64,7 @@ def run(path0,path1,pathLog,num_frames,dt):
 	
 	cam0.close()
 	cam1.close()
-	sys.exit() 
+	exit() 
 		
 
 if __name__ == '__main__':
