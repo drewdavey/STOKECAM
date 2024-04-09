@@ -63,7 +63,7 @@ def run(path0,path1,pathLog,calib_frames,dt):
 
 	cam0.close()
 	cam1.close()
-	exit()
+	sys.exit()
 		
 
 if __name__ == '__main__':

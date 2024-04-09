@@ -10,11 +10,11 @@
 
 # Parse command line input
 if [ $# -eq 0 ]; then
-  calib_frames=10
-  dt=0
+  calib_frames=15
+  dt=1
 elif [ $# -eq 1 ]; then
   calib_frames=$1
-  dt=0
+  dt=1
 else
   calib_frames=$1
   dt=$2
@@ -60,11 +60,15 @@ python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt &
 # echo 'Stop Time: ' $tstop |& tee -a $fdir_out$fname_log
 
 # Get process ID of the background script
-#PID=$!
-#echo 'Process:' $PID |& tee -a $fdir_out$fname_log
+PID=$!
+echo 'Process:' $PID |& tee -a $fdir_log$fname_log
+
+# Wait for the background process to finish
+wait $PID |& tee -a $fdir_log$fname_log
+echo 'Completed Process:' $PID |& tee -a $fdir_log$fname_log
 
 # Wait 
-#sleep $run_time |& tee -a $fdir_out$fname_log
+# sleep $run_time |& tee -a $fdir_log$fname_log
 
 # Kill the background process
-#kill -INT $PID |& tee -a $fdir_out$fname_log
+# kill -INT $PID |& tee -a $fdir_log$fname_log

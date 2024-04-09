@@ -63,8 +63,10 @@ python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt &
 PID=$!
 echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
-wait $PID
-echo 'DDOONNEE'
+# Wait for the background process to finish
+wait $PID |& tee -a $fdir_log$fname_log
+echo 'Completed Process:' $PID |& tee -a $fdir_log$fname_log
+
 # Wait 
 # sleep $run_time |& tee -a $fdir_log$fname_log
 
