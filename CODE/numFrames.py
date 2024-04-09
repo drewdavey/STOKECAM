@@ -4,7 +4,6 @@
 # Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames (5) dt
 ##################################
 
-
 import sys
 import time
 from picamera2 import Picamera2
@@ -65,7 +64,7 @@ def run(path0,path1,pathLog,num_frames,dt):
 	
 	cam0.close()
 	cam1.close()
-	exit() 
+	sys.exit() 
 		
 
 if __name__ == '__main__':
