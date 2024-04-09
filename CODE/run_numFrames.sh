@@ -27,7 +27,6 @@ fname_log='LOG_'$(date -u +'%H%M%S_numFrames.txt')''
 fdir_out='../../DATA/'$(date -u +'%Y%m%d')'/'$(date -u +'%H%M%S_numFrames')'/'
 fdir_cam0=$fdir_out'cam0/'
 fdir_cam1=$fdir_out'cam1/'
-# fdir_log='../../LOG/'$(date -u +'%Y%m%d')'/'
 
 if [ ! -d '$fdir_out' ]; then
   mkdir -p $fdir_out
@@ -37,11 +36,6 @@ if [ ! -d '$fdir_out' ]; then
   mkdir -p $fdir_cam1
   echo '--Created cam1 folder: ' $fdir_cam1
 fi
-
-# if [ ! -d '$fdir_log' ]; then
-#   mkdir -p $fdir_log
-#   echo '--Created folder to write LOG files: ' $fdir_log
-# fi 
 
 echo 'Running numFrames.py [' $num_frames '] frames' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
