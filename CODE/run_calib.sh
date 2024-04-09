@@ -65,7 +65,7 @@ if [ $? -eq 0 ]; then
     echo 'Process:' $PID |& tee -a $fdir_log$fname_log
 
     # Wait for the background process to finish
-    wait $PID |& tee -a $fdir_log$fname_log
+    wait $PID # |& tee -a $fdir_log$fname_log
     echo 'Completed Process:' $PID |& tee -a $fdir_log$fname_log
 else
     echo 'Failed to start calib.py' |& tee -a $fdir_log$fname_log
