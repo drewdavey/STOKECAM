@@ -28,7 +28,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	# More config settings, why?
 	# cam0.rotation = 180
 	# cam1.rotation = 180
-	transform=Transform(hflip=1))
+	config0["transform"] = libcamera.Transform(vflip=1)
+	config1["transform"] = libcamera.Transform(vflip=1)
 
 	
 	# Apply configurations
