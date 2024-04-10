@@ -9,6 +9,7 @@ import time
 from picamera2 import Picamera2
 from datetime import datetime
 from signal import pause
+from libcamera import Transform
 
 def run(path0,path1,pathLog,num_frames,dt):
 	cam0 = Picamera2(0)
@@ -25,9 +26,10 @@ def run(path0,path1,pathLog,num_frames,dt):
 	config1['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
 	
 	# More config settings, why?
-	cam0.rotation = 180
-	cam1.rotation = 180
-	
+	# cam0.rotation = 180
+	# cam1.rotation = 180
+	transform=Transform(hflip=1))
+
 	
 	# Apply configurations
 	cam0.configure(config0)
