@@ -17,13 +17,18 @@ def run(path0,path1,pathLog,num_frames,dt):
 	# Define camera configurations
 	config0 = cam0.create_still_configuration()
 	config1 = cam1.create_still_configuration()
-
+	
 	# Configuration settings
 	config0['main']['size'] = (1920, 1080)  # Resolution for cam0
 	config1['main']['size'] = (1920, 1080)  # Resolution for cam1
 	config0['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate (in microseconds) for cam0
 	config1['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
-
+	
+	config0['main']['rotation'] = 180  # Rotate cam0 by 180 degrees
+	config0['main']['color_effects'] = (128, 128)  # Set cam0 color to RGB
+	config1['main']['rotation'] = 180  # Rotate cam1 by 180 degrees
+	config1['main']['color_effects'] = (128, 128)  # Set cam1 color to RGB
+	
 	# Apply configurations
 	cam0.configure(config0)
 	cam1.configure(config1)
