@@ -9,7 +9,7 @@ import time
 from picamera2 import Picamera2
 from datetime import datetime
 from signal import pause
-from libcamera import Transform
+# from libcamera import Transform
 
 def run(path0,path1,pathLog,num_frames,dt):
 	cam0 = Picamera2(0)
@@ -28,8 +28,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	# More config settings, why?
 	# cam0.rotation = 180
 	# cam1.rotation = 180
-	config0["transform"] = libcamera.Transform(vflip=1)
-	config1["transform"] = libcamera.Transform(vflip=1)
+	# config0["transform"] = libcamera.Transform(vflip=1)
+	# config1["transform"] = libcamera.Transform(vflip=1)
 
 	
 	# Apply configurations
