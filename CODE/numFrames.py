@@ -24,10 +24,10 @@ def run(path0,path1,pathLog,num_frames,dt):
 	config0['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate (in microseconds) for cam0
 	config1['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
 	
-	config0['main']['rotation'] = 180  # Rotate cam0 by 180 degrees
-	config0['main']['color_effects'] = (128, 128)  # Set cam0 color to RGB
-	config1['main']['rotation'] = 180  # Rotate cam1 by 180 degrees
-	config1['main']['color_effects'] = (128, 128)  # Set cam1 color to RGB
+	# More config settings, why?
+	cam0.rotation = 180
+	cam1.rotation = 180
+	
 	
 	# Apply configurations
 	cam0.configure(config0)
