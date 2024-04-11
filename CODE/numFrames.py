@@ -8,8 +8,7 @@ import sys
 import time
 from picamera2 import Picamera2
 from datetime import datetime
-# from signal import pause
-from libcamera import Transform
+# from libcamera import Transform
 # import xarray as xr
 
 def run(path0,path1,pathLog,num_frames,dt):
@@ -17,8 +16,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	cam1 = Picamera2(1)
 
 	# Define camera configurations
-	config0 = cam0.create_still_configuration(raw=Picamera2.sensor_modes[0])
-	config1 = cam1.create_still_configuration(raw=Picamera2.sensor_modes[0])
+	config0 = cam0.create_still_configuration()
+	config1 = cam1.create_still_configuration()
 	
 	# Configuration settings
 	config0['main']['size'] = (1500, 1000)  # Resolution for cam0
@@ -38,10 +37,9 @@ def run(path0,path1,pathLog,num_frames,dt):
 	# config0['main']['transform'] = Transform(hflip=1, vflip=1)
 	# config1['main']['transform'] = Transform(hflip=1, vflip=1)
 
-	config0['main']['format'] = 'XRGB8888'
-	config1['main']['format'] = 'XRGB8888'
+	# config0['main']['format'] = 'XRGB8888'
+	# config1['main']['format'] = 'XRGB8888'
 
-	
 	# Apply configurations
 	cam0.configure(config0)
 	cam1.configure(config1)
