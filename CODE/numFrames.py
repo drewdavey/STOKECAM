@@ -35,8 +35,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	# More config settings, why?
 	# cam0.rotation = 180
 	# cam1.rotation = 180
-	config0['main']['transform'] = Transform(hflip=1, vflip=1)
-	config1['main']['transform'] = Transform(hflip=1, vflip=1)
+	# config0['main']['transform'] = Transform(hflip=1, vflip=1)
+	# config1['main']['transform'] = Transform(hflip=1, vflip=1)
 
 	config0['main']['format'] = 'RGB888'
 	config1['main']['format'] = 'RGB888'
