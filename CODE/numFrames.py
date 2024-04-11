@@ -38,6 +38,9 @@ def run(path0,path1,pathLog,num_frames,dt):
 	config0['transform'] = Transform(hflip=1, vflip=1)
 	config1['transform'] = Transform(hflip=1, vflip=1)
 
+	config0['format'] = 'RGB888'
+	config1['format'] = 'RGB888'
+
 	
 	# Apply configurations
 	cam0.configure(config0)
