@@ -17,8 +17,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	cam1 = Picamera2(1)
 
 	# Define camera configurations
-	config0 = cam0.create_still_configuration()
-	config1 = cam1.create_still_configuration()
+	config0 = cam0.create_still_configuration(raw=Picamera2.sensor_modes[0])
+	config1 = cam1.create_still_configuration(raw=Picamera2.sensor_modes[0])
 	
 	# Configuration settings
 	config0['main']['size'] = (1500, 1000)  # Resolution for cam0
