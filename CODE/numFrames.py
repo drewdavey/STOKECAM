@@ -38,13 +38,13 @@ def run(path0,path1,pathLog,num_frames,dt):
 	config0['transform'] = Transform(vflip=1)
 	config1['transform'] = Transform(vflip=1)
 
-	cam0.start()
-	cam1.start()
+	
 	# Apply configurations
 	cam0.configure(config0)
 	cam1.configure(config1)
 
-
+	cam0.start()
+	cam1.start()
 
 	meta0 = cam0.capture_metadata()
 	meta1 = cam1.capture_metadata()
