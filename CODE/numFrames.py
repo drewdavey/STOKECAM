@@ -21,8 +21,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	config1 = cam1.create_still_configuration()
 	
 	# Configuration settings
-	config0['main']['size'] = (1000, 1000)  # Resolution for cam0
-	config1['main']['size'] = (1000, 1000)  # Resolution for cam1
+	config0['main']['size'] = (1500, 1000)  # Resolution for cam0
+	config1['main']['size'] = (1500, 1000)  # Resolution for cam1
 	config0['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate (in microseconds) for cam0
 	config1['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
 	
@@ -38,8 +38,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	# config0['main']['transform'] = Transform(hflip=1, vflip=1)
 	# config1['main']['transform'] = Transform(hflip=1, vflip=1)
 
-	config0['main']['format'] = 'RGB888'
-	config1['main']['format'] = 'RGB888'
+	config0['main']['format'] = 'XRGB8888'
+	config1['main']['format'] = 'XRGB8888'
 
 	
 	# Apply configurations
