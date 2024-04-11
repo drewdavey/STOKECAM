@@ -8,7 +8,7 @@ import sys
 import time
 from picamera2 import Picamera2
 from datetime import datetime
-from signal import pause
+# from signal import pause
 # from libcamera import Transform
 
 def run(path0,path1,pathLog,num_frames,dt):
@@ -20,16 +20,16 @@ def run(path0,path1,pathLog,num_frames,dt):
 	config1 = cam1.create_still_configuration()
 	
 	# Configuration settings
-	config0['main']['size'] = (1920, 1080)  # Resolution for cam0
-	config1['main']['size'] = (1920, 1080)  # Resolution for cam1
-	config0['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate (in microseconds) for cam0
-	config1['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
+	# config0['main']['size'] = (1920, 1080)  # Resolution for cam0
+	# config1['main']['size'] = (1920, 1080)  # Resolution for cam1
+	# config0['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate (in microseconds) for cam0
+	# config1['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
 	
 	# Try this .. maybe import xarray
-	# config0.main.size = (1920, 1080)  # Resolution for cam0
-	# config1.main.size = (1920, 1080)  # Resolution for cam1
-	# config0.controls.FrameDurationLimits = (33333, 33333)  # Frame rate (in microseconds) for cam0
-	# config1.controls.FrameDurationLimits = (33333, 33333)  # Frame rate for cam1
+	config0.main.size = (1920, 1080)  # Resolution for cam0
+	config1.main.size = (1920, 1080)  # Resolution for cam1
+	config0.controls.FrameDurationLimits = (33333, 33333)  # Frame rate (in microseconds) for cam0
+	config1.controls.FrameDurationLimits = (33333, 33333)  # Frame rate for cam1
 
 	# More config settings, why?
 	# cam0.rotation = 180
