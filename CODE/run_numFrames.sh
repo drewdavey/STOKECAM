@@ -7,7 +7,7 @@
 # Example:
 #   sudo ./run_numFrames.sh 10 1
 ##################################
-
+ 
 # Parse command line input
 if [ $# -eq 0 ]; then
   num_frames=5
