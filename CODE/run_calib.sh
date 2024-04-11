@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Last updated: 2024-04-08
+# Last updated: 2024-04-10
 ##################################
 # This script calls calib.py to collect a specified batch of images
 # Inputs: (1) Number of frames for calibration (default = 10) (2) dt (default = 0)
@@ -10,11 +10,11 @@
 
 # Parse command line input
 if [ $# -eq 0 ]; then
-  calib_frames=15
-  dt=1
+  calib_frames=30
+  dt=5
 elif [ $# -eq 1 ]; then
   calib_frames=$1
-  dt=1
+  dt=5
 else
   calib_frames=$1
   dt=$2
@@ -45,9 +45,6 @@ echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& t
 echo '' |& tee -a $fdir_out$fname_log
 echo 'Getting camera specs' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
-
-# # Run image collection script
-# python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt & 
 
 # Run image collection script
 python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt >> $fdir_out$fname_log 2>&1 &

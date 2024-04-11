@@ -1,4 +1,4 @@
-# Last updated: 2024-04-08
+# Last updated: 2024-04-10
 ##################################
 # This script is passed 5 arguments from run_calib.sh
 # Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames for calibration (5) dt
@@ -64,7 +64,6 @@ def run(path0,path1,pathLog,calib_frames,dt):
 	cam0.close()
 	cam1.close()
 	exit()
-		
 
 if __name__ == '__main__':
     run(sys.argv[1],sys.argv[2],sys.argv[3],int(sys.argv[4]),int(sys.argv[5]))
