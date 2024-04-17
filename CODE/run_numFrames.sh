@@ -19,7 +19,7 @@ else
   num_frames=$1
   dt=$2
 fi
-
+# change
 # Output log file name
 fname_log='LOG_'$(date -u +'%H%M%S_numFrames.txt')''
 
