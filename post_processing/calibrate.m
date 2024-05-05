@@ -4,13 +4,11 @@
 
 clear; clc; close all;
 
-rectifiedImagesDir = 'Rectified_Images'; 
-if ~exist(rectifiedImagesDir, 'dir')
-    mkdir(rectifiedImagesDir); % mkdir for rectified images
-end
+%% Inputs
+calib_path = uigetdir('Select path to calibration session'); % load path to calibration session
 
-dir1 = dir('cam0/*.jpg');
-dir2 = dir('cam1/*.jpg');
+dir1 = dir([calib_path '/cam0/*.jpg']);
+dir2 = dir([calib_path '/cam1/*.jpg']);
 
 % Check the number of files in each directory
 numFiles = min(length(dir1), length(dir2));
@@ -53,12 +51,6 @@ h2=figure; showExtrinsics(stereoParams, 'CameraCentric');
 % Display parameter estimation errors
 displayErrors(estimationErrors, stereoParams);
 
-% You can use the calibration data to rectify stereo images.
-I2 = imread(imageFileNames2{1});
-[J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams);
-
-
-%% Add to default 
-
+%% Save mat
 clearvars -except stereoParams
-save("calib.mat");
+save('calib.mat');

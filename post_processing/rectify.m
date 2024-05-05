@@ -5,15 +5,18 @@
 clear; clc; close all;
 
 %% Load mat and create dir
-load("calib.mat");
+calib_path = uigetdir('Select path to calibration session'); % load path to calibration session
+load([calib_path '/calib.mat']);
 
-rectifiedImagesDir = 'Rectified_Images'; 
+path = uigetdir('Select path to any session for reconstruction'); % load path to dir to reconstruct
+
+rectifiedImagesDir = [path '/Rectified_Images']; 
 if ~exist(rectifiedImagesDir, 'dir')
     mkdir(rectifiedImagesDir); % mkdir for rectified images
 end
 
-dir1 = dir('cam0/*.jpg');
-dir2 = dir('cam1/*.jpg');
+dir1 = dir([path '/cam0/*.jpg']);
+dir2 = dir([path '/cam1/*.jpg']);
 
 % Check the number of files in each directory
 numFiles = min(length(dir1), length(dir2));
@@ -101,3 +104,4 @@ view(player3D, ptCloud);
 
 % Save as .ply
 pcwrite(ptCloud,'Rectified_Images\ptCloud.ply');
+
