@@ -103,5 +103,5 @@ player3D = pcplayer([-3, 3], [-3, 3], [0, 8], VerticalAxis="y", ...
 view(player3D, ptCloud);
 
 % Save as .ply
-pcwrite(ptCloud,'Rectified_Images\ptCloud.ply');
+pcwrite(ptCloud, [rectifiedImagesDir '\ptCloud.ply']);
 
