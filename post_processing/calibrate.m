@@ -5,7 +5,7 @@
 clear; clc; close all;
 
 %% Inputs
-calib_path = uigetdir('Select path to calibration session'); % load path to calibration session
+calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
 
 dir1 = dir([calib_path '/cam0/*.jpg']);
 dir2 = dir([calib_path '/cam1/*.jpg']);
@@ -52,5 +52,5 @@ h2=figure; showExtrinsics(stereoParams, 'CameraCentric');
 displayErrors(estimationErrors, stereoParams);
 
 %% Save mat
-clearvars -except stereoParams
+clearvars -except stereoParams calib_path
 save([calib_path '/calib.mat']);

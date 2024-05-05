@@ -5,10 +5,10 @@
 clear; clc; close all;
 
 %% Load mat and create dir
-calib_path = uigetdir('Select path to calibration session'); % load path to calibration session
+calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
 load([calib_path '/calib.mat']);
 
-path = uigetdir('Select path to any session for reconstruction'); % load path to dir to reconstruct
+path = uigetdir('../../','Select path to session for reconstruction'); % load path to dir to reconstruct
 
 rectifiedImagesDir = [path '/Rectified_Images']; 
 if ~exist(rectifiedImagesDir, 'dir')
