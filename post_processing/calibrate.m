@@ -53,4 +53,4 @@ displayErrors(estimationErrors, stereoParams);
 
 %% Save mat
 clearvars -except stereoParams
-save('calib.mat');
+save([calib_path '/calib.mat']);
