@@ -2,6 +2,10 @@
 
 # This script will discard all local changes!!!
 
+# Add these two lines to crontab to update on reboot and every hour:
+# @reboot sleep 60 && cd /home/drew/stereo_repo && ./update.sh
+# 0 * * * * cd /home/drew/stereo_repo && ./update.sh
+
 # Ping Google's DNS server to check for internet connectivity
 if ping -c 1 8.8.8.8 &> /dev/null; then
     # Internet is up, continue with the update
