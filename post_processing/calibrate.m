@@ -52,5 +52,5 @@ h2=figure; showExtrinsics(stereoParams, 'CameraCentric');
 displayErrors(estimationErrors, stereoParams);
 
 %% Save mat
-clearvars -except stereoParams calib_path
+% clearvars -except stereoParams calib_path
 save([calib_path '/calib.mat']);
