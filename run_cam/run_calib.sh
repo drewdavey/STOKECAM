@@ -7,7 +7,7 @@
 # Example:
 #   sudo ./run_calib.sh 50 1
 ##################################
-
+ 
 # Parse command line input
 if [ $# -eq 0 ]; then
   calib_frames=30
