@@ -11,8 +11,11 @@ load([calib_path '/calib.mat']);
 path = uigetdir('../../','Select path to session for reconstruction'); % load path to dir to reconstruct
 
 rectifiedImagesDir = [path '/Rectified_Images']; 
+plyDir = [rectifiedImagesDir '/plys'];
 if ~exist(rectifiedImagesDir, 'dir')
     mkdir(rectifiedImagesDir); % mkdir for rectified images
+elseif ~exist(plyDir, 'dir')
+    mkdir(plyDir); % mkdir for ptClouds
 end
 
 dir1 = dir([path '/cam0/*.jpg']);
@@ -49,43 +52,37 @@ for i = 1:length(imageFileNames1)
     % Save rectified images as PNG
     filename = [imageFileNames1{i}(end-21:end-4) '_rect' num2str(i) '.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
-    exportgraphics(gcf,fullFilePath,'Resolution',600);
-    close(f1);
+    exportgraphics(f1,fullFilePath,'Resolution',600);
 
     % Display disparity map
     f2 = figure(2);
     imshow(disparityMap, [0, 64]);
-    colormap jet
-    colorbar
+    colormap jet; colorbar;
     % Save disparity map as PNG
     filename = [imageFileNames1{i}(end-21:end-4) '_disp' num2str(i) '.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
-    exportgraphics(gcf,fullFilePath,'Resolution',600);
-    close(f2);
+    exportgraphics(f2,fullFilePath,'Resolution',600);
 
     % Create point cloud
     points3D = reconstructScene(disparityMap, reprojectionMatrix); % for single disparity map
     % Convert to meters and create a pointCloud object
     points3D = points3D ./ 1000;
     ptCloud = pointCloud(points3D, Color=J1);
+
     % Create a streaming point cloud viewer
-    player3D = pcplayer([-3, 3], [-3, 3], [0, 8], VerticalAxis="y", ...
-        VerticalAxisDir="down");
+%     player3D = pcplayer([-3, 3], [-3, 3], [0, 8], VerticalAxis="y", ...
+%         VerticalAxisDir="down");
     % Visualize the point cloud
-    view(player3D, ptCloud);
-    % Save ptCloud as fig
+%     view(player3D, ptCloud);
+
+    % Save ptCloud as .ply
     filename = [imageFileNames1{i}(end-21:end-4) '_ptCloud' num2str(i)];
-    fullFilePath = fullfile(rectifiedImagesDir, filename);
-    saveas(gcf,fullFilePath,'fig');
-    % Save as .ply
-    %     filename = [imageFileNames1{i}(end-21:end-4) '_ptCloud' num2str(i)];
-%         pcwrite(ptCloud, [rectifiedImagesDir '/ptClouds/' filename]);
-    pcwrite(ptCloud,fullFilePath,'Encoding','ascii');
+    fullFilePath = fullfile(plyDir, filename);
+    pcwrite(ptCloud, fullFilePath);
     
 end
 
 %% Write rectified images as a movie
-
 outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'rectified_movie'));
 outputVideo.FrameRate = 5;
 open(outputVideo);
