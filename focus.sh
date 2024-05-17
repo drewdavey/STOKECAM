@@ -3,7 +3,7 @@
 # Last updated: 2024-04-10
 ##################################
 # This script creates two preview windows to focus the cameras
-# Inputs: (1) Width (default = 1440) (2) Height (default = 1080)
+# Inputs: (1) Width in pixels (default = 1440) (2) Height in pixels (default = 1080)
 # Example:
 #  ./focus.sh 1440 1080
 ##################################
