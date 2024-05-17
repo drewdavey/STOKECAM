@@ -4,21 +4,21 @@
 ##################################
 # This script calls burst.py to collect burst images when shutter is pressed
 # Spaced by [dt] for [duration]
-# Inputs: (1) dt (default = 0) (2) duration (default = 10)
+# Inputs: (1) duration (default = 10) (2) dt (default = 0)
 # Example:
-#   sudo ./run_burst.sh 1 60
+#   sudo ./run_burst.sh 60 1
 ##################################
 
 # Parse command line input
 if [ $# -eq 0 ]; then
-	dt=0
-  duration=10
+	duration=10
+  dt=0
 elif [ $# -eq 1 ]; then
-  dt=$1
-  duration=10
+  duration=$1
+  dt=0
 else
-  dt=$1
-  duration=$2
+  duration=$1
+  dt=$2
 fi
 
 # Output log file name
