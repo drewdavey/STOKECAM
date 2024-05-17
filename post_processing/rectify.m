@@ -11,10 +11,12 @@ load([calib_path '/calib.mat']);
 path = uigetdir('../../','Select path to session for reconstruction'); % load path to dir to reconstruct
 
 rectifiedImagesDir = [path '/Rectified_Images']; 
-plyDir = [rectifiedImagesDir '/plys'];
 if ~exist(rectifiedImagesDir, 'dir')
     mkdir(rectifiedImagesDir); % mkdir for rectified images
-elseif ~exist(plyDir, 'dir')
+end
+
+plyDir = [rectifiedImagesDir '/plys'];
+if ~exist(plyDir, 'dir')
     mkdir(plyDir); % mkdir for ptClouds
 end
 
@@ -70,10 +72,10 @@ for i = 1:length(imageFileNames1)
     ptCloud = pointCloud(points3D, Color=J1);
 
     % Create a streaming point cloud viewer
-%     player3D = pcplayer([-3, 3], [-3, 3], [0, 8], VerticalAxis="y", ...
-%         VerticalAxisDir="down");
+    player3D = pcplayer([-3, 3], [-3, 3], [0, 8], VerticalAxis="y", ...
+        VerticalAxisDir="down");
     % Visualize the point cloud
-%     view(player3D, ptCloud);
+    view(player3D, ptCloud);
 
     % Save ptCloud as .ply
     filename = [imageFileNames1{i}(end-21:end-4) '_ptCloud' num2str(i)];
