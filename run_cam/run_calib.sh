@@ -10,7 +10,7 @@
  
 # Parse command line input
 if [ $# -eq 0 ]; then
-  calib_frames=30
+  calib_frames=50
   dt=5
 elif [ $# -eq 1 ]; then
   calib_frames=$1
