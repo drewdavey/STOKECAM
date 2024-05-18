@@ -13,6 +13,8 @@ path = uigetdir('../../','Select path to session for point cloud generation'); %
 ptCloudDir = [path '/ptClouds'];
 if ~exist(ptCloudDir, 'dir')
     mkdir(ptCloudDir); % mkdir for ptClouds
+
+    % else ... overwrite? ADD PROMPT
 end
 
 matDir = [path '/mats'];

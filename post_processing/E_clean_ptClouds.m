@@ -27,6 +27,8 @@ while cleanFlag
     while isOpen(player3D)
         pause(0.1)
     end
+
+    % answer = overwrite? ADD PROMPT
     % Save mat
     save([matDir '/' file '.mat'],'ptCloud');
 
