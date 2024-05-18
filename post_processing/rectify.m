@@ -1,6 +1,6 @@
 % Stereo Reconstruction Code
 % Drew Davey
-% Last updated: 2024-03-05 
+% Last updated: 2024-03-17
 
 clear; clc; close all;
 
@@ -10,14 +10,14 @@ load([calib_path '/calib.mat']);
 
 path = uigetdir('../../','Select path to session for reconstruction'); % load path to dir to reconstruct
 
+matDir = [path '/mats'];
+if ~exist(matDir, 'dir')
+    mkdir(matDir); % mkdir for .mats
+end
+
 rectifiedImagesDir = [path '/Rectified_Images']; 
 if ~exist(rectifiedImagesDir, 'dir')
     mkdir(rectifiedImagesDir); % mkdir for rectified images
-end
-
-plyDir = [rectifiedImagesDir '/plys'];
-if ~exist(plyDir, 'dir')
-    mkdir(plyDir); % mkdir for ptClouds
 end
 
 dir1 = dir([path '/cam0/*.jpg']);
@@ -52,7 +52,7 @@ for i = 1:length(imageFileNames1)
     f1 = figure(1);
     imshow(stereoAnaglyph(J1,J2));
     % Save rectified images as PNG
-    filename = [imageFileNames1{i}(end-21:end-4) '_rect' num2str(i) '.png'];
+    filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     exportgraphics(f1,fullFilePath,'Resolution',600);
 
@@ -61,26 +61,14 @@ for i = 1:length(imageFileNames1)
     imshow(disparityMap, [0, 64]);
     colormap jet; colorbar;
     % Save disparity map as PNG
-    filename = [imageFileNames1{i}(end-21:end-4) '_disp' num2str(i) '.png'];
+    filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     exportgraphics(f2,fullFilePath,'Resolution',600);
 
-    % Create point cloud
-    points3D = reconstructScene(disparityMap, reprojectionMatrix); % for single disparity map
-    % Convert to meters and create a pointCloud object
-    points3D = points3D ./ 1000;
-    ptCloud = pointCloud(points3D, Color=J1);
-
-    % Create a streaming point cloud viewer
-    player3D = pcplayer([-3, 3], [-3, 3], [0, 8], VerticalAxis="y", ...
-        VerticalAxisDir="down");
-    % Visualize the point cloud
-    view(player3D, ptCloud);
-
-    % Save ptCloud as .ply
-    filename = [imageFileNames1{i}(end-21:end-4) '_ptCloud' num2str(i)];
-    fullFilePath = fullfile(plyDir, filename);
-    pcwrite(ptCloud, fullFilePath);
+    % Save .mat
+    filename = imageFileNames1{i}(end-18:end-4);
+    fullFilePath = fullfile(matDir, filename);
+    save(fullFilePath,'I1','I2','J1','J2','reprojectionMatrix','disparityMap','calib_path');
     
 end
 
@@ -89,7 +77,7 @@ outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'rectified_movie'));
 outputVideo.FrameRate = 5;
 open(outputVideo);
 for i = 1:length(imageFileNames1)
-    filename = [imageFileNames1{i}(end-21:end-4) '_rect' num2str(i) '.png'];
+    filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     img = imread(fullFilePath);
     writeVideo(outputVideo, img);
@@ -101,7 +89,7 @@ outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'disparity_movie'));
 outputVideo.FrameRate = 5;
 open(outputVideo);
 for i = 1:length(imageFileNames1)
-    filename = [imageFileNames1{i}(end-21:end-4) '_disp' num2str(i) '.png'];
+    filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     img = imread(fullFilePath);
     writeVideo(outputVideo, img);
