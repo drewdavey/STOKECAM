@@ -6,10 +6,11 @@ clear; clc; close all;
 
 %% Inputs
 
-path = uigetdir('../../','Select path to session for point cloud generation'); % load path to dir
+path = uigetdir('../../','Select path to session for point cloud cleaning'); % load path to dir
 matDir = [path '/mats'];
 
 cleanFlag = 1;
+saveFlag = 1;
 
 %% Clean point clouds
 
@@ -22,15 +23,26 @@ while cleanFlag
     % Create a streaming point cloud viewer
     player3D = pcplayer([-3, 3], [-3, 3], [0, 8], VerticalAxis="y", ...
         VerticalAxisDir="down");
+    
     % Visualize the point cloud
     view(player3D, ptCloud);
     while isOpen(player3D)
         pause(0.1)
     end
 
-    % answer = overwrite? ADD PROMPT
-    % Save mat
-    save([matDir '/' file '.mat'],'ptCloud');
+%     answer = questdlg('Save Changes?', ...
+%     'Save Point Cloud', ...
+%     'Yes','No','Yes');
+%     switch answer
+%         case 'Yes'
+%             saveFlag = 1; 
+%         case 'No'
+%             saveFlag = 0; 
+%     end
+% 
+%     if saveFlag
+%         save([matDir '/' file '.mat'],'ptCloud'); % Save mat
+%     end
 
     answer = questdlg('Another?', ...
     'Clean another point cloud', ...

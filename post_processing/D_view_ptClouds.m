@@ -6,7 +6,7 @@ clear; clc; close all;
 
 %% Inputs
 
-path = uigetdir('../../','Select path to session for point cloud generation'); % load path to dir
+path = uigetdir('../../','Select path to session for point cloud viewing'); % load path to dir
 matDir = [path '/mats'];
 
 viewFlag = 1;
@@ -27,7 +27,6 @@ while viewFlag
     while isOpen(player3D)
         pause(0.1)
     end
-
     answer = questdlg('Another?', ...
     'View another point cloud', ...
     'Yes','No','Yes');
