@@ -1,4 +1,4 @@
-## Stereo ReadMe... will populate soon
+## STereo imaging system for Overturning wave KinEmatics (STOKE)
 # Last Updated: 2024-02-21
 # Author: Drew Davey
 
