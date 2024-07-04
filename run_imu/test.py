@@ -15,11 +15,23 @@ from vnpy import *
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
 
-ypr = s.read_yaw_pitch_roll()
 
-print(ypr)
+# Record the start time
+start_time = time.time()
+duration = 30  # seconds
 
-s.write_async_data_output_frequency(10)
+while time.time() - start_time < duration:
+    # Read yaw, pitch, and roll values
+    ypr = s.read_yaw_pitch_roll()
+    yaw, pitch, roll = ypr.yaw, ypr.pitch, ypr.roll
+    
+    # Print the yaw, pitch, and roll values
+    print(f"Yaw: {yaw}, Pitch: {pitch}, Roll: {roll}")
+    
+    # Pause for a short time to avoid flooding the command window
+    time.sleep(0.01)  # Adjust as needed based on the desired update rate
 
+# Disconnect from the sensor
+s.disconnect()
 
-time.sleep(10)
+# s.write_async_data_output_frequency(10)
