@@ -31,7 +31,7 @@ while time.time() - start_time < duration:
     print(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}")
 
     # Pause for a short time to avoid flooding the command window
-    time.sleep(0.01)  # Adjust as needed based on the desired update rate
+    time.sleep(0.1)  # Adjust as needed based on the desired update rate
 
 # Disconnect from the sensor
 s.disconnect()
