@@ -1,7 +1,7 @@
-# Last updated: 2024-04-10
+# Last updated: 2024-06-03
 ##################################
-# This script is passed 5 arguments from run_numFrames.sh
-# Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames (5) dt
+# This script is passed 
+# Args: (1) 
 ##################################
 
 import sys
@@ -31,7 +31,7 @@ while time.time() - start_time < duration:
     print(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}")
 
     # Pause for a short time to avoid flooding the command window
-    time.sleep(0.1)  # Adjust as needed based on the desired update rate
+    time.sleep(0.1)  
 
 # Disconnect from the sensor
 s.disconnect()
