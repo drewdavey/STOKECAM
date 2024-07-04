@@ -23,6 +23,8 @@ end
 dir1 = dir([path '/cam0/*.jpg']);
 dir2 = dir([path '/cam1/*.jpg']);
 
+%% Parse data
+
 % Check the number of files in each directory
 numFiles = min(length(dir1), length(dir2));
 
@@ -36,34 +38,37 @@ for i = 1:numFiles
     imageFileNames2{i} = fullfile(dir2(i).folder, dir2(i).name);
 end
 
-%% Parse data
+% Loop through each frame
 for i = 1:length(imageFileNames1)
     I1 = imread(imageFileNames1{i});
     I2 = imread(imageFileNames2{i});
     
-    [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams); %rectify
-    
+    %%% Rectify Images %%%
+%     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='valid'); 
+    [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='full'); 
     frameLeftGray  = im2gray(J1);
     frameRightGray = im2gray(J2);
-    
-    disparityMap = disparitySGM(frameLeftGray, frameRightGray);
-   
-    % Display rectified images
+    %%%%%%%%%%%%%%%%%%%%%%%
+
+    %%% Compute Disparity Map %%%
+%     disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
+% disparityMap = disparityBM(J1,J2,'DisparityRange',disparityRange,'UniquenessThreshold',20);
+                       % use J1 and J2?
+    disparityMap = disparitySGM(frameLeftGray, frameRightGray); % semi-global matching
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    % Plotting
     f1 = figure(1);
-    imshow(stereoAnaglyph(J1,J2));
-    % Save rectified images as PNG
+    imshow(stereoAnaglyph(J1,J2)); % Display rectified images
     filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
-    exportgraphics(f1,fullFilePath,'Resolution',600);
-
-    % Display disparity map
+    exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
     f2 = figure(2);
-    imshow(disparityMap, [0, 64]);
+    imshow(disparityMap, [0, 64]); % Display disparity map
     colormap jet; colorbar;
-    % Save disparity map as PNG
     filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
-    exportgraphics(f2,fullFilePath,'Resolution',600);
+    exportgraphics(f2,fullFilePath,'Resolution',600); % Save disparity map as PNG
 
     % Save .mat
     filename = imageFileNames1{i}(end-18:end-4);
