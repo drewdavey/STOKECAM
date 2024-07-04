@@ -28,8 +28,8 @@ while time.time() - start_time < duration:
     print(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}")
     
     reg = s.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates()
-    print(reg)
-    
+    print(f"Acc_X: {reg.accel(0)}, Acc_Y: {reg.accel(1)}, Acc_Z: {reg.accel(2)}")
+
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.01)  # Adjust as needed based on the desired update rate
 
