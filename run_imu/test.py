@@ -15,4 +15,11 @@ from vnpy import *
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
 
+ypr = s.read_yaw_pitch_roll()
+
+print(ypr)
+
+s.write_async_data_output_frequency(10)
+
+
 time.sleep(10)
