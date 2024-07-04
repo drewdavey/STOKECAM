@@ -23,15 +23,18 @@ duration = 30  # seconds
 while time.time() - start_time < duration:
     # Read yaw, pitch, and roll values
     ypr = s.read_yaw_pitch_roll()
-    yaw, pitch, roll = ypr.yaw, ypr.pitch, ypr.roll
     
     # Print the yaw, pitch, and roll values
-    print(f"Yaw: {yaw}, Pitch: {pitch}, Roll: {roll}")
+    print(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}")
+    
+    reg = s.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates()
+    print(reg)
     
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.01)  # Adjust as needed based on the desired update rate
 
 # Disconnect from the sensor
 s.disconnect()
+
 
 # s.write_async_data_output_frequency(10)
