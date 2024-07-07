@@ -5,20 +5,26 @@
 # This script calls numFrames.py to collect a specified batch of images
 # Inputs: (1) Number of frames to be collected (default = 5) (2) dt (default = 0)
 # Example:
-#   sudo ./run_numFrames.sh 10 1
+#   ./run_numFrames.sh 10 1
 ##################################
  
 # Parse command line input
 if [ $# -eq 0 ]; then
   num_frames=5
-  dt=0
+  dt=0.05
 elif [ $# -eq 1 ]; then
   num_frames=$1
-  dt=0
+  dt=0.05
 else
   num_frames=$1
   dt=$2
 fi
+
+# Generate IMU dt
+imu_dt = dt*0.01;
+
+# Output IMU file name
+fname_imu='IMU_'$(date -u +'%H%M%S_numFrames.txt')''
 
 # Output log file name
 fname_log='LOG_'$(date -u +'%H%M%S_numFrames.txt')''
@@ -55,9 +61,21 @@ if [ $? -eq 0 ]; then
     PID=$!
     echo 'Started Process:' $PID |& tee -a $fdir_out$fname_log
 
-    # Wait for the background process to finish
+    # Run IMU collection script
+    python3 IMU.py $fdir_out$fname_imu $imu_dt >> $fdir_out$fname_log 2>&1 &
+    echo 'Starting IMU' |& tee -a $fdir_out$fname_log
+    echo '' |& tee -a $fdir_out$fname_log
+
+    # Get process ID of the IMU script
+    IMU_PID=$!
+
+    # Wait for the camera to finish
     wait $PID 
     echo 'Completed Process:' $PID 
+
+    # Kill IMU process
+    kill -INT $IMU_PID |& tee -a $fdir_out$fname_log
+    
 else
-    echo 'Failed to start calib.py' |& tee -a $fdir_out$fname_log
+    echo 'Failed to start numFrames.py' |& tee -a $fdir_out$fname_log
 fi

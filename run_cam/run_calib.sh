@@ -5,7 +5,7 @@
 # This script calls calib.py to collect a specified batch of images
 # Inputs: (1) Number of frames for calibration (default = 10) (2) dt (default = 0)
 # Example:
-#   sudo ./run_calib.sh 50 1
+#   ./run_calib.sh 50 1
 ##################################
  
 # Parse command line input
@@ -19,6 +19,9 @@ else
   calib_frames=$1
   dt=$2
 fi
+
+# Output IMU file name
+fname_imu='IMU_'$(date -u +'%H%M%S_calib.txt')''
 
 # Output log file name
 fname_log='LOG_'$(date -u +'%H%M%S_calib.txt')''

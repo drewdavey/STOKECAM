@@ -6,20 +6,23 @@
 # Spaced by [dt] for [duration]
 # Inputs: (1) duration (default = 10) (2) dt (default = 0)
 # Example:
-#   sudo ./run_burst.sh 60 1
+#   ./run_burst.sh 60 1
 ##################################
 
 # Parse command line input
 if [ $# -eq 0 ]; then
 	duration=10
-  dt=0
+  dt=0.05
 elif [ $# -eq 1 ]; then
   duration=$1
-  dt=0
+  dt=0.05
 else
   duration=$1
   dt=$2
 fi
+
+# Output IMU file name
+fname_imu='IMU_'$(date -u +'%H%M%S_burst.txt')''
 
 # Output log file name
 fname_log='LOG_'$(date -u +'%H%M%S_burst.txt')''
@@ -66,5 +69,5 @@ if [ $? -eq 0 ]; then
     kill -INT $PID |& tee -a $fdir_out$fname_log 
     echo 'Completed Process:' $PID 
 else
-    echo 'Failed to start calib.py' |& tee -a $fdir_out$fname_log
+    echo 'Failed to start burst.py' |& tee -a $fdir_out$fname_log
 fi
