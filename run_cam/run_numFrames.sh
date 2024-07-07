@@ -22,7 +22,7 @@ fi
 
 # Generate IMU dt
 # imu_dt=$((dt * 1))
-imu_dt=dt
+imu_dt=0.01
 
 # Output IMU file name
 fname_imu='IMU_'$(date -u +'%H%M%S_numFrames.txt')''
