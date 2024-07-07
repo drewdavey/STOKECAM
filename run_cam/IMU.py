@@ -17,9 +17,8 @@ s.connect('/dev/ttyUSB0', 115200)
 
 
 # Record the start time
-start_time = time.time()
-duration = 30  # seconds
-
+# start_time = time.time()
+# duration = 30  # seconds
 
 def run_imu(path,imu_dt):
 

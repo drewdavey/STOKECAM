@@ -21,7 +21,7 @@ else
 fi
 
 # Generate IMU dt
-imu_dt = $(0.01*$dt);
+imu_dt = 0.01*$dt;
 
 # Output IMU file name
 fname_imu='IMU_'$(date -u +'%H%M%S_numFrames.txt')''
@@ -59,13 +59,13 @@ python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt >
 if [ $? -eq 0 ]; then
     # Get process ID of the background script
     PID=$!
-    echo 'Started Process:' $PID |& tee -a $fdir_out$fname_log
+    echo 'Starting Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
 
     # Run IMU script
-    python3 IMU.py $fdir_out$fname_imu $dt >> $fdir_out$fname_log 2>&1 &
+    python3 IMU.py $fdir_out$fname_imu $imu_dt >> $fdir_out$fname_log 2>&1 &
     # Get process ID of the IMU script
     IMU_PID=$!
-    echo 'Starting IMU:' $IMU_PID  |& tee -a $fdir_out$fname_log
+    echo 'Starting IMU: PID = ' $IMU_PID  |& tee -a $fdir_out$fname_log
     echo '' |& tee -a $fdir_out$fname_log
 
     # Wait for the camera to finish
