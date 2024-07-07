@@ -49,4 +49,4 @@ def run_imu(path,imu_dt):
     # s.write_async_data_output_frequency(10)
 
 if __name__ == '__main__':
-    run_imu(sys.argv[1],sys.argv[2])
+    run_imu(sys.argv[1],int(sys.argv[2]))
