@@ -6,6 +6,7 @@
 
 import sys
 import time
+import psutil
 
 # Import vnpy library
 from vnpy import *
@@ -20,13 +21,21 @@ s.connect('/dev/ttyUSB0', 115200)
 # start_time = time.time()
 # duration = 30  # seconds
 
-def run_imu(path,imu_dt):
+def is_pid_active(pid):
+    """Check if a process with the given PID is still running."""
+    try:
+        process = psutil.Process(pid)
+        return process.is_running() and process.status() != psutil.STATUS_ZOMBIE
+    except psutil.NoSuchProcess:
+        return False
+    
+def run_imu(path,imu_dt,pid):
 
     outfile = open(path, 'a')
         
     outfile.write(str('Time(UTC),Heading(deg, magN),Yaw(deg),Roll(deg),Pitch(deg)') + '\n')
 
-    while True:
+    while is_pid_active(pid):
 
         # Read yaw, pitch, and roll values
         ypr = s.read_yaw_pitch_roll()
@@ -48,4 +57,4 @@ def run_imu(path,imu_dt):
     # s.write_async_data_output_frequency(10)
 
 if __name__ == '__main__':
-    run_imu(sys.argv[1],float(sys.argv[2]))
+    run_imu(sys.argv[1],float(sys.argv[2]),int(sys.argv[3]))
