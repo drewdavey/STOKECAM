@@ -11,10 +11,10 @@
 # Parse command line input
 if [ $# -eq 0 ]; then
   num_frames=5
-  dt=0.05
+  dt=1
 elif [ $# -eq 1 ]; then
   num_frames=$1
-  dt=0.05
+  dt=1
 else
   num_frames=$1
   dt=$2
