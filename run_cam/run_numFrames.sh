@@ -21,8 +21,9 @@ else
 fi
 
 # Generate IMU dt
-imu_dt=$((dt * 0.01))
+# imu_dt=$((dt * 0.01))
 # imu_dt=0.01
+imu_dt=$(echo "$dt * 0.01" | bc)
 
 # Output IMU file name
 fname_imu='IMU_'$(date -u +'%H%M%S_numFrames.txt')''
