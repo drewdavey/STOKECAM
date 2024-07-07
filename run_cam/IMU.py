@@ -26,7 +26,7 @@ def run_imu(path,imu_dt):
         
     outfile.write(str('Time(UTC),Heading(deg, magN),Yaw(deg),Roll(deg),Pitch(deg)') + '\n')
 
-    while time.time() - start_time < duration:
+    while True:
 
         # Read yaw, pitch, and roll values
         ypr = s.read_yaw_pitch_roll()
