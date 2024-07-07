@@ -29,22 +29,23 @@ def is_pid_active(pid):
     except psutil.NoSuchProcess:
         return False
     
-def run_imu(path,imu_dt,pid):
+def run_imu(log_path,imu_path,imu_dt,cam_pid):
 
-    outfile = open(path, 'a')
+    imu_out = open(imu_path, 'a')
+    log_out = open(log_path, 'a')
         
-    outfile.write(str('Time(UTC),Heading(deg, magN),Yaw(deg),Roll(deg),Pitch(deg)') + '\n')
+    imu_out.write(str('Time(UTC),Heading(deg, magN),Yaw(deg),Roll(deg),Pitch(deg)') + '\n')
 
-    while is_pid_active(pid):
+    while is_pid_active(cam_pid):
 
         # Read yaw, pitch, and roll values
         ypr = s.read_yaw_pitch_roll()
         
         # Print the yaw, pitch, and roll values
-        outfile.write(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
+        imu_out.write(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
         
         reg = s.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates()
-        outfile.write(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}" + '\n')
+        imu_out.write(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}" + '\n')
 
         # Pause for imu_dt seconds
         time.sleep(imu_dt)  
@@ -52,9 +53,12 @@ def run_imu(path,imu_dt,pid):
     # Disconnect from the sensor
     s.disconnect()
 
-    outfile.close()
+    log_out.write('Stopping IMU cleanly' + '\n')
+    log_out.close()
+
+    imu_out.close()
 
     # s.write_async_data_output_frequency(10)
 
 if __name__ == '__main__':
-    run_imu(sys.argv[1],float(sys.argv[2]),int(sys.argv[3]))
+    run_imu(sys.argv[1],sys.argv[2],float(sys.argv[3]),int(sys.argv[4]))

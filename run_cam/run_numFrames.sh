@@ -63,7 +63,7 @@ if [ $? -eq 0 ]; then
     echo 'Starting Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
 
     # Run IMU script
-    python3 IMU.py $fdir_out$fname_imu $imu_dt $PID >> $fdir_out$fname_log 2>&1 &
+    python3 IMU.py $fdir_out$fname_log $fdir_out$fname_imu $imu_dt $PID >> $fdir_out$fname_log 2>&1 &
     # Get process ID of the IMU script
     IMU_PID=$!
     echo 'Starting IMU: PID = ' $IMU_PID  |& tee -a $fdir_out$fname_log
@@ -71,10 +71,13 @@ if [ $? -eq 0 ]; then
 
     # Wait for the camera to finish
     wait $PID 
-    echo 'Completed Process:' $PID 
+    echo 'Stopping Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
+    echo '' |& tee -a $fdir_out$fname_log
 
     # Kill IMU process
-    kill -INT $IMU_PID |& tee -a $fdir_out$fname_log
+    # kill -INT $IMU_PID |& tee -a $fdir_out$fname_log
+    # echo 'Stopping IMU: PID = ' $IMU_PID  |& tee -a $fdir_out$fname_log
+    # echo '' |& tee -a $fdir_out$fname_log
 
 else
     echo 'Failed to start numFrames.py' |& tee -a $fdir_out$fname_log
