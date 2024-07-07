@@ -21,7 +21,7 @@ else
 fi
 
 # Generate IMU dt
-imu_dt = dt*0.01;
+imu_dt = dt*1;
 
 # Output IMU file name
 fname_imu='IMU_'$(date -u +'%H%M%S_numFrames.txt')''
