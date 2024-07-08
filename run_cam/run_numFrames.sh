@@ -64,7 +64,7 @@ if [ $? -eq 0 ]; then
     echo 'Starting Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
 
     # Run IMU script
-    python3 imu.py $fdir_out$fname_log $fdir_out$fname_imu $imu_dt $PID >> $fdir_out$fname_log 2>&1 &
+    python3 run_imu.py $fdir_out$fname_log $fdir_out$fname_imu $imu_dt $PID >> $fdir_out$fname_log 2>&1 &
     # Get process ID of the IMU script
     IMU_PID=$!
     echo 'Starting IMU: PID = ' $IMU_PID  |& tee -a $fdir_out$fname_log
