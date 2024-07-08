@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Last updated: 2024-02-23
+# Last updated: 2024-07-08
 ##################################
 # This script calls burst.py to collect burst images when shutter is pressed
 # Spaced by [dt] for [duration]

@@ -1,4 +1,4 @@
-# Last updated: 2024-06-06
+# Last updated: 2024-07-08
 ##################################
 # This script is passed IMU filename and IMU dt
 # Args: (1)  (2)

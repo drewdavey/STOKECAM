@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Last updated: 2024-04-10
+# Last updated: 2024-07-08
 ##################################
 # This script calls calib.py to collect a specified batch of images
 # Inputs: (1) Number of frames for calibration (default = 10) (2) dt (default = 0)
