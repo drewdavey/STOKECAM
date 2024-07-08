@@ -23,7 +23,7 @@ fi
 # Generate IMU dt
 # imu_dt=$((dt * 0.01))
 # imu_dt=0.01
-imu_dt=$(echo "$dt * 0.01" | bc)
+imu_dt=$(echo "$dt * 0.1" | bc)
 
 # Output IMU file name
 fname_imu='IMU_'$(date -u +'%H%M%S_numFrames.txt')''
@@ -64,7 +64,7 @@ if [ $? -eq 0 ]; then
     echo 'Starting Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
 
     # Run IMU script
-    python3 IMU.py $fdir_out$fname_log $fdir_out$fname_imu $imu_dt $PID >> $fdir_out$fname_log 2>&1 &
+    python3 imu.py $fdir_out$fname_log $fdir_out$fname_imu $imu_dt $PID >> $fdir_out$fname_log 2>&1 &
     # Get process ID of the IMU script
     IMU_PID=$!
     echo 'Starting IMU: PID = ' $IMU_PID  |& tee -a $fdir_out$fname_log
