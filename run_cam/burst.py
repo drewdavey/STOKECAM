@@ -80,4 +80,4 @@ def run(path0,path1,pathLog,dt,duration):
 		
 
 if __name__ == '__main__':
-    run(sys.argv[1],sys.argv[2],sys.argv[3],int(sys.argv[4]),int(sys.argv[5]))
+    run(sys.argv[1],sys.argv[2],sys.argv[3],float(sys.argv[4]),int(sys.argv[5]))
