@@ -21,8 +21,6 @@ else
 fi
 
 # Generate IMU dt
-# imu_dt=$((dt * 0.01))
-# imu_dt=0.01
 imu_dt=$(echo "$dt * 0.1" | bc)
 
 # Output IMU file name
@@ -74,11 +72,6 @@ if [ $? -eq 0 ]; then
     wait $PID 
     echo 'Stopping Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
     echo '' |& tee -a $fdir_out$fname_log
-
-    # Kill IMU process
-    # kill -INT $IMU_PID |& tee -a $fdir_out$fname_log
-    # echo 'Stopping IMU: PID = ' $IMU_PID  |& tee -a $fdir_out$fname_log
-    # echo '' |& tee -a $fdir_out$fname_log
 
 else
     echo 'Failed to start numFrames.py' |& tee -a $fdir_out$fname_log

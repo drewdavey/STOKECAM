@@ -20,6 +20,9 @@ else
   dt=$2
 fi
 
+# Generate IMU dt
+imu_dt=$(echo "$dt * 0.1" | bc)
+
 # Output IMU file name
 fname_imu='IMU_'$(date -u +'%H%M%S_calib.txt')''
 
@@ -56,11 +59,20 @@ python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt >> 
 if [ $? -eq 0 ]; then
     # Get process ID of the background script
     PID=$!
-    echo 'Started Process:' $PID |& tee -a $fdir_out$fname_log
+    echo 'Starting Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
 
-    # Wait for the background process to finish
+    # Run IMU script
+    python3 imu.py $fdir_out$fname_log $fdir_out$fname_imu $imu_dt $PID >> $fdir_out$fname_log 2>&1 &
+    # Get process ID of the IMU script
+    IMU_PID=$!
+    echo 'Starting IMU: PID = ' $IMU_PID  |& tee -a $fdir_out$fname_log
+    echo '' |& tee -a $fdir_out$fname_log
+
+    # Wait for the camera to finish
     wait $PID 
-    echo 'Completed Process:' $PID 
+    echo 'Stopping Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
+    echo '' |& tee -a $fdir_out$fname_log
+
 else
     echo 'Failed to start calib.py' |& tee -a $fdir_out$fname_log
 fi
