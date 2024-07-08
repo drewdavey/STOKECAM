@@ -12,10 +12,10 @@
 # Parse command line input
 if [ $# -eq 0 ]; then
 	duration=10
-  dt=1
+  dt=0
 elif [ $# -eq 1 ]; then
   duration=$1
-  dt=1
+  dt=0
 else
   duration=$1
   dt=$2
