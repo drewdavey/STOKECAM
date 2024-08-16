@@ -2,48 +2,49 @@
 
 # Last updated: 2024-07-08
 ##################################
-# This script calls calib.py to collect a specified batch of images
-# Inputs: (1) Number of frames for calibration (default = 10) (2) dt (default = 0)
+# This script calls numFrames.py to collect a specified batch of images
+# Inputs: (1) Number of frames to be collected (default = 5) (2) dt (default = 0)
 # Example:
-#   ./run_calib.sh 50 1
+#   ./run_numFrames.sh 10 1
 ##################################
 
 # Parse command line input
 if [ $# -eq 0 ]; then
-  calib_frames=50
-  dt=5
+  duration=10
+  dt=1
+  num_frames=5
 elif [ $# -eq 1 ]; then
-  calib_frames=$1
-  dt=5
-else
-  calib_frames=$1
+  duration=$1
+  dt=1
+  num_frames=5
+elif [ $# -eq 2 ]; then
+  duration=$1
   dt=$2
+  num_frames=5
+else
+  duration=$1
+  dt=$2
+  num_frames=$3
 fi
 
 # Generate IMU dt
 imu_dt=$(echo "$dt * 0.1" | bc)
-
+# echo $imu_dt
 # Output IMU file name
-fname_imu='IMU_'$(date -u +'%H%M%S_calib.txt')''
+fname_imu='IMU_'$(date -u +'%H%M%S_numFrames.txt')''
 
 # Output log file name
-fname_log='LOG_'$(date -u +'%H%M%S_calib.txt')''
+fname_log='LOG_'$(date -u +'%H%M%S_numFrames.txt')''
 
 # Create directory for data and log file export, if necessary
-fdir_out='../../DATA/'$(date -u +'%Y%m%d')'/'$(date -u +'%H%M%S_calib')'/'
-fdir_cam0=$fdir_out'cam0/'
-fdir_cam1=$fdir_out'cam1/'
+fdir_out='../../DATA/'$(date -u +'%Y%m%d')'/'
 
 if [ ! -d '$fdir_out' ]; then
   mkdir -p $fdir_out
   echo '--Created output folder: ' $fdir_out
-  mkdir -p $fdir_cam0
-  echo '--Created cam0 folder: ' $fdir_cam0
-  mkdir -p $fdir_cam1
-  echo '--Created cam1 folder: ' $fdir_cam1
 fi
 
-echo 'Running calib.py [' $calib_frames '] frames' |& tee -a $fdir_out$fname_log
+echo 'Running stoke.py for [' $duration '] seconds' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
 echo '  Output folder:            ' $fdir_out |& tee -a $fdir_out$fname_log
@@ -53,7 +54,7 @@ echo 'Getting camera specs' |& tee -a $fdir_out$fname_log
 echo '' |& tee -a $fdir_out$fname_log
 
 # Run image collection script
-python3 calib.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $calib_frames $dt >> $fdir_out$fname_log 2>&1 &
+python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt >> $fdir_out$fname_log 2>&1 &
 
 # Check if the background job was successfully started
 if [ $? -eq 0 ]; then
@@ -74,5 +75,5 @@ if [ $? -eq 0 ]; then
     echo '' |& tee -a $fdir_out$fname_log
 
 else
-    echo 'Failed to start calib.py' |& tee -a $fdir_out$fname_log
+    echo 'Failed to start numFrames.py' |& tee -a $fdir_out$fname_log
 fi
