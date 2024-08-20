@@ -13,7 +13,7 @@ def burst_mode(cam0, cam1, log_file, duration, interval):
         cam0.start()
         cam1.start()
         start_time = time.time()
-        while right_button.is_held:
+        while right_button.is_pressed:
             cam0.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
             cam1.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
             time.sleep(interval)

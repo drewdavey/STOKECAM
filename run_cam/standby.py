@@ -7,8 +7,8 @@ import subprocess
 from gpiozero import Button
 
 # GPIO pin definitions
-right_button = Button(18)  # Replace with your GPIO pin number
-left_button = Button(17)   # Replace with your GPIO pin number
+right_button = Button(18, hold_time=3)  # Replace with your GPIO pin number
+left_button = Button(17, hold_time=3)   # Replace with your GPIO pin number
 
 def standby_mode(log_file):
     with open(log_file, 'a') as log:
