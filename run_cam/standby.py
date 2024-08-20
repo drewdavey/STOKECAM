@@ -27,9 +27,11 @@ def standby_mode(log_file):
         time.sleep(0.1)  # Debounce delay
 
 def release_buttons():
-    gpiozero.pins.rpigpio.RPiGPIOPin.close 
+    # gpiozero.pins.pigpio.RPiGPIOPin.close 
     # right_button.close()
     # left_button.close()
+    Button(18).close()
+    Button(17).close()
 
 def start_burst_mode(log_file):
     release_buttons()
