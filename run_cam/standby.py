@@ -30,8 +30,9 @@ def release_buttons():
     # gpiozero.pins.pigpio.RPiGPIOPin.close 
     # right_button.close()
     # left_button.close()
-    Button(18).close()
-    Button(17).close()
+    # Button(18).close()
+    # Button(17).close()
+    print("Released buttons.")
 
 def start_burst_mode(log_file):
     release_buttons()
