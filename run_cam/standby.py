@@ -19,13 +19,13 @@ def standby_mode(log_file):
         log.write(f"Entered standby mode.\n")
     while True:
         if left_button.is_held and right_button.is_held:
-            right_button.close()
+            # right_button.close()
             start_burst_mode(log_file)
         # elif left_button.is_held and right_button.is_held:
         #     # start_calibration_mode(log_file)
         elif left_button.is_held:
             stop_current_mode()
-            right_button = Button(18, hold_time=3)
+            # right_button = Button(18, hold_time=3)
         time.sleep(0.1)  # Debounce delay
 
 def release_buttons():
