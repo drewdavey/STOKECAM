@@ -7,14 +7,13 @@ import subprocess
 from gpiozero import Button
 
 # GPIO pin definitions
-right_button = Button(18, hold_time=3)  # Replace with your GPIO pin number
-left_button = Button(17, hold_time=3)   # Replace with your GPIO pin number
-
-def release_buttons():
-    right_button.close()
-    left_button.close()
+right_button = Button(18, hold_time=3)  # 
+left_button = Button(17, hold_time=3)   # 
 
 def standby_mode(log_file):
+    right_button = Button(18, hold_time=3) 
+    left_button = Button(17, hold_time=3)
+
     with open(log_file, 'a') as log:
         log.write(f"Entered stanby mode.\n")
     while True:
@@ -25,6 +24,10 @@ def standby_mode(log_file):
         elif left_button.is_held:
             stop_current_mode()
         time.sleep(0.1)  # Debounce delay
+
+def release_buttons():
+    right_button.close()
+    left_button.close()
 
 def start_burst_mode(log_file):
     release_buttons()
@@ -40,7 +43,9 @@ def stop_current_mode():
     subprocess.run(['pkill', '-f', 'calib.py'])
 
 def main(log_file):
-    standby_mode(log_file)  # Enter standby mode
+    while True:
+        standby_mode(log_file)  # Enter standby mode
+        time.sleep(0.1)  # Debounce delay
 
 if __name__ == "__main__":
     main(sys.argv[1])
