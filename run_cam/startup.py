@@ -20,6 +20,20 @@ s.connect('/dev/ttyUSB0', 115200)
 # Initialize the camera
 camera = Picamera2()
 
+def setup_logging():
+    log_dir = f"../../DATA/{time.strftime('%Y%m%d')}/"
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    log_file = os.path.join(log_dir, "LOG.txt")
+    return log_file
+
+def config_cameras():
+    log_dir = f"../DATA/{time.strftime('%Y%m%d')}/"
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    log_file = os.path.join(log_dir, "log.txt")
+    return log_file
+
 def sync_clock_from_gps():
     while True:
         gps_data = gps_serial.readline().decode('ascii', errors='replace')
@@ -32,21 +46,9 @@ def sync_clock_from_gps():
                 os.system(f'sudo date -u --set="{formatted_time}"')
                 break
 
-def config_cameras():
-    log_dir = f"../DATA/{time.strftime('%Y%m%d')}/"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    log_file = os.path.join(log_dir, "log.txt")
-    return log_file
-
-def setup_logging():
-    log_dir = f"../../DATA/{time.strftime('%Y%m%d')}/"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    log_file = os.path.join(log_dir, "LOG.txt")
-    return log_file
-
 def enter_standby(log_file):
+    with open(log_file, 'a') as log:
+        log.write(f"Entering stanby mode.\n")
     subprocess.Popen(['python3', 'standby.py', log_file])
 
 def main():

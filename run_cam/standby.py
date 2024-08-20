@@ -12,7 +12,7 @@ left_button = Button(27)   # Replace with your GPIO pin number
 
 def standby_mode(log_file):
     with open(log_file, 'a') as log:
-        log.write(f"Entering stanby mode.\n")
+        log.write(f"Entered stanby mode.\n")
     while True:
         if right_button.is_held:
             start_burst_mode(log_file)
