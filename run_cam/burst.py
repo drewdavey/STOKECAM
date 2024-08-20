@@ -14,6 +14,8 @@ def burst_mode(cam0, cam1, log_file, duration, interval):
             time.sleep(interval)
         cam0.stop()
         cam1.stop()
+        cam0.close()
+        cam1.close()
         log.write("Burst mode ended.\n")
 
 if __name__ == "__main__":
