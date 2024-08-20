@@ -19,6 +19,7 @@ def standby_mode(log_file):
         log.write(f"Entered stanby mode.\n")
     while True:
         if right_button.is_held:
+            right_button.close()
             start_burst_mode(log_file)
         elif left_button.is_held and right_button.is_held:
             start_calibration_mode(log_file)
