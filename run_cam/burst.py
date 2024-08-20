@@ -1,6 +1,11 @@
 import time
 import sys
 from picamera2 import Picamera2
+from gpiozero import Button
+
+# GPIO pin definitions
+right_button = Button(18)  # Replace with your GPIO pin number
+
 
 def burst_mode(cam0, cam1, log_file, duration, interval):
     with open(log_file, 'a') as log:
@@ -8,7 +13,7 @@ def burst_mode(cam0, cam1, log_file, duration, interval):
         cam0.start()
         cam1.start()
         start_time = time.time()
-        while time.time() - start_time < duration:
+        while right_button.is_held:
             cam0.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
             cam1.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
             time.sleep(interval)
