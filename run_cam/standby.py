@@ -35,9 +35,9 @@ def release_buttons():
     # Button(17).close()
     print("FIRE")
 
-def start_burst_mode(log_file):
+def start_burst_mode(log_file, right_button, left_button):
     release_buttons()
-    subprocess.Popen(['python3', 'burst.py', log_file])
+    subprocess.Popen(['python3', 'burst.py', log_file, right_button, left_button])
 
 # def start_calibration_mode(log_file):
 #     release_buttons()
