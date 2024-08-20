@@ -40,7 +40,7 @@ def config_cameras():
     return log_file
 
 def setup_logging():
-    log_dir = f"../DATA/{time.strftime('%Y%m%d')}/"
+    log_dir = f"../../DATA/{time.strftime('%Y%m%d')}/"
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     log_file = os.path.join(log_dir, "LOG.txt")
