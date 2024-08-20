@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import subprocess
+import gpiozero
 from gpiozero import Button
 
 # GPIO pin definitions
@@ -26,8 +27,9 @@ def standby_mode(log_file):
         time.sleep(0.1)  # Debounce delay
 
 def release_buttons():
-    right_button.close()
-    left_button.close()
+    gpiozero.pins.rpigpio.RPiGPIOPin.close 
+    # right_button.close()
+    # left_button.close()
 
 def start_burst_mode(log_file):
     release_buttons()
