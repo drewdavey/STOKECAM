@@ -18,7 +18,7 @@ s.connect('/dev/ttyUSB0', 115200)
 # gps_serial = serial.Serial("/dev/serial0", baudrate=9600, timeout=1)
 
 # Initialize the camera
-camera = Picamera2()
+# camera = Picamera2()
 
 def setup_logging():
     log_dir = f"../../DATA/{time.strftime('%Y%m%d')}/"
@@ -27,12 +27,8 @@ def setup_logging():
     log_file = os.path.join(log_dir, "LOG.txt")
     return log_file
 
-def config_cameras():
-    log_dir = f"../DATA/{time.strftime('%Y%m%d')}/"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    log_file = os.path.join(log_dir, "log.txt")
-    return log_file
+# def config_cameras():
+
 
 def sync_clock_from_gps():
     while True:
