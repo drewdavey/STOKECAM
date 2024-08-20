@@ -1,21 +1,37 @@
 
 
+import os
+import sys
+import time
+import subprocess
 from gpiozero import Button
-from subprocess import check_call
-from signal import pause
 
-def start_stoke():
-    # check_call(['sudo', 'poweroff'])
-    print('start stoke.py')
+# GPIO pin definitions
+right_button = Button(17)  # Replace with your GPIO pin number
+left_button = Button(27)   # Replace with your GPIO pin number
 
-def stop_stoke():
-    print('stop stoke.py')
+def standby_mode(log_file):
+    while True:
+        if right_button.is_held:
+            start_burst_mode(log_file)
+        elif left_button.is_held and right_button.is_held:
+            start_calibration_mode(log_file)
+        elif left_button.is_held:
+            stop_current_mode()
+        time.sleep(0.1)  # Debounce delay
 
+def start_burst_mode(log_file):
+    subprocess.Popen(['python3', 'burst.py', log_file])
 
-button0 = Button(17, hold_time=5)
-button0.when_held = start_stoke
+def start_calibration_mode(log_file):
+    subprocess.Popen(['python3', 'calib.py', log_file])
 
-button1 = Button(23, hold_time=5)
-stoke_on.when_held = stop_stoke
+def stop_current_mode():
+    subprocess.run(['pkill', '-f', 'burst.py'])
+    subprocess.run(['pkill', '-f', 'calib.py'])
 
-pause()
+def main(log_file):
+    standby_mode(log_file)  # Enter standby mode
+
+if __name__ == "__main__":
+    main(sys.argv[1])
