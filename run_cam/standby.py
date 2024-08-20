@@ -19,12 +19,13 @@ def standby_mode(log_file):
         log.write(f"Entered standby mode.\n")
     while True:
         if left_button.is_held and right_button.is_held:
-            # right_button.close()
-            start_burst_mode(log_file, right_button, left_button)
+            right_button.close()
+            start_burst_mode(log_file)
         # elif left_button.is_held and right_button.is_held:
         #     # start_calibration_mode(log_file)
         elif left_button.is_held:
             stop_current_mode()
+            right_button = Button(18, hold_time=3)
         time.sleep(0.1)  # Debounce delay
 
 def release_buttons():
@@ -35,9 +36,9 @@ def release_buttons():
     # Button(17).close()
     print("FIRE")
 
-def start_burst_mode(log_file, right_button, left_button):
+def start_burst_mode(log_file):
     release_buttons()
-    subprocess.Popen(['python3', 'burst.py', log_file, right_button, left_button])
+    subprocess.Popen(['python3', 'burst.py', log_file])
 
 # def start_calibration_mode(log_file):
 #     release_buttons()

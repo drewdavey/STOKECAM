@@ -4,10 +4,10 @@ from picamera2 import Picamera2
 from gpiozero import Button
 
 # GPIO pin definitions
-# right_button = Button(18)  # Replace with your GPIO pin number
+right_button = Button(18)  # Replace with your GPIO pin number
 # left_button = Button(17)  # Replace with your GPIO pin number
 
-def burst_mode(cam0, cam1, log_file, right_button, left_button, duration, interval):
+def burst_mode(cam0, cam1, log_file, duration, interval):
     with open(log_file, 'a') as log:
         log.write(f"Starting burst mode for {duration} seconds with {interval} second interval.\n")
         cam0.start()
@@ -23,22 +23,20 @@ def burst_mode(cam0, cam1, log_file, right_button, left_button, duration, interv
         cam1.close()
         log.write("Burst mode ended.\n")
 
-# def cleanup():
-#     right_button.close()
-#     # left_button.close()
+def cleanup():
+    right_button.close()
+    # left_button.close()
 
 if __name__ == "__main__":
     log_file = sys.argv[1]
-    right_button = sys.argv[2]
-    left_button = sys.argv[3]
     duration = 10
     interval = 1
 
     cam0 = Picamera2(0)
     cam1 = Picamera2(1)
 
-    # try:
-    burst_mode(cam0, cam1, log_file, right_button, left_button, duration, interval)
-    # finally:
-    #     cleanup()  # Cleanup GPIO resources
+    try:
+        burst_mode(cam0, cam1, log_file, duration, interval)
+    finally:
+        cleanup()  # Cleanup GPIO resources
     
