@@ -64,6 +64,7 @@ def exit_standby(log):
     sys.exit(0)
 
 def standby(pathLog):
+    global busy
     log = open(pathLog, 'a')
     log.write(f"Entered standby mode.\n")
 
