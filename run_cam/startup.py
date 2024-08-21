@@ -54,9 +54,10 @@ def configure_cameras():
             'Saturation': config['saturation'],
             'AwbMode': config['awb_mode']
         })
-        cam.start()
+        # cam.start()
 
-        #### pull each camera config and print to log ################
+        #### pull each camera config and print to log ################'
+        #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
 
     return cam0, cam1
 
@@ -83,11 +84,11 @@ def enter_standby(fdir, pathLog):
 
 def startup():
     fdir, pathLog = setup_logging()  # Setup logging
-    cam0, cam1 = configure_cameras()
+    configure_cameras()
     # sync_clock(pathLog)  # Sync clock from GPS
     # dt = 0
     # num_frames = 10
-    enter_standby(fdir, pathLog, cam0, cam1)  # Enter standby mode
+    enter_standby(fdir, pathLog)  # Enter standby mode
 
 if __name__ == "__main__":
     startup()

@@ -8,6 +8,7 @@ import os
 import sys
 import time
 import subprocess
+import yaml
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
@@ -22,14 +23,57 @@ right_button = Button(18, hold_time=3)  #
 left_button = Button(17, hold_time=3)   # 
 
 # Connect to the cameras
-# cam0 = Picamera2(0)
-# cam1 = Picamera2(1)
-# cam0.start()
-# cam1.start()
+cam0 = Picamera2(0)
+cam1 = Picamera2(1)
+cam0.start()
+cam1.start()
+
+def configure_cameras(log):
+    # Load the configuration
+    config_file='../config.yaml'
+    # Load the YAML configuration file
+    with open(config_file, 'r') as file:
+        config = yaml.safe_load(file)['camera_settings']
+
+    # # Define the transform using the settings from the YAML file
+    # transform = Transform(hflip=config['transform'].get('hflip', False),
+    #                       vflip=config['transform'].get('vflip', False))
+
+    # # Define the color space
+    # color_space = ColorSpace.Srgb() if config.get('color_space', 'sRGB') == 'sRGB' else ColorSpace.Adobe()
+
+    # Apply settings to both cameras
+    for cam in [cam0, cam1]:
+        camera_config = cam.create_still_configuration(
+            main={"size": config['resolution'], "format": "RGB888"},
+            # transform=transform,
+            # colour_space=color_space
+        )
+        cam.configure(camera_config)
+        cam.set_controls({
+            'ExposureTime': config['exposure_time'],
+            'AnalogueGain': config['iso'],
+            'FrameRate': config['framerate'],
+            'Brightness': config['brightness'],
+            'Contrast': config['contrast'],
+            'Saturation': config['saturation'],
+            'AwbMode': config['awb_mode']
+        })
+        # cam.start()
+        log.write(f"Camera configuration: {cam.camera_configuration()}\n")
+        #### pull each camera config and print to log ################'
+        #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
+
+
+
+
+
+
+
 
 busy = False
 
-def burst(fdir, log, dt, cam0, cam1):
+def burst(fdir, log, dt): 
     global busy
     i = 0
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
@@ -46,7 +90,7 @@ def burst(fdir, log, dt, cam0, cam1):
     imu.close()
     busy = False
 
-def numFrames(fdir, log, dt, num_frames, cam0, cam1):
+def numFrames(fdir, log, dt, num_frames):
     global busy
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
     imu = open(fname_imu, 'a')
@@ -72,7 +116,7 @@ def create_dirs(fdir, mode):
     print(f'--Created output folders: {fdir_cam0} and {fdir_cam1}')
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
-def exit_standby(log, cam0, cam1):
+def exit_standby(log):
     log.write(f"EXITING STANDBY.\n")
     log.close()
     s.disconnect() # Disconnect from the VN-200
@@ -82,7 +126,7 @@ def exit_standby(log, cam0, cam1):
     left_button.close() # Close the buttons
     sys.exit(0)
 
-def standby(fdir, pathLog, dt, num_frames, cam0, cam1):
+def standby(fdir, pathLog, dt, num_frames):
     global busy
     log = open(pathLog, 'a')
     log.write(f"Entered standby mode.\n")
@@ -92,12 +136,12 @@ def standby(fdir, pathLog, dt, num_frames, cam0, cam1):
         # right_button.when_pressed = lambda: burst(log)
         if right_button.is_pressed and not left_button.is_pressed and not busy:
             busy = True
-            burst(fdir, log, dt, cam0, cam1)
+            burst(fdir, log, dt)
         if left_button.is_pressed and not right_button.is_pressed and not busy:
             busy = True
-            numFrames(fdir, log, dt, num_frames, cam0, cam1)
+            numFrames(fdir, log, dt, num_frames)
 
-    exit_standby(log, cam0, cam1)
+    exit_standby(log)
 
 if __name__ == "__main__":
-    standby(sys.argv[1], sys.argv[2], 0, 10, sys.argv[3], sys.argv[4])
+    standby(sys.argv[1], sys.argv[2], 0, 10)
