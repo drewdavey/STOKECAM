@@ -46,7 +46,7 @@ def numFrames(log):
 	# 	cam0.capture_file(f"{path0}0_{tstr}_{i+1:05}.jpg")
 	# 	cam1.capture_file(f"{path1}1_{tstr}_{i+1:05}.jpg")
 	# 	time.sleep(dt)
-    pause(1)
+    time.sleep(1)
     busy = False
 
 
