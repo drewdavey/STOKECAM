@@ -41,7 +41,7 @@ def sync_clock_from_gps():
 
 def enter_standby(pathLog):
     with open(pathLog, 'a') as log:
-        log.write(f"Entering standby mode - created log for today blah blah.\n")
+        log.write(f"Startup complete - created log for today blah blah.\n")
     subprocess.Popen(['python3', 'standby.py', pathLog])
 
 def startup():

@@ -18,11 +18,11 @@ cam1 = Picamera2(1)
 cam0.start()
 cam1.start()
 
-bursting = False
+busy = False
 
 def burst(log):
 
-    global bursting
+    global busy
 
     log.write(f"Starting burst.\n")
     
@@ -35,11 +35,19 @@ def burst(log):
     
     log.write("Stopping burst.\n")
  
-    bursting = False
+    busy = False
 
 def numFrames(log):
-    if not bursting:
-        log.write(f"numFrames.\n")
+    global busy
+    log.write(f"numFrames.\n")
+    # for i in range(int(num_frames)):
+	# 	timestamp = datetime.utcnow()
+	# 	tstr = timestamp.strftime('%H%M%S%f')[:-3] 
+	# 	cam0.capture_file(f"{path0}0_{tstr}_{i+1:05}.jpg")
+	# 	cam1.capture_file(f"{path1}1_{tstr}_{i+1:05}.jpg")
+	# 	time.sleep(dt)
+    pause(1)
+    busy = False
 
 
 def exit_standby(log):
@@ -61,11 +69,14 @@ def standby(pathLog):
 
     while not right_button.is_held and not left_button.is_held:
         # sleep 0.5.... check if both are pressed
-        if right_button.is_pressed and not left_button.is_pressed:
+        if right_button.is_pressed and not left_button.is_pressed and not busy:
             # right_button.when_pressed = lambda: burst(log)
+            busy = True
             burst(log)
-        if left_button.is_pressed and not right_button.is_pressed:
+
+        if left_button.is_pressed and not right_button.is_pressed and not busy:
             # left_button.when_pressed = lambda: numFrames(log)
+            busy = True
             numFrames(log)
 
 
