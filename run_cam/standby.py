@@ -20,7 +20,6 @@ bursting = False
 def burst(log_file):
 
     global bursting
-    bursting = True
 
     log = open(log_file, 'a')
     log.write(f"Starting burst.\n")
@@ -68,6 +67,7 @@ def standby(log_file):
 
         # right_button.when_held = exit_standby(log_file)
         # left_button.when_held = exit_standby(log_file)
+        global bursting
 
         if right_button.is_pressed:
             bursting = True
