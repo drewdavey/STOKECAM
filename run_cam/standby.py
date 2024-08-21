@@ -41,7 +41,9 @@ def exit_standby(log_file):
     log = open(log_file, 'a')
     log.write(f"BOTH BUTTONS HELD.\n")
     log.close()
-    # Insert your calibration mode logic here
+    right_button.close()
+    left_button.close()
+    exit()
     
 
 def standby(log_file):
@@ -66,9 +68,7 @@ def standby(log_file):
 
     if left_button.is_held and right_button.is_held:
         exit_standby(log_file)
-        # right_button.close()
-        # left_button.close()
-        # break
+
     # Keep the script running to listen for button events
     pause()
 
