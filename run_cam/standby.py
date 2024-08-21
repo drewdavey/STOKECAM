@@ -11,6 +11,12 @@ import subprocess
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
+from vnpy import *
+
+# Create sensor object and connect to the VN-200 
+# at the baud rate of 115200 (115,200 bytes/s)
+s = VnSensor()
+s.connect('/dev/ttyUSB0', 115200)
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
@@ -27,30 +33,33 @@ busy = False
 def burst(fdir, log, dt):
     global busy
     i = 0
-    fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
-    log.write(f"Created directories and log files.\n")
-    log.write(f"Starting burst.\n")
-    
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
+    imu = open(fname_imu, 'a')
+    log.write(f"burst session: {fdir_out}\n")
     while right_button.is_pressed:
         tstr = time.strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+        ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
+        imu.write(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n') # Print the yaw, pitch, and roll values
         i += 1
         time.sleep(dt)
-    
-    log.write("Stopping burst.\n")
- 
+    imu.close()
     busy = False
 
 def numFrames(fdir, log, dt, num_frames):
     global busy
-    fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
-    log.write(f"numFrames.\n")
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
+    imu = open(fname_imu, 'a')
+    log.write(f"numFrames session: {fdir_out}\n")
     for i in range(int(num_frames)):
         tstr = time.strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+        ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
+        imu.write(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n') # Print the yaw, pitch, and roll values
         time.sleep(dt)
+    imu.close()
     busy = False
 
 def create_dirs(fdir, mode):
@@ -62,16 +71,18 @@ def create_dirs(fdir, mode):
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
 
-    # fname_log = f'{fdir_out}LOG_{session}.txt'
     fname_imu = f'{fdir_out}IMU_{session}.txt'
 
     print(f'--Created output folders: {fdir_cam0} and {fdir_cam1}')
-    return fdir_cam0, fdir_cam1, fname_imu
+    return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def exit_standby(log):
     log.write(f"EXITING STANDBY.\n")
     
     log.close()
+
+    # Disconnect from the sensor
+    s.disconnect()
 
     cam0.stop()
     cam1.stop()
