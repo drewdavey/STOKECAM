@@ -45,18 +45,18 @@ def sync_clock_from_gps():
                 os.system(f'sudo date -u --set="{formatted_time}"')
                 break
 
-def enter_standby(fdir, pathLog, dt, num_frames):
+def enter_standby(fdir, pathLog):
     with open(pathLog, 'a') as log:
         log.write(f"Startup complete - created log for today blah blah.\n")
-    subprocess.Popen(['python3', 'standby.py', fdir, pathLog, dt, num_frames])
+    subprocess.Popen(['python3', 'standby.py', fdir, pathLog])
 
 def startup():
     fdir, pathLog = setup_logging()  # Setup logging
     # config_cameras(pathLog)  # Configure cameras
     # sync_clock_from_gps(pathLog)  # Sync clock from GPS
-    dt = 0
-    num_frames = 10
-    enter_standby(fdir, pathLog, int(dt), int(num_frames))  # Enter standby mode
+    # dt = 0
+    # num_frames = 10
+    enter_standby(fdir, pathLog)  # Enter standby mode
 
 if __name__ == "__main__":
     startup()
