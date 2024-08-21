@@ -24,24 +24,39 @@ def configure_cameras():
     config_file='../config.yaml'
     # Load the YAML configuration file
     with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)
+        config = yaml.safe_load(file)['camera_settings']
 
     # Initialize both cameras
-    cam0 = Picamera2(0)
-    cam1 = Picamera2(1)
+    cam0 = Picamera2(camera_num=0)
+    cam1 = Picamera2(camera_num=1)
 
-    # Apply settings to both cameras directly from the YAML configuration
+    # # Define the transform using the settings from the YAML file
+    # transform = Transform(hflip=config['transform'].get('hflip', False),
+    #                       vflip=config['transform'].get('vflip', False))
+
+    # # Define the color space
+    # color_space = ColorSpace.Srgb() if config.get('color_space', 'sRGB') == 'sRGB' else ColorSpace.Adobe()
+
+    # Apply settings to both cameras
     for cam in [cam0, cam1]:
-        cam.configure(config)
+        camera_config = cam.create_still_configuration(
+            main={"size": config['resolution'], "format": "RGB888"},
+            # transform=transform,
+            # colour_space=color_space
+        )
+        cam.configure(camera_config)
+        cam.set_controls({
+            'ExposureTime': config['exposure_time'],
+            'AnalogueGain': config['iso'],
+            'FrameRate': config['framerate'],
+            'Brightness': config['brightness'],
+            'Contrast': config['contrast'],
+            'Saturation': config['saturation'],
+            'AwbMode': config['awb_mode']
+        })
         # cam.start()
 
-    # # Save the configuration to both cameras (if needed)
-    # cam0.capture_file('camera0_settings.json')
-    # cam1.capture_file('camera1_settings.json') # what? <---
-
-    # close cams? do they even need to open?
-
-    return cam0, cam1 #?
+    return cam0, cam1
 
 def sync_clock():
     # Create sensor object and connect to the VN-200 
