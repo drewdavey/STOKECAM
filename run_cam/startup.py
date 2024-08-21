@@ -54,7 +54,9 @@ def configure_cameras():
             'Saturation': config['saturation'],
             'AwbMode': config['awb_mode']
         })
-        # cam.start()
+        cam.start()
+
+        #### pull each camera config and print to log ################
 
     return cam0, cam1
 
@@ -85,7 +87,7 @@ def startup():
     # sync_clock(pathLog)  # Sync clock from GPS
     # dt = 0
     # num_frames = 10
-    enter_standby(fdir, pathLog)  # Enter standby mode
+    enter_standby(fdir, pathLog, cam0, cam1)  # Enter standby mode
 
 if __name__ == "__main__":
     startup()
