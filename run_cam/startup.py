@@ -22,8 +22,8 @@ def setup_logging():
     log_dir = f"../../DATA/{time.strftime('%Y%m%d')}/"
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    log_file = os.path.join(log_dir, "LOG.txt")
-    return log_file
+    pathLog = os.path.join(log_dir, "LOG.txt")
+    return pathLog
 
 # def config_cameras():
 
@@ -39,16 +39,16 @@ def sync_clock_from_gps():
                 os.system(f'sudo date -u --set="{formatted_time}"')
                 break
 
-def enter_standby(log_file):
-    with open(log_file, 'a') as log:
-        log.write(f"Entering standby mode.\n")
-    subprocess.Popen(['python3', 'standby.py', log_file])
+def enter_standby(pathLog):
+    with open(pathLog, 'a') as log:
+        log.write(f"Entering standby mode - created log for today blah blah.\n")
+    subprocess.Popen(['python3', 'standby.py', pathLog])
 
 def startup():
-    log_file = setup_logging()  # Setup logging
-    # config_cameras(log_file)  # Configure cameras
-    # sync_clock_from_gps(log_file)  # Sync clock from GPS
-    enter_standby(log_file)  # Enter standby mode
+    pathLog = setup_logging()  # Setup logging
+    # config_cameras(pathLog)  # Configure cameras
+    # sync_clock_from_gps(pathLog)  # Sync clock from GPS
+    enter_standby(pathLog)  # Enter standby mode
 
 if __name__ == "__main__":
     startup()

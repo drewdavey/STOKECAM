@@ -55,14 +55,18 @@ def exit_standby(log):
 
     sys.exit(0)
 
-def standby(log_file):
-    log = open(log_file, 'a')
+def standby(pathLog):
+    log = open(pathLog, 'a')
     log.write(f"Entered standby mode.\n")
 
     while not right_button.is_held and not left_button.is_held:
         # sleep 0.5.... check if both are pressed
-        right_button.when_pressed = lambda: burst(log)
-        left_button.when_pressed = lambda: numFrames(log)
+        if right_button.is_pressed and not left_button.is_pressed:
+            # right_button.when_pressed = lambda: burst(log)
+            burst(log)
+        if left_button.is_pressed and not right_button.is_pressed:
+            # left_button.when_pressed = lambda: numFrames(log)
+            numFrames(log)
 
 
     exit_standby(log)
@@ -70,15 +74,15 @@ def standby(log_file):
 
         # if right_button.is_pressed:
         #     bursting = True
-        #     burst(log_file)
+        #     burst(pathLog)
         
         # if left_button.is_pressed and not bursting:
-        #     numFrames(log_file)
+        #     numFrames(pathLog)
 
         # if right_button.is_held and left_button.is_held:
-        #     exit_standby(log_file)
+        #     exit_standby(pathLog)
     # finally:
-    #     log = open(log_file, 'a')
+    #     log = open(pathLog, 'a')
     #     log.write(f"I died.\n")
     #     log.close()
     #     right_button.close()
