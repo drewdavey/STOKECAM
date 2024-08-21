@@ -53,7 +53,7 @@ def exit_standby(log_file):
     log.close()
     right_button.close()
     left_button.close()
-    exit()
+    sys.exit()
 
 def standby(log_file):
     log = open(log_file, 'a')
@@ -86,7 +86,7 @@ def standby(log_file):
     #     log.close()
     #     right_button.close()
     #     left_button.close()
-    #     exit()
+    #     sys.exit()
 
 if __name__ == "__main__":
     standby(sys.argv[1])
