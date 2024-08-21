@@ -77,7 +77,6 @@ def run(path0,path1,pathLog,dt,duration):
 	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
 	outfile.write('Done collecting images.' + '\n')
 	outfile.close()
-		
 
 if __name__ == '__main__':
     run(sys.argv[1],sys.argv[2],sys.argv[3],float(sys.argv[4]),int(sys.argv[5]))

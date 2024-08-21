@@ -31,16 +31,15 @@ def burst(log):
     while right_button.is_pressed:
         cam0.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
         cam1.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
-        # time.sleep(interval)
+        # time.sleep(dt) - do watchdog loop
     
-    # cam0.close()
-    # cam1.close()
     log.write("Stopping burst.\n")
  
     bursting = False
 
 def numFrames(log):
-    log.write(f"numFrames.\n")
+    if not bursting:
+        log.write(f"numFrames.\n")
 
 
 def exit_standby(log):
@@ -54,18 +53,17 @@ def exit_standby(log):
     right_button.close()
     left_button.close()
 
-    sys.exit()
+    sys.exit(0)
 
 def standby(log_file):
     log = open(log_file, 'a')
     log.write(f"Entered standby mode.\n")
 
     while not right_button.is_held and not left_button.is_held:
+        # sleep 0.5.... check if both are pressed
         right_button.when_pressed = lambda: burst(log)
         left_button.when_pressed = lambda: numFrames(log)
 
-    # right_button.when_held = lambda: exit_standby(log_file)
-    # left_button.when_held = lambda: exit_standby(log_file)
 
     exit_standby(log)
         # global bursting
