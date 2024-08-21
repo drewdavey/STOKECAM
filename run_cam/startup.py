@@ -45,10 +45,10 @@ def sync_clock_from_gps():
                 os.system(f'sudo date -u --set="{formatted_time}"')
                 break
 
-def enter_standby(fdir, pathLog):
+def enter_standby(fdir, pathLog, dt, num_frames):
     with open(pathLog, 'a') as log:
         log.write(f"Startup complete - created log for today blah blah.\n")
-    subprocess.Popen(['python3', 'standby.py', fdir, pathLog])
+    subprocess.Popen(['python3', 'standby.py', fdir, pathLog, dt, num_frames])
 
 def startup():
     pathLog, fdir = setup_logging()  # Setup logging
