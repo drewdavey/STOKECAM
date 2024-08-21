@@ -66,11 +66,11 @@ def create_dirs(fdir, mode):
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
 
-    fname_log = f'{fdir_out}LOG_{session}.txt'
+    # fname_log = f'{fdir_out}LOG_{session}.txt'
     fname_imu = f'{fdir_out}IMU_{session}.txt'
 
     print(f'--Created output folders: {fdir_cam0} and {fdir_cam1}')
-    return fdir_cam0, fdir_cam1, fname_log, fname_imu
+    return fdir_cam0, fdir_cam1, fname_imu
 
 def exit_standby(log):
     log.write(f"EXITING STANDBY.\n")
