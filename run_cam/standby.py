@@ -54,13 +54,12 @@ def exit_standby(log):
     
     right_button.close()
     left_button.close()
-    
+
     sys.exit()
 
 def standby(log_file):
     log = open(log_file, 'a')
     log.write(f"Entered standby mode.\n")
-    log.close()
 
     while not right_button.is_held and not left_button.is_held:
         right_button.when_pressed = lambda: burst(log)
