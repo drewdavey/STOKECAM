@@ -39,7 +39,7 @@ def burst(log_file):
     # cam1.close()
     log.write("Stopping burst.\n")
     log.close()
-
+ 
     bursting = False
 
 def numFrames(log_file):
