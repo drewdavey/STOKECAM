@@ -65,7 +65,7 @@ def standby(log_file):
     right_button.when_pressed = lambda: burst(log_file)
     left_button.when_pressed = lambda: numFrames(log_file)
 
-    right_button.when_held = lambda: exit_standby(log_file)
+    # right_button.when_held = lambda: exit_standby(log_file)
     left_button.when_held = lambda: exit_standby(log_file)
 
     pause()
