@@ -19,23 +19,6 @@ def setup_logging():
     pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
     return fdir, pathLog
 
-def apply_camera_settings(camera, settings):
-    # Apply the settings to the camera
-    camera.configure({
-        'mode': settings.get('mode', 'manual'),
-        'size': settings.get('resolution', [1920, 1080]),
-        'controls': {
-            'ExposureTime': settings.get('exposure_time', 10000),
-            'AnalogueGain': settings.get('iso', 100),
-            'FrameRate': settings.get('framerate', 30),
-            'Brightness': settings.get('brightness', 50),
-            'Contrast': settings.get('contrast', 0),
-            'Saturation': settings.get('saturation', 0),
-            'AwbMode': settings.get('awb_mode', 'auto'),
-        }
-    })
-    camera.start()
-
 def configure_cameras():
     # Load the configuration
     config_file='../config.yaml'
@@ -47,9 +30,10 @@ def configure_cameras():
     cam0 = Picamera2(0)
     cam1 = Picamera2(1)
 
-    # Apply settings to both cameras
-    apply_camera_settings(cam0, config['camera_0'])
-    apply_camera_settings(cam1, config['camera_1'])
+    # Apply settings to both cameras directly from the YAML configuration
+    for cam in [cam0, cam1]:
+        cam.configure(config)
+        # cam.start()
 
     # # Save the configuration to both cameras (if needed)
     # cam0.capture_file('camera0_settings.json')
