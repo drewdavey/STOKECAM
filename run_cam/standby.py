@@ -43,10 +43,9 @@ def burst(log_file):
     bursting = False
 
 def numFrames(log_file):
-    if not bursting:
-        log = open(log_file, 'a')
-        log.write(f"Entered numFrames mode.\n")
-        log.close()
+    log = open(log_file, 'a')
+    log.write(f"Entered numFrames mode.\n")
+    log.close()
 
 def exit_standby(log_file):
     log = open(log_file, 'a')
@@ -57,35 +56,26 @@ def exit_standby(log_file):
     sys.exit(0)
 
 def standby(log_file):
-    # right_button = Button(18, hold_time=3) 
-    # left_button = Button(17, hold_time=3)
-
     log = open(log_file, 'a')
     log.write(f"Entered standby mode.\n")
     log.close()
 
-    # while True:
-    #     if left_button.is_held and right_button.is_held:
-            # right_button.close()
-            
-        # right_button.when_held = start_burst_mode(log_file)
-        # elif left_button.is_held and right_button.is_held:
-        #     # start_calibration_mode(log_file)
-        # elif left_button.is_held:
-
     global bursting
 
     while True:
-        if right_button.is_pressed and not bursting:
+
+        if right_button.is_pressed:
             bursting = True
             burst(log_file)
         
-        if left_button.is_pressed:
+        if left_button.is_pressed and not bursting:
             numFrames(log_file)
 
         if right_button.is_held and left_button.is_held:
             exit_standby(log_file)
-            
+        
+        pause()
+
     # right_button.when_pressed = burst(log_file)
     # left_button.when_pressed = numFrames(log_file)
 

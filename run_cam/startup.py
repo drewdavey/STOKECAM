@@ -47,6 +47,7 @@ def enter_standby(log_file):
         log.write(f"Entering standby mode.\n")
     subprocess.Popen(['python3', 'standby.py', log_file])
 
+
 def main():
     log_file = setup_logging()  # Setup logging
     # config_cameras(log_file)  # Configure cameras
