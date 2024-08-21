@@ -126,4 +126,4 @@ def standby(fdir, pathLog, dt, num_frames):
     #     sys.exit()
 
 if __name__ == "__main__":
-    standby(sys.argv[1], sys.argv[2], float(sys.argv[3]), int(sys.argv[4]))
+    standby(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))
