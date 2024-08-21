@@ -58,7 +58,7 @@ def numFrames(fdir, log, dt, num_frames):
     busy = False
 
 def create_dirs(fdir, mode):
-    session = strftime('%H%M%S_' + mode)
+    session = time.strftime('%H%M%S_' + mode)
     fdir_out = os.path.join(fdir, session + '/')
     fdir_cam0 = os.path.join(fdir_out, 'cam0/')
     fdir_cam1 = os.path.join(fdir_out, 'cam1/')
