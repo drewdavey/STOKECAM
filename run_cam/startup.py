@@ -30,7 +30,7 @@ def setup_logging():
     pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
     return fdir, pathLog
 
-def load_camera_config(config_file='camera_config.yaml'):
+def load_camera_config(config_file='../config.yaml'):
     # Load the YAML configuration file
     with open(config_file, 'r') as file:
         config = yaml.safe_load(file)
