@@ -130,6 +130,7 @@ def standby(fdir, pathLog, dt, num_frames):
     global busy
     log = open(pathLog, 'a')
     log.write(f"Entered standby mode.\n")
+    configure_cameras(log)
 
     while not (right_button.is_held and left_button.is_held):
         # left_button.when_pressed = lambda: numFrames(log)

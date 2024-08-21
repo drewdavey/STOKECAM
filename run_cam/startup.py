@@ -59,8 +59,6 @@ def configure_cameras():
         #### pull each camera config and print to log ################'
         #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
 
-    return cam0, cam1
-
 def sync_clock():
     # Create sensor object and connect to the VN-200 
     # at the baud rate of 115200 (115,200 bytes/s)
