@@ -61,12 +61,14 @@ def standby(log_file):
     log.close()
 
     # while True:
-    try:
-        right_button.when_pressed = lambda: burst(log_file)
-        left_button.when_pressed = lambda: numFrames(log_file)
+    # try:
+    right_button.when_pressed = lambda: burst(log_file)
+    left_button.when_pressed = lambda: numFrames(log_file)
 
-        right_button.when_held = lambda: exit_standby(log_file)
-        left_button.when_held = lambda: exit_standby(log_file)
+    right_button.when_held = lambda: exit_standby(log_file)
+    left_button.when_held = lambda: exit_standby(log_file)
+
+    pause()
         # global bursting
 
         # if right_button.is_pressed:
@@ -78,13 +80,13 @@ def standby(log_file):
 
         # if right_button.is_held and left_button.is_held:
         #     exit_standby(log_file)
-    finally:
-        log = open(log_file, 'a')
-        log.write(f"I died.\n")
-        log.close()
-        right_button.close()
-        left_button.close()
-        exit()
+    # finally:
+    #     log = open(log_file, 'a')
+    #     log.write(f"I died.\n")
+    #     log.close()
+    #     right_button.close()
+    #     left_button.close()
+    #     exit()
 
 if __name__ == "__main__":
     standby(sys.argv[1])
