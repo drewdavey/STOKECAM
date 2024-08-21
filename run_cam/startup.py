@@ -27,8 +27,8 @@ def configure_cameras():
         config = yaml.safe_load(file)['camera_settings']
 
     # Initialize both cameras
-    cam0 = Picamera2(camera_num=0)
-    cam1 = Picamera2(camera_num=1)
+    cam0 = Picamera2(0)
+    cam1 = Picamera2(1)
 
     # # Define the transform using the settings from the YAML file
     # transform = Transform(hflip=config['transform'].get('hflip', False),
@@ -54,7 +54,7 @@ def configure_cameras():
             'Saturation': config['saturation'],
             'AwbMode': config['awb_mode']
         })
-        # cam.start()
+        cam.start()
 
         #### pull each camera config and print to log ################'
         #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 

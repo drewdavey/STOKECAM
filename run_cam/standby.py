@@ -28,41 +28,41 @@ cam1 = Picamera2(1)
 cam0.start()
 cam1.start()
 
-def configure_cameras(log):
-    # Load the configuration
-    config_file='../config.yaml'
-    # Load the YAML configuration file
-    with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)['camera_settings']
+# def configure_cameras(log):
+#     # Load the configuration
+#     config_file='../config.yaml'
+#     # Load the YAML configuration file
+#     with open(config_file, 'r') as file:
+#         config = yaml.safe_load(file)['camera_settings']
 
-    # # Define the transform using the settings from the YAML file
-    # transform = Transform(hflip=config['transform'].get('hflip', False),
-    #                       vflip=config['transform'].get('vflip', False))
+#     # # Define the transform using the settings from the YAML file
+#     # transform = Transform(hflip=config['transform'].get('hflip', False),
+#     #                       vflip=config['transform'].get('vflip', False))
 
-    # # Define the color space
-    # color_space = ColorSpace.Srgb() if config.get('color_space', 'sRGB') == 'sRGB' else ColorSpace.Adobe()
+#     # # Define the color space
+#     # color_space = ColorSpace.Srgb() if config.get('color_space', 'sRGB') == 'sRGB' else ColorSpace.Adobe()
 
-    # Apply settings to both cameras
-    for cam in [cam0, cam1]:
-        camera_config = cam.create_still_configuration(
-            main={"size": config['resolution'], "format": "RGB888"},
-            # transform=transform,
-            # colour_space=color_space
-        )
-        cam.configure(camera_config)
-        cam.set_controls({
-            'ExposureTime': config['exposure_time'],
-            'AnalogueGain': config['iso'],
-            'FrameRate': config['framerate'],
-            'Brightness': config['brightness'],
-            'Contrast': config['contrast'],
-            'Saturation': config['saturation'],
-            'AwbMode': config['awb_mode']
-        })
-        # cam.start()
-        log.write(f"Camera configuration: {cam.camera_configuration()}\n")
-        #### pull each camera config and print to log ################'
-        #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
+#     # Apply settings to both cameras
+#     for cam in [cam0, cam1]:
+#         camera_config = cam.create_still_configuration(
+#             main={"size": config['resolution'], "format": "RGB888"},
+#             # transform=transform,
+#             # colour_space=color_space
+#         )
+#         cam.configure(camera_config)
+#         cam.set_controls({
+#             'ExposureTime': config['exposure_time'],
+#             'AnalogueGain': config['iso'],
+#             'FrameRate': config['framerate'],
+#             'Brightness': config['brightness'],
+#             'Contrast': config['contrast'],
+#             'Saturation': config['saturation'],
+#             'AwbMode': config['awb_mode']
+#         })
+#         # cam.start()
+#         log.write(f"Camera configuration: {cam.camera_configuration()}\n")
+#         #### pull each camera config and print to log ################'
+#         #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
 
 
 
@@ -130,7 +130,7 @@ def standby(fdir, pathLog, dt, num_frames):
     global busy
     log = open(pathLog, 'a')
     log.write(f"Entered standby mode.\n")
-    configure_cameras(log)
+    # configure_cameras(log)
 
     while not (right_button.is_held and left_button.is_held):
         # left_button.when_pressed = lambda: numFrames(log)
