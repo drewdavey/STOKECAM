@@ -36,7 +36,6 @@ def burst(log):
     # cam0.close()
     # cam1.close()
     log.write("Stopping burst.\n")
-    log.close()
  
     bursting = False
 
