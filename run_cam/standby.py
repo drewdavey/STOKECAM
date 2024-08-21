@@ -4,55 +4,57 @@ import os
 import sys
 import time
 import subprocess
-# import gpiozero
+from picamera2 import Picamera2
 from gpiozero import Button
+from signal import pause
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
 left_button = Button(17, hold_time=3)   # 
 
-def standby_mode(log_file):
+cam0 = Picamera2(0)
+cam1 = Picamera2(1)
+
+def burst(log_file):
+    with open(log_file, 'a') as log:
+        log.write("Starting burst. \n")
+        cam0.start()
+        cam1.start()
+        # start_time = time.time()
+        while right_button.is_pressed:
+            cam0.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
+            cam1.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
+            # time.sleep(interval)
+        cam0.stop()
+        cam1.stop()
+        # cam0.close()
+        # cam1.close()
+        log.write("Stopping burst.\n")
+
+
+def numFrames():
+    print('numFrames')
+
+def standby(log_file):
     # right_button = Button(18, hold_time=3) 
     # left_button = Button(17, hold_time=3)
 
     with open(log_file, 'a') as log:
         log.write(f"Entered standby mode.\n")
-    while True:
-        if left_button.is_held and right_button.is_held:
+    # while True:
+    #     if left_button.is_held and right_button.is_held:
             # right_button.close()
-            start_burst_mode(log_file)
+            
+        # right_button.when_held = start_burst_mode(log_file)
         # elif left_button.is_held and right_button.is_held:
         #     # start_calibration_mode(log_file)
-        elif left_button.is_held:
-            stop_current_mode()
-            # right_button = Button(18, hold_time=3)
-        time.sleep(0.1)  # Debounce delay
+        # elif left_button.is_held:
 
-def release_buttons():
-    # gpiozero.pins.pigpio.RPiGPIOPin.close 
-    # right_button.close()
-    # left_button.close()
-    # Button(18).close()
-    # Button(17).close()
-    print("FIRE")
+    right_button.when_pressed = burst(log_file)
+    left_button.when_pressed = numFrames()
 
-def start_burst_mode(log_file):
-    release_buttons()
-    subprocess.Popen(['python3', 'burst.py', log_file])
-
-# def start_calibration_mode(log_file):
-#     release_buttons()
-#     subprocess.Popen(['python3', 'calib.py', log_file])
-
-def stop_current_mode():
-    release_buttons()
-    subprocess.run(['pkill', '-f', 'burst.py'])
-    subprocess.run(['pkill', '-f', 'calib.py'])
-
-def main(log_file):
-    while True:
-        standby_mode(log_file)  # Enter standby mode
-        time.sleep(0.1)  # Debounce delay
+    # Keep the script running to listen for button events
+    pause()
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    standby(sys.argv[1])
