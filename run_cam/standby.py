@@ -45,7 +45,7 @@ def burst(log_file):
 
 def numFrames(log_file):
     log = open(log_file, 'a')
-    log.write(f"Entered numFrames mode.\n")
+    log.write(f"numFrames.\n")
     log.close()
 
 def exit_standby(log_file):
@@ -62,7 +62,12 @@ def standby(log_file):
     log.write(f"Entered standby mode.\n")
     log.close()
 
-    # while True:
+    while True:
+        right_button.when_pressed = burst(log_file)
+        left_button.when_pressed = numFrames(log_file)
+
+        right_button.when_held = exit_standby(log_file)
+        left_button.when_held = exit_standby(log_file)
 
     #     if right_button.is_pressed:
     #         bursting = True
@@ -75,15 +80,6 @@ def standby(log_file):
     #         exit_standby(log_file)
         
     #     pause()
-
-    right_button.when_pressed = burst(log_file)
-    left_button.when_pressed = numFrames(log_file)
-
-    right_button.when_held = exit_standby(log_file)
-    left_button.when_held = exit_standby(log_file) 
-    
-    # Keep the script running to listen for button events
-    pause()
 
 if __name__ == "__main__":
     standby(sys.argv[1])

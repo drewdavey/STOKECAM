@@ -29,7 +29,6 @@ def setup_logging():
 
 # def config_cameras():
 
-
 def sync_clock_from_gps():
     while True:
         gps_data = gps_serial.readline().decode('ascii', errors='replace')
@@ -46,7 +45,6 @@ def enter_standby(log_file):
     with open(log_file, 'a') as log:
         log.write(f"Entering standby mode.\n")
     subprocess.Popen(['python3', 'standby.py', log_file])
-
 
 def main():
     log_file = setup_logging()  # Setup logging
