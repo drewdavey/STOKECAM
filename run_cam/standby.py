@@ -11,7 +11,6 @@ import subprocess
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
-# from time import strftime, datetime
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
@@ -32,11 +31,7 @@ def burst(fdir, log, dt):
     log.write(f"Created directories and log files.\n")
     log.write(f"Starting burst.\n")
     
-    # start_time = time.time()
-    
     while right_button.is_pressed:
-        cam0.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
-        cam1.capture_file(f'../../DATA/{time.strftime("%Y%m%d_%H%M%S")}.jpg')
         tstr = time.strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
