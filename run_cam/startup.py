@@ -1,4 +1,8 @@
-
+# Last updated: 2024-04-10
+##################################
+# This script is passed 5 arguments from run_numFrames.sh
+# Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames (5) dt
+##################################
 
 import os
 import sys
@@ -19,13 +23,15 @@ s.connect('/dev/ttyUSB0', 115200)
 # camera = Picamera2()
 
 def setup_logging():
-    log_dir = f"../../DATA/{time.strftime('%Y%m%d')}/"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    pathLog = os.path.join(log_dir, "LOG.txt")
-    return pathLog
+    fdir = f"../../DATA/{time.strftime('%Y%m%d')}/"
+    if not os.path.exists(fdir):
+        os.makedirs(fdir)
+    pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
+    return fdir, pathLog
 
 # def config_cameras():
+#     dt = 0
+#     return dt  
 
 def sync_clock_from_gps():
     while True:
@@ -39,16 +45,18 @@ def sync_clock_from_gps():
                 os.system(f'sudo date -u --set="{formatted_time}"')
                 break
 
-def enter_standby(pathLog):
+def enter_standby(fdir, pathLog):
     with open(pathLog, 'a') as log:
         log.write(f"Startup complete - created log for today blah blah.\n")
-    subprocess.Popen(['python3', 'standby.py', pathLog])
+    subprocess.Popen(['python3', 'standby.py', fdir, pathLog])
 
 def startup():
-    pathLog = setup_logging()  # Setup logging
+    pathLog, fdir = setup_logging()  # Setup logging
     # config_cameras(pathLog)  # Configure cameras
     # sync_clock_from_gps(pathLog)  # Sync clock from GPS
-    enter_standby(pathLog)  # Enter standby mode
+    dt = 0
+    num_frames = 10
+    enter_standby(fdir, pathLog, dt, num_frames)  # Enter standby mode
 
 if __name__ == "__main__":
     startup()
