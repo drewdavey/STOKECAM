@@ -94,7 +94,7 @@ def standby(fdir, pathLog, dt, num_frames):
     log = open(pathLog, 'a')
     log.write(f"Entered standby mode.\n")
 
-    while not right_button.is_held and not left_button.is_held:
+    while not (right_button.is_held and left_button.is_held):
         # left_button.when_pressed = lambda: numFrames(log)
         # right_button.when_pressed = lambda: burst(log)
         if right_button.is_pressed and not left_button.is_pressed and not busy:

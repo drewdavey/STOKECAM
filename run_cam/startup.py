@@ -64,9 +64,11 @@ def configure_cameras():
 
     # Save the configuration to both cameras (if needed)
     cam0.capture_file('camera0_settings.json')
-    cam1.capture_file('camera1_settings.json')
+    cam1.capture_file('camera1_settings.json') # what? <---
 
-    return cam0, cam1
+    # close cams? do they even need to open?
+
+    return cam0, cam1 #?
 
 def sync_clock_from_gps():
     while True:
