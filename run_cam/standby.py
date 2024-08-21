@@ -20,6 +20,7 @@ bursting = False
 def burst(log_file):
 
     global bursting
+    bursting = True
 
     log = open(log_file, 'a')
     log.write(f"Starting burst.\n")
@@ -48,42 +49,41 @@ def numFrames(log_file):
     log.close()
 
 def exit_standby(log_file):
-    log = open(log_file, 'a')
-    log.write(f"BOTH BUTTONS HELD.\n")
-    log.close()
-    right_button.close()
-    left_button.close()
-    sys.exit(0)
+    if right_button.is_held and left_button.is_held:
+        log = open(log_file, 'a')
+        log.write(f"BOTH BUTTONS HELD.\n")
+        log.close()
+        right_button.close()
+        left_button.close()
+        sys.exit(0)
 
 def standby(log_file):
     log = open(log_file, 'a')
     log.write(f"Entered standby mode.\n")
     log.close()
 
-    global bursting
+    # while True:
 
-    while True:
-
-        if right_button.is_pressed:
-            bursting = True
-            burst(log_file)
+    #     if right_button.is_pressed:
+    #         bursting = True
+    #         burst(log_file)
         
-        if left_button.is_pressed and not bursting:
-            numFrames(log_file)
+    #     if left_button.is_pressed and not bursting:
+    #         numFrames(log_file)
 
-        if right_button.is_held and left_button.is_held:
-            exit_standby(log_file)
+    #     
+    #         exit_standby(log_file)
         
-        pause()
+    #     pause()
 
-    # right_button.when_pressed = burst(log_file)
-    # left_button.when_pressed = numFrames(log_file)
+    right_button.when_pressed = burst(log_file)
+    left_button.when_pressed = numFrames(log_file)
 
-    # if left_button.is_held and right_button.is_held:
-    #     exit_standby(log_file)
-
-    # # Keep the script running to listen for button events
-    # pause()
+    right_button.when_held = exit_standby(log_file)
+    left_button.when_held = exit_standby(log_file) 
+    
+    # Keep the script running to listen for button events
+    pause()
 
 if __name__ == "__main__":
     standby(sys.argv[1])
