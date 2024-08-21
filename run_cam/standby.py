@@ -32,15 +32,26 @@ def burst(log_file):
         log.write("Stopping burst.\n")
 
 
-def numFrames():
-    print('numFrames')
+def numFrames(log_file):
+    log = open(log_file, 'a')
+    log.write(f"Entered numFrames mode.\n")
+    log.close()
+
+def exit_standby(log_file):
+    log = open(log_file, 'a')
+    log.write(f"BOTH BUTTONS HELD.\n")
+    log.close()
+    # Insert your calibration mode logic here
+    
 
 def standby(log_file):
     # right_button = Button(18, hold_time=3) 
     # left_button = Button(17, hold_time=3)
 
-    with open(log_file, 'a') as log:
-        log.write(f"Entered standby mode.\n")
+    log = open(log_file, 'a')
+    log.write(f"Entered standby mode.\n")
+    log.close()
+
     # while True:
     #     if left_button.is_held and right_button.is_held:
             # right_button.close()
@@ -51,8 +62,13 @@ def standby(log_file):
         # elif left_button.is_held:
 
     right_button.when_pressed = burst(log_file)
-    left_button.when_pressed = numFrames()
+    left_button.when_pressed = numFrames(log_file)
 
+    if left_button.is_held and right_button.is_held:
+        exit_standby(log_file)
+        # right_button.close()
+        # left_button.close()
+        # break
     # Keep the script running to listen for button events
     pause()
 

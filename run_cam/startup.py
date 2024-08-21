@@ -44,7 +44,7 @@ def sync_clock_from_gps():
 
 def enter_standby(log_file):
     with open(log_file, 'a') as log:
-        log.write(f"Entering stanby mode.\n")
+        log.write(f"Entering standby mode.\n")
     subprocess.Popen(['python3', 'standby.py', log_file])
 
 def main():
