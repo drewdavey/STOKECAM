@@ -51,7 +51,7 @@ def enter_standby(fdir, pathLog, dt, num_frames):
     subprocess.Popen(['python3', 'standby.py', fdir, pathLog, dt, num_frames])
 
 def startup():
-    pathLog, fdir = setup_logging()  # Setup logging
+    fdir, pathLog = setup_logging()  # Setup logging
     # config_cameras(pathLog)  # Configure cameras
     # sync_clock_from_gps(pathLog)  # Sync clock from GPS
     dt = 0
