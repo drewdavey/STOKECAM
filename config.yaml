@@ -9,4 +9,4 @@ camera_settings:
   saturation: 0
   awb_mode: 'auto'  # auto white balance mode
   iso: 100
-  color_space: 'sRGB'  # Possible values: 'sRGB', 'AdobeRGB', 'Rec2020', etc.
+  colour_space: 'sRGB'  # Possible values: 'sRGB', 'AdobeRGB', 'Rec2020', etc.
