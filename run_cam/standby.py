@@ -27,6 +27,7 @@ busy = False
 
 def burst(fdir, log, dt):
     global busy
+    i = 0
     fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
     log.write(f"Created directories and log files.\n")
     log.write(f"Starting burst.\n")
