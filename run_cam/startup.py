@@ -12,11 +12,6 @@ import subprocess
 from picamera2 import Picamera2
 from vnpy import *
 
-# Create sensor object and connect to the VN-200 
-# at the baud rate of 115200 (115,200 bytes/s)
-s = VnSensor()
-s.connect('/dev/ttyUSB0', 115200)
-
 # # Setup serial for GPS (adjust as necessary)
 # gps_serial = serial.Serial("/dev/serial0", baudrate=9600, timeout=1)
 
@@ -70,17 +65,21 @@ def configure_cameras():
 
     return cam0, cam1 #?
 
-def sync_clock_from_gps():
-    while True:
-        gps_data = gps_serial.readline().decode('ascii', errors='replace')
-        if gps_data.startswith('$GPRMC'):
-            parts = gps_data.split(',')
-            if parts[2] == 'A':  # Check if data is valid
-                utc_time = parts[1]
-                utc_date = parts[9]
-                formatted_time = f"{utc_date[4:6]}-{utc_date[2:4]}-{utc_date[0:2]} {utc_time[0:2]}:{utc_time[2:4]}:{utc_time[4:6]}"
-                os.system(f'sudo date -u --set="{formatted_time}"')
-                break
+def sync_clock():
+    # Create sensor object and connect to the VN-200 
+    # at the baud rate of 115200 (115,200 bytes/s)
+    s = VnSensor()
+    s.connect('/dev/ttyUSB0', 115200)
+    # while True:
+    #     gps_data = gps_serial.readline().decode('ascii', errors='replace')
+    #     if gps_data.startswith('$GPRMC'):
+    #         parts = gps_data.split(',')
+    #         if parts[2] == 'A':  # Check if data is valid
+    #             utc_time = parts[1]
+    #             utc_date = parts[9]
+    #             formatted_time = f"{utc_date[4:6]}-{utc_date[2:4]}-{utc_date[0:2]} {utc_time[0:2]}:{utc_time[2:4]}:{utc_time[4:6]}"
+    #             os.system(f'sudo date -u --set="{formatted_time}"')
+    #             break
 
 def enter_standby(fdir, pathLog):
     with open(pathLog, 'a') as log:
@@ -90,7 +89,7 @@ def enter_standby(fdir, pathLog):
 def startup():
     fdir, pathLog = setup_logging()  # Setup logging
     cam0, cam1 = configure_cameras()
-    # sync_clock_from_gps(pathLog)  # Sync clock from GPS
+    # sync_clock(pathLog)  # Sync clock from GPS
     # dt = 0
     # num_frames = 10
     enter_standby(fdir, pathLog)  # Enter standby mode

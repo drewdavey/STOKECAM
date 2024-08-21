@@ -13,7 +13,7 @@ from gpiozero import Button
 from signal import pause
 from vnpy import *
 
-# Create sensor object and connect to the VN-200 
+# Connect to the VN-200 
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
 
@@ -21,9 +21,9 @@ s.connect('/dev/ttyUSB0', 115200)
 right_button = Button(18, hold_time=3)  # 
 left_button = Button(17, hold_time=3)   # 
 
+# Connect to the cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
-
 cam0.start()
 cam1.start()
 
@@ -69,24 +69,17 @@ def create_dirs(fdir, mode):
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
     fname_imu = f'{fdir_out}IMU_{session}.txt'
-
     print(f'--Created output folders: {fdir_cam0} and {fdir_cam1}')
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def exit_standby(log):
     log.write(f"EXITING STANDBY.\n")
-    
     log.close()
-
-    # Disconnect from the sensor
-    s.disconnect()
-
-    cam0.stop()
-    cam1.stop()
-    
-    right_button.close()
-    left_button.close()
-
+    s.disconnect() # Disconnect from the VN-200
+    cam0.stop() 
+    cam1.stop() # Close the cameras
+    right_button.close() 
+    left_button.close() # Close the buttons
     sys.exit(0)
 
 def standby(fdir, pathLog, dt, num_frames):
