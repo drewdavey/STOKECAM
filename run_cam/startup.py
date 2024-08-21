@@ -12,8 +12,6 @@ from vnpy import *
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
 
-# import serial
-
 # # Setup serial for GPS (adjust as necessary)
 # gps_serial = serial.Serial("/dev/serial0", baudrate=9600, timeout=1)
 
@@ -46,11 +44,11 @@ def enter_standby(log_file):
         log.write(f"Entering standby mode.\n")
     subprocess.Popen(['python3', 'standby.py', log_file])
 
-def main():
+def startup():
     log_file = setup_logging()  # Setup logging
     # config_cameras(log_file)  # Configure cameras
     # sync_clock_from_gps(log_file)  # Sync clock from GPS
     enter_standby(log_file)  # Enter standby mode
 
 if __name__ == "__main__":
-    main()
+    startup()
