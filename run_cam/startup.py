@@ -7,6 +7,7 @@
 import os
 import sys
 import time
+import yaml
 import subprocess
 from picamera2 import Picamera2
 from vnpy import *
@@ -29,9 +30,46 @@ def setup_logging():
     pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
     return fdir, pathLog
 
-# def config_cameras():
-#     dt = 0
-#     return dt  
+def load_camera_config(config_file='camera_config.yaml'):
+    # Load the YAML configuration file
+    with open(config_file, 'r') as file:
+        config = yaml.safe_load(file)
+    return config
+
+def apply_camera_settings(camera, settings):
+    # Apply the settings to the camera
+    camera.configure({
+        'mode': settings.get('mode', 'manual'),
+        'size': settings.get('resolution', [1920, 1080]),
+        'controls': {
+            'ExposureTime': settings.get('exposure_time', 10000),
+            'AnalogueGain': settings.get('iso', 100),
+            'FrameRate': settings.get('framerate', 30),
+            'Brightness': settings.get('brightness', 50),
+            'Contrast': settings.get('contrast', 0),
+            'Saturation': settings.get('saturation', 0),
+            'AwbMode': settings.get('awb_mode', 'auto'),
+        }
+    })
+    camera.start()
+
+def configure_cameras():
+    # Load the configuration
+    config = load_camera_config()
+
+    # Initialize both cameras
+    cam0 = Picamera2(camera_num=0)
+    cam1 = Picamera2(camera_num=1)
+
+    # Apply settings to both cameras
+    apply_camera_settings(cam0, config['camera_0'])
+    apply_camera_settings(cam1, config['camera_1'])
+
+    # Save the configuration to both cameras (if needed)
+    cam0.capture_file('camera0_settings.json')
+    cam1.capture_file('camera1_settings.json')
+
+    return cam0, cam1
 
 def sync_clock_from_gps():
     while True:
@@ -52,7 +90,7 @@ def enter_standby(fdir, pathLog):
 
 def startup():
     fdir, pathLog = setup_logging()  # Setup logging
-    # config_cameras(pathLog)  # Configure cameras
+    cam0, cam1 = configure_cameras()
     # sync_clock_from_gps(pathLog)  # Sync clock from GPS
     # dt = 0
     # num_frames = 10

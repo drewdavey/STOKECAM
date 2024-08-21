@@ -1,0 +1,23 @@
+camera_0:
+  mode: 'manual' # manual or auto
+  resolution: [1920, 1080]
+  framerate: 30
+  shutter_speed: 10000  # in microseconds
+  exposure_time: 10000  # in microseconds
+  brightness: 50
+  contrast: 0
+  saturation: 0
+  awb_mode: 'auto'  # auto white balance mode
+  iso: 100
+
+camera_1:
+  mode: 'manual' # manual or auto
+  resolution: [1920, 1080]
+  framerate: 30
+  shutter_speed: 10000  # in microseconds
+  exposure_time: 10000  # in microseconds
+  brightness: 50
+  contrast: 0
+  saturation: 0
+  awb_mode: 'auto'  # auto white balance mode
+  iso: 100
