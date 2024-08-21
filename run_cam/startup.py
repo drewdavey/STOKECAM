@@ -12,12 +12,6 @@ import subprocess
 from picamera2 import Picamera2
 from vnpy import *
 
-# # Setup serial for GPS (adjust as necessary)
-# gps_serial = serial.Serial("/dev/serial0", baudrate=9600, timeout=1)
-
-# Initialize the camera
-# camera = Picamera2()
-
 def setup_logging():
     fdir = f"../../DATA/{time.strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
@@ -50,16 +44,16 @@ def configure_cameras():
         config = yaml.safe_load(file)
 
     # Initialize both cameras
-    cam0 = Picamera2(camera_num=0)
-    cam1 = Picamera2(camera_num=1)
+    cam0 = Picamera2(0)
+    cam1 = Picamera2(1)
 
     # Apply settings to both cameras
     apply_camera_settings(cam0, config['camera_0'])
     apply_camera_settings(cam1, config['camera_1'])
 
-    # Save the configuration to both cameras (if needed)
-    cam0.capture_file('camera0_settings.json')
-    cam1.capture_file('camera1_settings.json') # what? <---
+    # # Save the configuration to both cameras (if needed)
+    # cam0.capture_file('camera0_settings.json')
+    # cam1.capture_file('camera1_settings.json') # what? <---
 
     # close cams? do they even need to open?
 
