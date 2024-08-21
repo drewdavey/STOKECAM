@@ -30,12 +30,6 @@ def setup_logging():
     pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
     return fdir, pathLog
 
-def load_camera_config(config_file='../config.yaml'):
-    # Load the YAML configuration file
-    with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)
-    return config
-
 def apply_camera_settings(camera, settings):
     # Apply the settings to the camera
     camera.configure({
@@ -55,7 +49,10 @@ def apply_camera_settings(camera, settings):
 
 def configure_cameras():
     # Load the configuration
-    config = load_camera_config()
+    config_file='../config.yaml'
+    # Load the YAML configuration file
+    with open(config_file, 'r') as file:
+        config = yaml.safe_load(file)
 
     # Initialize both cameras
     cam0 = Picamera2(camera_num=0)
