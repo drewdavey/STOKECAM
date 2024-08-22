@@ -19,45 +19,45 @@ def setup_logging():
     pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
     return fdir, pathLog
 
-def configure_cameras():
-    # Load the configuration
-    config_file='../config.yaml'
-    # Load the YAML configuration file
-    with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)['camera_settings']
+# def configure_cameras():
+#     # Load the configuration
+#     config_file='../config.yaml'
+#     # Load the YAML configuration file
+#     with open(config_file, 'r') as file:
+#         config = yaml.safe_load(file)['camera_settings']
 
-    # Initialize both cameras
-    cam0 = Picamera2(0)
-    cam1 = Picamera2(1)
+#     # Initialize both cameras
+#     cam0 = Picamera2(0)
+#     cam1 = Picamera2(1)
 
-    # # Define the transform using the settings from the YAML file
-    # transform = Transform(hflip=config['transform'].get('hflip', False),
-    #                       vflip=config['transform'].get('vflip', False))
+#     # # Define the transform using the settings from the YAML file
+#     # transform = Transform(hflip=config['transform'].get('hflip', False),
+#     #                       vflip=config['transform'].get('vflip', False))
 
-    # # Define the color space
-    # color_space = ColorSpace.Srgb() if config.get('color_space', 'sRGB') == 'sRGB' else ColorSpace.Adobe()
+#     # # Define the color space
+#     # color_space = ColorSpace.Srgb() if config.get('color_space', 'sRGB') == 'sRGB' else ColorSpace.Adobe()
 
-    # Apply settings to both cameras
-    for cam in [cam0, cam1]:
-        camera_config = cam.create_still_configuration(
-            main={"size": config['resolution'], "format": "RGB888"},
-            # transform=transform,
-            # colour_space=color_space
-        )
-        cam.configure(camera_config)
-        cam.set_controls({
-            'ExposureTime': config['exposure_time'],
-            'AnalogueGain': config['iso'],
-            'FrameRate': config['framerate'],
-            'Brightness': config['brightness'],
-            'Contrast': config['contrast'],
-            'Saturation': config['saturation'],
-            'AwbMode': config['awb_mode']
-        })
-        cam.start()
+#     # Apply settings to both cameras
+#     for cam in [cam0, cam1]:
+#         camera_config = cam.create_still_configuration(
+#             main={"size": config['resolution'], "format": "RGB888"},
+#             # transform=transform,
+#             # colour_space=color_space
+#         )
+#         cam.configure(camera_config)
+#         cam.set_controls({
+#             'ExposureTime': config['exposure_time'],
+#             'AnalogueGain': config['iso'],
+#             'FrameRate': config['framerate'],
+#             'Brightness': config['brightness'],
+#             'Contrast': config['contrast'],
+#             'Saturation': config['saturation'],
+#             'AwbMode': config['awb_mode']
+#         })
+#         cam.start()
 
-        #### pull each camera config and print to log ################'
-        #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
+#         #### pull each camera config and print to log ################'
+#         #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
 
 def sync_clock():
     # Create sensor object and connect to the VN-200 
@@ -82,7 +82,7 @@ def enter_standby(fdir, pathLog):
 
 def startup():
     fdir, pathLog = setup_logging()  # Setup logging
-    configure_cameras()
+    # configure_cameras()
     # sync_clock(pathLog)  # Sync clock from GPS
     # dt = 0
     # num_frames = 10
