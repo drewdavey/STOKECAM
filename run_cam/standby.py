@@ -35,26 +35,17 @@ def configure_cameras(log):
 
     # Load the configuration
     config_file='../config.yaml'
-    # Load the YAML configuration file
     with open(config_file, 'r') as file:
         config = yaml.safe_load(file)['camera_settings']
-
-    # # Define the transform using the settings from the YAML file
-    # transform = Transform(hflip=config['transform'].get('hflip', False),
-    #                       vflip=config['transform'].get('vflip', False))
-
-    # # Define the color space
-    # color_space = ColorSpace.Srgb() if config.get('color_space', 'sRGB') == 'sRGB' else ColorSpace.Adobe()
 
     # Apply settings to both cameras
     for cam in [cam0, cam1]:
         camera_config = cam.create_still_configuration(
             main={"size": config['resolution'], "format": "RGB888"},
-            # transform=transform,
-            # colour_space=color_space
         )
         cam.configure(camera_config)
-        cam.set_controls({
+
+        controls = {
             'ExposureTime': int(config['exposure_time']),
             'AnalogueGain': float(config['iso']),
             'FrameRate': int(config['framerate']),
@@ -62,11 +53,16 @@ def configure_cameras(log):
             'Contrast': float(config['contrast']),
             'Saturation': float(config['saturation']),
             'AwbMode': config['awb_mode']
-        })
+        }
+
+        # Debugging output
+        print("Controls being set:")
+        for key, value in controls.items():
+            print(f"{key}: {value} (type: {type(value)})")
+
+        cam.set_controls(controls)
         cam.start()
         log.write(f"Camera configuration: {cam.camera_configuration()}\n")
-        #### pull each camera config and print to log ################'
-        #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
 
 
 busy = False
