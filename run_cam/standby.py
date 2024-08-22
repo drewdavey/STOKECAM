@@ -29,7 +29,6 @@ left_button = Button(17, hold_time=3)   #
 # cam1.start()
 
 def configure_cameras(log):
-
     cam0 = Picamera2(0)
     cam1 = Picamera2(1)
 
@@ -38,31 +37,48 @@ def configure_cameras(log):
     with open(config_file, 'r') as file:
         config = yaml.safe_load(file)['camera_settings']
 
-    # Apply settings to both cameras
+    # Apply minimal settings to both cameras
     for cam in [cam0, cam1]:
         camera_config = cam.create_still_configuration(
             main={"size": config['resolution'], "format": "RGB888"},
         )
         cam.configure(camera_config)
 
-        controls = {
-            'ExposureTime': int(config['exposure_time']),
-            'AnalogueGain': float(config['iso']),
-            'FrameRate': int(config['framerate']),
-            'Brightness': float(config['brightness']),
-            'Contrast': float(config['contrast']),
-            'Saturation': float(config['saturation']),
-            'AwbMode': config['awb_mode']
-        }
-
-        # Debugging output
-        print("Controls being set:")
-        for key, value in controls.items():
-            print(f"{key}: {value} (type: {type(value)})")
-
-        cam.set_controls(controls)
         cam.start()
-        log.write(f"Camera configuration: {cam.camera_configuration()}\n")
+        log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
+    # cam0 = Picamera2(0)
+    # cam1 = Picamera2(1)
+
+    # # Load the configuration
+    # config_file='../config.yaml'
+    # with open(config_file, 'r') as file:
+    #     config = yaml.safe_load(file)['camera_settings']
+
+    # # Apply settings to both cameras
+    # for cam in [cam0, cam1]:
+    #     camera_config = cam.create_still_configuration(
+    #         main={"size": config['resolution'], "format": "RGB888"},
+    #     )
+    #     cam.configure(camera_config)
+
+    #     controls = {
+    #         'ExposureTime': int(config['exposure_time']),
+    #         'AnalogueGain': float(config['iso']),
+    #         'FrameRate': int(config['framerate']),
+    #         'Brightness': float(config['brightness']),
+    #         'Contrast': float(config['contrast']),
+    #         'Saturation': float(config['saturation']),
+    #         'AwbMode': config['awb_mode']
+    #     }
+
+    #     # Debugging output
+    #     print("Controls being set:")
+    #     for key, value in controls.items():
+    #         print(f"{key}: {value} (type: {type(value)})")
+
+    #     cam.set_controls(controls)
+    #     cam.start()
+    #     log.write(f"Camera configuration: {cam.camera_configuration()}\n")
 
 
 busy = False
