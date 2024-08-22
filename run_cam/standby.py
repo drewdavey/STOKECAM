@@ -55,12 +55,12 @@ def configure_cameras(log):
         )
         cam.configure(camera_config)
         cam.set_controls({
-            'ExposureTime': config['exposure_time'],
-            'AnalogueGain': config['iso'],
-            'FrameRate': config['framerate'],
-            'Brightness': config['brightness'],
-            'Contrast': config['contrast'],
-            'Saturation': config['saturation'],
+            'ExposureTime': int(config['exposure_time']),
+            'AnalogueGain': float(config['iso']),
+            'FrameRate': int(config['framerate']),
+            'Brightness': float(config['brightness']),
+            'Contrast': float(config['contrast']),
+            'Saturation': float(config['saturation']),
             'AwbMode': config['awb_mode']
         })
         cam.start()
