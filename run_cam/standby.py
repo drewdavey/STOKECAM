@@ -23,29 +23,12 @@ right_button = Button(18, hold_time=3)  #
 left_button = Button(17, hold_time=3)   # 
 
 # Connect to the cameras
-# cam0 = Picamera2(0)
-# cam1 = Picamera2(1)
-# cam0.start()
-# cam1.start()
+cam0 = Picamera2(0)
+cam1 = Picamera2(1)
+cam0.start()
+cam1.start()
 
-def configure_cameras(log):
-    cam0 = Picamera2(0)
-    cam1 = Picamera2(1)
-
-    # Load the configuration
-    config_file='../config.yaml'
-    with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)['camera_settings']
-
-    # Apply minimal settings to both cameras
-    for cam in [cam0, cam1]:
-        camera_config = cam.create_still_configuration(
-            main={"size": config['resolution'], "format": "RGB888"},
-        )
-        cam.configure(camera_config)
-
-        cam.start()
-        log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
+# def configure_cameras(log):
     # cam0 = Picamera2(0)
     # cam1 = Picamera2(1)
 
@@ -140,7 +123,7 @@ def standby(fdir, pathLog, dt, num_frames):
     global busy
     log = open(pathLog, 'a')
     log.write(f"Entered standby mode.\n")
-    configure_cameras(log)
+    # configure_cameras(log)
 
     while not (right_button.is_held and left_button.is_held):
         # left_button.when_pressed = lambda: numFrames(log)
