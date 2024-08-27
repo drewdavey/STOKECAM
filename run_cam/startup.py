@@ -30,6 +30,7 @@ def configure_cameras(log):
 
     # Apply minimal settings to both cameras
     for cam in [cam0, cam1]:
+        print(config)
         camera_config = cam.create_still_configuration(
             main={"size": config['resolution'], "format": "RGB888"},
         )
