@@ -30,14 +30,14 @@ def configure_cameras(log):
     print(settings['config'])
     print(settings['controls'])
     # Apply minimal settings to both cameras
-    # for cam in [cam0, cam1]:
-    #     print(config)
-    #     camera_config = cam.create_still_configuration()
+    for cam in [cam0, cam1]:
+        cam_config = cam.create_still_configuration()
+        cam.configure(cam_config)
         
-    #     for control, value in controls.items():
-    #         cam.set_controls({control: value})
+        for control, value in settings['controls'].items():
+            cam.set_controls({control: value})
         
-    #     cam.configure(camera_config)
+        
     #     log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
 
 
