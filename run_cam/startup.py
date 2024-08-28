@@ -41,6 +41,54 @@ def configure_cameras(log):
 #         #### pull each camera config and print to log ################'
 #         #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
 
+# from picamera2 import Picamera2
+# picam2 = Picamera2()
+# picam2.configure(picam2.create_preview_configuration())
+# picam2.set_controls({"ExposureTime": 10000, "AnalogueGain": 1.0})
+# picam2.start()
+
+# from picamera2 import Picamera2
+# picam2 = Picamera2()
+# config = picam2.create_preview_configuration()
+# picam2.configure(config)
+# picam2.start()
+
+######################################################################################
+    # def configure_cameras(log):
+    # cam0 = Picamera2(0)
+    # cam1 = Picamera2(1)
+
+    # # Load the configuration
+    # config_file='../config.yaml'
+    # with open(config_file, 'r') as file:
+    #     config = yaml.safe_load(file)['camera_settings']
+
+    # # Apply settings to both cameras
+    # for cam in [cam0, cam1]:
+    #     camera_config = cam.create_still_configuration(
+    #         main={"size": config['resolution'], "format": "RGB888"},
+    #     )
+    #     cam.configure(camera_config)
+
+    #     controls = {
+    #         'ExposureTime': int(config['exposure_time']),
+    #         'AnalogueGain': float(config['iso']),
+    #         'FrameRate': int(config['framerate']),
+    #         'Brightness': float(config['brightness']),
+    #         'Contrast': float(config['contrast']),
+    #         'Saturation': float(config['saturation']),
+    #         'AwbMode': config['awb_mode']
+    #     }
+
+    #     # Debugging output
+    #     print("Controls being set:")
+    #     for key, value in controls.items():
+    #         print(f"{key}: {value} (type: {type(value)})")
+
+    #     cam.set_controls(controls)
+    #     cam.start()
+    #     log.write(f"Camera configuration: {cam.camera_configuration()}\n")
+
 def sync_clock():
     # Create sensor object and connect to the VN-200 
     # at the baud rate of 115200 (115,200 bytes/s)
