@@ -33,10 +33,11 @@ def configure_cameras(log):
     for cam in [cam0, cam1]:
         cam_config = cam.create_still_configuration()
         cam.configure(cam_config)
-        
+
         for control, value in settings['controls'].items():
             cam.set_controls({control: value})
         
+    cam.start()
         
     #     log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
 
