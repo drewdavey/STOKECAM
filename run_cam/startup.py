@@ -31,11 +31,11 @@ def configure_cameras(log):
     # Apply minimal settings to both cameras
     for cam in [cam0, cam1]:
         print(config)
-        camera_config = cam.create_still_configuration(config)
-        cam.configure("still")
+        camera_config = cam.create_still_configuration(still=config)
+        cam.configure(camera_config)
 
         cam.start()
-        log.write(f"Still Camera configuration: {cam.camera_configuration()}\n")
+        log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
 
 
 #         #### pull each camera config and print to log ################'
