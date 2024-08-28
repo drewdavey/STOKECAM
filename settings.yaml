@@ -1,0 +1,32 @@
+config:
+  transform:                # Image transformation (identity, hflip, vflip, hvflip)
+    hflip: false
+    vflip: false
+  colour_space:             # Colour space (sYCC, SMPTE170M, Rec709)
+    primaries: "Rec709"
+    transfer_function: "Rec709"
+    ycbcr_encoding: "Rec709"
+    quantization: "full"
+  buffer_count: 4           # Number of buffer sets
+  queue: false              # Queue up a frame ready for capture
+  display: "main"           # Stream to show in the preview window
+  encode: "main"            # Stream to encode in video recording (if applicable)
+
+controls:
+  ExposureTime: 1000        # Exposure time in microseconds
+  AnalogueGain: 1.0         # Gain multiplier
+  Brightness: 0.0           # Brightness adjustment
+  Contrast: 1.0             # Contrast adjustment
+  Saturation: 1.0           # Saturation adjustment
+  Sharpness: 1.0            # Sharpness adjustment
+  AeMeteringMode: "centre-weighted"  # Auto exposure metering mode
+  AeExposureMode: "auto"    # Auto exposure mode
+  AwbMode: "auto"           # Auto white balance mode
+  AwbEnable: true           # Enable auto white balance
+  FocusMode: "auto"         # Focus mode
+  AfTrigger: false          # Autofocus trigger
+  LensPosition: 0.0         # Manual lens position
+  FrameRate: 30.0           # Frame rate in frames per second
+  NoiseReductionMode: "high-quality" # Noise reduction mode
+  StillsPostProcessing: "normal"  # Post-processing mode for stills capture
+

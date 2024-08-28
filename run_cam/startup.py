@@ -23,18 +23,22 @@ def configure_cameras(log):
     cam1 = Picamera2(1)
 
     # Load the configuration
-    config_file='../config.yaml'
-    with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)['camera_settings']
-
+    settings='../settings.yaml'
+    with open(settings, 'r') as file:
+        config = yaml.safe_load(file)['config']
+        controls = yaml.safe_load(file)['controls']
+    print(config)
+    print(controls) 
     # Apply minimal settings to both cameras
-    for cam in [cam0, cam1]:
-        print(config)
-        camera_config = cam.create_still_configuration(still=config)
-        cam.configure(camera_config)
-
-        cam.start()
-        log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
+    # for cam in [cam0, cam1]:
+    #     print(config)
+    #     camera_config = cam.create_still_configuration()
+        
+    #     for control, value in controls.items():
+    #         cam.set_controls({control: value})
+        
+    #     cam.configure(camera_config)
+    #     log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
 
 
 #         #### pull each camera config and print to log ################'
