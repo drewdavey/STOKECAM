@@ -36,10 +36,10 @@ def configure_cameras(log):
         config = cam.create_still_configuration()
 
         # Apply general configuration settings
-        if 'transform' in settings['config']:
-            config['transform'] = Transform(**settings['config']['transform'])
-        if 'colour_space' in settings['config']:
-            config['colour_space'] = ColorSpace(**settings['config']['colour_space'])
+        # if 'transform' in settings['config']:
+        #     config['transform'] = Transform(**settings['config']['transform'])
+        # if 'colour_space' in settings['config']:
+        #     config['colour_space'] = ColorSpace(**settings['config']['colour_space'])
         if 'buffer_count' in settings['config']:
             config['buffer_count'] = settings['config']['buffer_count']
         if 'queue' in settings['config']:
