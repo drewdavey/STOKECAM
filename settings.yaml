@@ -1,16 +1,12 @@
 config:
   transform:                # Image transformation (identity, hflip, vflip, hvflip)
     hflip: false
-    vflip: false
-  colour_space:             # Colour space (sYCC, SMPTE170M, Rec709)
-    primaries: "Rec709"
-    transfer_function: "Rec709"
-    ycbcr_encoding: "Rec709"
-    quantization: "full"
+    vflip: true
+  colour_space: Sycc()      # Colour space (sYCC, SMPTE170M, Rec709)
   buffer_count: 4           # Number of buffer sets
   queue: false              # Queue up a frame ready for capture
-  display: "main"           # Stream to show in the preview window
-  encode: "main"            # Stream to encode in video recording (if applicable)
+  display: "None"           # Stream to show in the preview window
+  encode: "None"            # Stream to encode in video recording (if applicable)
   main:
     size: (1440, 1080)
   controls:
