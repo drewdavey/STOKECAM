@@ -44,7 +44,8 @@ def configure_cameras(log):
         # if 'colour_space' in settings['config']:
         #     config['colour_space'] = ColorSpace(**settings['config']['colour_space'])
         for setting in settings['config']:
-            config[setting] = settings['config'][setting]
+            # config[setting] = settings['config'][setting]
+            print(settings['config'][setting])
         # if 'buffer_count' in settings['config']:
         #     config['buffer_count'] = settings['config']['buffer_count']
         # if 'queue' in settings['config']:
