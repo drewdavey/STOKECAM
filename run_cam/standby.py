@@ -38,10 +38,25 @@ def configure_cameras(log):
     for cam in [cam0, cam1]:
 
         config = cam.create_still_configuration() #colour_space=ColorSpace.Sycc()
-
-        for setting, value in settings['config'].items():
-            # exec(f"{setting} = {value}")
-            config[str(setting)] = value
+        
+        for section, params in settings.get('config', {}).items():
+            if section in config:
+                for param, value in params.items():
+                    # Handle nested controls configuration
+                    if param == 'controls' and isinstance(value, dict):
+                        for control_name, control_value in value.items():
+                            # Convert lists to tuples if needed
+                            if isinstance(control_value, list) and len(control_value) == 2:
+                                control_value = tuple(control_value)
+                            config[section]['controls'][control_name] = control_value
+                    else:
+                        # Convert lists to tuples if needed
+                        if isinstance(value, list) and len(value) == 2:
+                            value = tuple(value)
+                        config[section][param] = value
+        # for setting, value in settings['config'].items():
+        #     # exec(f"{setting} = {value}")
+        #     config[str(setting)] = value
         # for setting in settings['config']:
         #     config[setting] = settings['config'][setting]
             # Handle tuple conversion for lists
