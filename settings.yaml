@@ -7,7 +7,7 @@ config:
   queue: false              # Queue up a frame ready for capture
 
   main:
-    size: [1440, 1080]
+    size: (1440, 1080)
     format: 'BGR888'
 
   controls:

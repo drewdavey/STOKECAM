@@ -38,22 +38,10 @@ def configure_cameras(log):
     for cam in [cam0, cam1]:
 
         config = cam.create_still_configuration() #colour_space=ColorSpace.Sycc()
+
+        config['main']['size'] = (1440, 1080)
+        config['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
         
-        for section, params in settings.get('config', {}).items():
-            if section in config:
-                for param, value in params.items():
-                    # Handle nested controls configuration
-                    if param == 'controls' and isinstance(value, dict):
-                        for control_name, control_value in value.items():
-                            # Convert lists to tuples if needed
-                            if isinstance(control_value, list) and len(control_value) == 2:
-                                control_value = tuple(control_value)
-                            config[section]['controls'][control_name] = control_value
-                    else:
-                        # Convert lists to tuples if needed
-                        if isinstance(value, list) and len(value) == 2:
-                            value = tuple(value)
-                        config[section][param] = value
         # for setting, value in settings['config'].items():
         #     # exec(f"{setting} = {value}")
         #     config[str(setting)] = value
@@ -64,16 +52,7 @@ def configure_cameras(log):
             #     if len(value) == 2:  # Assuming tuples are used for size and white balance settings
             #         value = tuple(value)
             #         print(settings['config'][setting])
-        # if 'buffer_count' in settings['config']:
-        #     config['buffer_count'] = settings['config']['buffer_count']
-        # if 'queue' in settings['config']:
-        #     config['queue'] = settings['config']['queue']
-        # if 'display' in settings['config']:
-        #     config['display'] = settings['config']['display']
-        # if 'encode' in settings['config']:
-        #     config['encode'] = settings['config']['encode']
-        # if 'size' in settings['config']:
-        #     config['size'] = settings['config']['size']
+
 
         # Apply control settings
         # if 'controls' in settings['config']:
@@ -82,9 +61,6 @@ def configure_cameras(log):
 
         # Configure the camera with the updated configuration
         cam.configure(config)
-
-            # for control, value in settings['controls'].items():
-            #     cam.set_controls({control: value})
             
         cam.start()
         
@@ -163,4 +139,3 @@ def standby(fdir, pathLog, dt, num_frames):
 
 if __name__ == "__main__":
     standby(sys.argv[1], sys.argv[2], 0, 10)
-
