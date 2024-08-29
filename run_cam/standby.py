@@ -10,6 +10,7 @@ import time
 import datetime
 import yaml
 from picamera2 import Picamera2
+from libcamera import ColorSpace, Transform
 from gpiozero import Button
 from signal import pause
 from vnpy import *
@@ -36,11 +37,11 @@ def configure_cameras(log):
 
     for cam in [cam0, cam1]:
 
-        config = cam.create_still_configuration(colour_space=ColorSpace.Sycc())
+        config = cam.create_still_configuration() #colour_space=ColorSpace.Sycc()
 
-        # for setting, value in settings['config'].items():
-        #     exec(f"{setting} = {value}")
-            # config[setting] = value
+        for setting, value in settings['config'].items():
+            # exec(f"{setting} = {value}")
+            config[str(setting)] = value
         # for setting in settings['config']:
         #     config[setting] = settings['config'][setting]
             # Handle tuple conversion for lists
