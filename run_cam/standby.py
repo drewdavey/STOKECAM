@@ -69,24 +69,6 @@ def configure_cameras(log):
         
         log.write(f"Camera configuration: {cam.camera_configuration()}\n")
 
-
-#         #### pull each camera config and print to log ################'
-#         #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
-
-# from picamera2 import Picamera2
-# picam2 = Picamera2()
-# picam2.configure(picam2.create_preview_configuration())
-# picam2.set_controls({"ExposureTime": 10000, "AnalogueGain": 1.0})
-# picam2.start()
-
-# from picamera2 import Picamera2
-# picam2 = Picamera2()
-# config = picam2.create_preview_configuration()
-# picam2.configure(config)
-# picam2.start()
-
-
-
 def burst(fdir, log, dt): 
     global busy
     i = 0
