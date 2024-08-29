@@ -41,7 +41,7 @@ def configure_cameras(log):
 
         config['main']['size'] = (1440, 1080)
         config['main']['format'] = 'BGR888'
-        config['lores']['size'] = (320, 240)
+        # config['lores']['size'] = (320, 240)
         config['lores']['format'] = 'BGR888'
         config['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
         config['controls']['ExposureTime'] = 10000  # Frame rate for cam1
