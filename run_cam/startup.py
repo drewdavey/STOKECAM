@@ -28,7 +28,7 @@ def configure_cameras(log):
     with open(camera_settings, 'r') as file:
         settings = yaml.safe_load(file)
 
-    print('\nCONFIG:\n' + '\n' + settings['config'])
+    # print('\nCONFIG:\n' + '\n' + settings['config'])
     # print('\nCONTROLS:\n' + '\n' + settings['controls'])
     # Apply minimal settings to both cameras
     for cam in [cam0, cam1]:
