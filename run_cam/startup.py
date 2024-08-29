@@ -8,7 +8,8 @@ import os
 import time
 import yaml
 import subprocess
-from picamera2 import Picamera2
+from picamera2 import Picamera2, Preview
+from libcamera import Transform, ColorSpace
 from vnpy import *
 
 def setup_logging():
@@ -27,15 +28,37 @@ def configure_cameras(log):
     with open(camera_settings, 'r') as file:
         settings = yaml.safe_load(file)
 
-    print(settings['config'])
-    print(settings['controls'])
+    print('\nCONFIG:\n' + '\n' + settings['config'])
+    # print('\nCONTROLS:\n' + '\n' + settings['controls'])
     # Apply minimal settings to both cameras
     for cam in [cam0, cam1]:
-        cam_config = cam.create_still_configuration()
-        cam.configure(cam_config)
 
-        for control, value in settings['controls'].items():
-            cam.set_controls({control: value})
+        config = cam.create_still_configuration()
+
+        # Apply general configuration settings
+        if 'transform' in settings['config']:
+            config['transform'] = Transform(**settings['config']['transform'])
+        if 'colour_space' in settings['config']:
+            config['colour_space'] = ColorSpace(**settings['config']['colour_space'])
+        if 'buffer_count' in settings['config']:
+            config['buffer_count'] = settings['config']['buffer_count']
+        if 'queue' in settings['config']:
+            config['queue'] = settings['config']['queue']
+        if 'display' in settings['config']:
+            config['display'] = settings['config']['display']
+        if 'encode' in settings['config']:
+            config['encode'] = settings['config']['encode']
+
+        # Apply control settings
+        if 'controls' in settings['config']:
+            for control, value in settings['config']['controls'].items():
+                config['controls'][control] = value
+
+    # Configure the camera with the updated configuration
+    cam.configure(config)
+
+        # for control, value in settings['controls'].items():
+        #     cam.set_controls({control: value})
         
     cam.start()
         
