@@ -5,10 +5,12 @@ config:
   colour_space: Sycc()      # Colour space (sYCC, SMPTE170M, Rec709)
   buffer_count: 4           # Number of buffer sets
   queue: false              # Queue up a frame ready for capture
-  
-  size: (1440, 1080)
-  controls:
 
+  main:
+    size: [1440, 1080]
+    format: 'BGR888'
+
+  controls:
     ExposureTime: 10000        # Exposure time in microseconds
     # FrameDurationLimits: (33333, 33333) 
     AnalogueGain: 1.0         # Gain multiplier
@@ -23,7 +25,6 @@ config:
     # FocusMode: "auto"         # Focus mode
     # AfTrigger: false          # Autofocus trigger
     # LensPosition: 0.0         # Manual lens position
-    # FrameRate: 30.0           # Frame rate in frames per second
     # NoiseReductionMode: "high-quality" # Noise reduction mode
     # StillsPostProcessing: "normal"  # Post-processing mode for stills capture
 

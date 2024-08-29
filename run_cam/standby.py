@@ -38,14 +38,15 @@ def configure_cameras(log):
 
         config = cam.create_still_configuration()
 
-        # Apply general configuration settings
-        # if 'transform' in settings['config']:
-        #     config['transform'] = Transform(**settings['config']['transform'])
-        # if 'colour_space' in settings['config']:
-        #     config['colour_space'] = ColorSpace(**settings['config']['colour_space'])
-        for setting in settings['config']:
-            # config[setting] = settings['config'][setting]
-            print(settings['config'][setting])
+        for key, value in settings['config'].items():
+            exec(f"{key} = {value}")
+        # for setting in settings['config']:
+        #     config[setting] = settings['config'][setting]
+            # Handle tuple conversion for lists
+            # if isinstance(value, list):
+            #     if len(value) == 2:  # Assuming tuples are used for size and white balance settings
+            #         value = tuple(value)
+            #         print(settings['config'][setting])
         # if 'buffer_count' in settings['config']:
         #     config['buffer_count'] = settings['config']['buffer_count']
         # if 'queue' in settings['config']:
@@ -58,9 +59,9 @@ def configure_cameras(log):
         #     config['size'] = settings['config']['size']
 
         # Apply control settings
-        if 'controls' in settings['config']:
-            for control, value in settings['config']['controls'].items():
-                config['controls'][control] = value
+        # if 'controls' in settings['config']:
+        #     for control, value in settings['config']['controls'].items():
+        #         config['controls'][control] = value
 
         # Configure the camera with the updated configuration
         cam.configure(config)
