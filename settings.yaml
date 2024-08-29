@@ -5,7 +5,7 @@ config:
   colour_space: Sycc()      # Colour space (sYCC, SMPTE170M, Rec709)
   buffer_count: 4           # Number of buffer sets
   queue: false              # Queue up a frame ready for capture
-  display: ""           # Stream to show in the preview window
+  display: None           # Stream to show in the preview window
   encode: None           # Stream to encode in video recording (if applicable)
   main:
     size: (1440, 1080)
