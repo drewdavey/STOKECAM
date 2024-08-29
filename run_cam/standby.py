@@ -7,6 +7,7 @@
 import os
 import sys
 import time
+import datetime
 import yaml
 from picamera2 import Picamera2
 from gpiozero import Button
@@ -66,7 +67,7 @@ def configure_cameras(log):
             
         cam.start()
         
-        log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
+        log.write(f"Camera configuration: {cam.camera_configuration()}\n")
 
 
 #         #### pull each camera config and print to log ################'
@@ -146,14 +147,14 @@ def standby(fdir, pathLog, dt, num_frames):
     configure_cameras(log)
 
     while not (right_button.is_held and left_button.is_held):
-        # left_button.when_pressed = lambda: numFrames(log)
-        # right_button.when_pressed = lambda: burst(log)
+
         if right_button.is_pressed and not left_button.is_pressed and not busy:
             busy = True
             burst(fdir, log, dt)
         if left_button.is_pressed and not right_button.is_pressed and not busy:
             busy = True
             numFrames(fdir, log, dt, num_frames)
+        time.sleep(0.1)
 
     exit_standby(log)
 

@@ -6,14 +6,15 @@
 
 import os
 import time
+import datetime
 import subprocess
 from vnpy import *
 
 def setup_logging():
-    fdir = f"../../DATA/{time.strftime('%Y%m%d')}/"
+    fdir = f"../../DATA/{datetime.strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
         os.makedirs(fdir)
-    pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
+    pathLog = os.path.join(fdir, f"{datetime.strftime('%Y%m%d')}_LOG.txt")
     return fdir, pathLog
 
 def sync_clock():
