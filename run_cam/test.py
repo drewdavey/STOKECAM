@@ -13,6 +13,7 @@ for key, value in settings['config'].items():
     #     if len(value) == 2:  # Assuming tuples are used for size and white balance settings
     #         value = tuple(value)
     print(f"{key} = {value}")
+    print( value)
 # Iterate over the items in the YAML file
 # for key, value in settings['config'].items():
 #     # Handle tuple conversion for lists

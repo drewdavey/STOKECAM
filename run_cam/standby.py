@@ -36,10 +36,10 @@ def configure_cameras(log):
 
     for cam in [cam0, cam1]:
 
-        config = cam.create_still_configuration()
+        config = cam.create_still_configuration(colour_space=ColorSpace.Sycc())
 
-        for setting, value in settings['config'].items():
-            exec(f"{setting} = {value}")
+        # for setting, value in settings['config'].items():
+        #     exec(f"{setting} = {value}")
             # config[setting] = value
         # for setting in settings['config']:
         #     config[setting] = settings['config'][setting]
