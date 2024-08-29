@@ -8,9 +8,11 @@ config:
   
   size: (1440, 1080)
   controls:
+
     ExposureTime: 10000        # Exposure time in microseconds
+    FrameDurationLimits: (33333, 33333) 
     AnalogueGain: 1.0         # Gain multiplier
-    Brightness: 1.0           # Brightness adjustment
+    Brightness: 0.0           # Brightness adjustment
     Contrast: 1.0             # Contrast adjustment
     Saturation: 1.0           # Saturation adjustment
     # Sharpness: 1.0            # Sharpness adjustment

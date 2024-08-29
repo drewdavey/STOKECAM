@@ -40,7 +40,6 @@ def enter_standby(fdir, pathLog):
 
 def startup():
     fdir, pathLog = setup_logging()  # Setup logging
-    # log = open(pathLog, 'a')
     # sync_clock(pathLog)  # Sync clock from GPS
     # dt = 0
     # num_frames = 10
