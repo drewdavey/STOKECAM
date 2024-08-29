@@ -2,7 +2,7 @@ config:
   transform:                # Image transformation (identity, hflip, vflip, hvflip)
     hflip: false
     vflip: true
-  colour_space: Sycc()      # Colour space (sYCC, SMPTE170M, Rec709)
+  # colour_space: Sycc()      # Colour space (sYCC, SMPTE170M, Rec709)
   buffer_count: 4           # Number of buffer sets
   queue: false              # Queue up a frame ready for capture
 
