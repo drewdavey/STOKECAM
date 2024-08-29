@@ -30,8 +30,8 @@ cam1 = Picamera2(1)
 busy = False
 
 def configure_cameras(log):
-    cam0 = Picamera2(0)
-    cam1 = Picamera2(1)
+    # cam0 = Picamera2(0)
+    # cam1 = Picamera2(1)
 
     # Load the configuration
     camera_settings='../settings.yaml'
