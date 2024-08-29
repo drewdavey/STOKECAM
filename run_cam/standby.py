@@ -43,16 +43,18 @@ def configure_cameras(log):
         #     config['transform'] = Transform(**settings['config']['transform'])
         # if 'colour_space' in settings['config']:
         #     config['colour_space'] = ColorSpace(**settings['config']['colour_space'])
-        if 'buffer_count' in settings['config']:
-            config['buffer_count'] = settings['config']['buffer_count']
-        if 'queue' in settings['config']:
-            config['queue'] = settings['config']['queue']
-        if 'display' in settings['config']:
-            config['display'] = settings['config']['display']
-        if 'encode' in settings['config']:
-            config['encode'] = settings['config']['encode']
-        if 'size' in settings['config']:
-            config['size'] = settings['config']['size']
+        for setting in settings['config']:
+            config[setting] = settings['config'][setting]
+        # if 'buffer_count' in settings['config']:
+        #     config['buffer_count'] = settings['config']['buffer_count']
+        # if 'queue' in settings['config']:
+        #     config['queue'] = settings['config']['queue']
+        # if 'display' in settings['config']:
+        #     config['display'] = settings['config']['display']
+        # if 'encode' in settings['config']:
+        #     config['encode'] = settings['config']['encode']
+        # if 'size' in settings['config']:
+        #     config['size'] = settings['config']['size']
 
         # Apply control settings
         if 'controls' in settings['config']:
