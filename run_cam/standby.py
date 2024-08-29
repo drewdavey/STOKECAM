@@ -39,8 +39,8 @@ def configure_cameras(log):
         config = cam.create_still_configuration()
 
         for setting, value in settings['config'].items():
-            # exec(f"{key} = {value}")
-            config[setting] = value
+            exec(f"{setting} = {value}")
+            # config[setting] = value
         # for setting in settings['config']:
         #     config[setting] = settings['config'][setting]
             # Handle tuple conversion for lists
