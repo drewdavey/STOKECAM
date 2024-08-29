@@ -40,6 +40,7 @@ def configure_cameras(log):
         config = cam.create_still_configuration() #colour_space=ColorSpace.Sycc()
 
         config['main']['size'] = (1440, 1080)
+        config['main']['format'] = 'BGR888'
         config['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
         config['controls']['ExposureTime'] = 10000  # Frame rate for cam1
 
@@ -62,7 +63,6 @@ def configure_cameras(log):
 
         # Configure the camera with the updated configuration
         cam.configure(config)
-            
         cam.start()
         
         log.write(f"Camera configuration: {cam.camera_configuration()}\n")
