@@ -24,23 +24,15 @@ left_button = Button(17, hold_time=3)   #
 # Connect to the cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
-# cam0.start()
-# cam1.start()
 
 busy = False
 
 def configure_cameras(log):
-    # cam0 = Picamera2(0)
-    # cam1 = Picamera2(1)
 
-    # Load the configuration
     camera_settings='../settings.yaml'
     with open(camera_settings, 'r') as file:
         settings = yaml.safe_load(file)
 
-    # print('\nCONFIG:\n' + '\n' + settings['config'])
-    # print('\nCONTROLS:\n' + '\n' + settings['controls'])
-    # Apply minimal settings to both cameras
     for cam in [cam0, cam1]:
 
         config = cam.create_still_configuration()
@@ -74,7 +66,7 @@ def configure_cameras(log):
             
         cam.start()
         
-    #     log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
+        log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
 
 
 #         #### pull each camera config and print to log ################'
