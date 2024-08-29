@@ -13,7 +13,7 @@ config:
   encode: "main"            # Stream to encode in video recording (if applicable)
   size: (1440, 1080)
   controls:
-    ExposureTime: 20000        # Exposure time in microseconds
+    ExposureTime: 10000        # Exposure time in microseconds
     AnalogueGain: 1.0         # Gain multiplier
     Brightness: 0.0           # Brightness adjustment
     Contrast: 1.0             # Contrast adjustment
