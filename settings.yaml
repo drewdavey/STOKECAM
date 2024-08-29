@@ -10,7 +10,7 @@ config:
   controls:
 
     ExposureTime: 10000        # Exposure time in microseconds
-    FrameDurationLimits: (33333, 33333) 
+    # FrameDurationLimits: (33333, 33333) 
     AnalogueGain: 1.0         # Gain multiplier
     Brightness: 0.0           # Brightness adjustment
     Contrast: 1.0             # Contrast adjustment
