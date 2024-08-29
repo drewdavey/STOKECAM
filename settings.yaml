@@ -11,6 +11,7 @@ config:
   queue: false              # Queue up a frame ready for capture
   display: "main"           # Stream to show in the preview window
   encode: "main"            # Stream to encode in video recording (if applicable)
+  size: (1440, 1080)
   controls:
     ExposureTime: 1000        # Exposure time in microseconds
     AnalogueGain: 1.0         # Gain multiplier

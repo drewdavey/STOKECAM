@@ -8,8 +8,7 @@ import os
 import time
 import yaml
 import subprocess
-from picamera2 import Picamera2, Preview
-from libcamera import Transform, ColorSpace
+from picamera2 import Picamera2
 from vnpy import *
 
 def setup_logging():
@@ -48,6 +47,8 @@ def configure_cameras(log):
             config['display'] = settings['config']['display']
         if 'encode' in settings['config']:
             config['encode'] = settings['config']['encode']
+        if 'size' in settings['config']:
+            config['size'] = settings['config']['size']
 
         # Apply control settings
         if 'controls' in settings['config']:
