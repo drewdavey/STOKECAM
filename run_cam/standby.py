@@ -7,6 +7,7 @@
 import os
 import sys
 import time
+import yaml
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
@@ -23,10 +24,109 @@ left_button = Button(17, hold_time=3)   #
 # Connect to the cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
-cam0.start()
-cam1.start()
+# cam0.start()
+# cam1.start()
 
 busy = False
+
+def configure_cameras(log):
+    cam0 = Picamera2(0)
+    cam1 = Picamera2(1)
+
+    # Load the configuration
+    camera_settings='../settings.yaml'
+    with open(camera_settings, 'r') as file:
+        settings = yaml.safe_load(file)
+
+    # print('\nCONFIG:\n' + '\n' + settings['config'])
+    # print('\nCONTROLS:\n' + '\n' + settings['controls'])
+    # Apply minimal settings to both cameras
+    for cam in [cam0, cam1]:
+
+        config = cam.create_still_configuration()
+
+        # Apply general configuration settings
+        # if 'transform' in settings['config']:
+        #     config['transform'] = Transform(**settings['config']['transform'])
+        # if 'colour_space' in settings['config']:
+        #     config['colour_space'] = ColorSpace(**settings['config']['colour_space'])
+        if 'buffer_count' in settings['config']:
+            config['buffer_count'] = settings['config']['buffer_count']
+        if 'queue' in settings['config']:
+            config['queue'] = settings['config']['queue']
+        if 'display' in settings['config']:
+            config['display'] = settings['config']['display']
+        if 'encode' in settings['config']:
+            config['encode'] = settings['config']['encode']
+        if 'size' in settings['config']:
+            config['size'] = settings['config']['size']
+
+        # Apply control settings
+        if 'controls' in settings['config']:
+            for control, value in settings['config']['controls'].items():
+                config['controls'][control] = value
+
+        # Configure the camera with the updated configuration
+        cam.configure(config)
+
+            # for control, value in settings['controls'].items():
+            #     cam.set_controls({control: value})
+            
+        cam.start()
+        
+    #     log.write(f"Minimal Camera configuration: {cam.camera_configuration()}\n")
+
+
+#         #### pull each camera config and print to log ################'
+#         #After configuring the camera, it’s often helpful to inspect picam2.camera_configuration() to check 
+
+# from picamera2 import Picamera2
+# picam2 = Picamera2()
+# picam2.configure(picam2.create_preview_configuration())
+# picam2.set_controls({"ExposureTime": 10000, "AnalogueGain": 1.0})
+# picam2.start()
+
+# from picamera2 import Picamera2
+# picam2 = Picamera2()
+# config = picam2.create_preview_configuration()
+# picam2.configure(config)
+# picam2.start()
+
+######################################################################################
+    # def configure_cameras(log):
+    # cam0 = Picamera2(0)
+    # cam1 = Picamera2(1)
+
+    # # Load the configuration
+    # config_file='../config.yaml'
+    # with open(config_file, 'r') as file:
+    #     config = yaml.safe_load(file)['camera_settings']
+
+    # # Apply settings to both cameras
+    # for cam in [cam0, cam1]:
+    #     camera_config = cam.create_still_configuration(
+    #         main={"size": config['resolution'], "format": "RGB888"},
+    #     )
+    #     cam.configure(camera_config)
+
+    #     controls = {
+    #         'ExposureTime': int(config['exposure_time']),
+    #         'AnalogueGain': float(config['iso']),
+    #         'FrameRate': int(config['framerate']),
+    #         'Brightness': float(config['brightness']),
+    #         'Contrast': float(config['contrast']),
+    #         'Saturation': float(config['saturation']),
+    #         'AwbMode': config['awb_mode']
+    #     }
+
+    #     # Debugging output
+    #     print("Controls being set:")
+    #     for key, value in controls.items():
+    #         print(f"{key}: {value} (type: {type(value)})")
+
+    #     cam.set_controls(controls)
+    #     cam.start()
+    #     log.write(f"Camera configuration: {cam.camera_configuration()}\n")
 
 def burst(fdir, log, dt): 
     global busy
@@ -85,7 +185,7 @@ def standby(fdir, pathLog, dt, num_frames):
     global busy
     log = open(pathLog, 'a')
     log.write(f"Entered standby mode.\n")
-    # configure_cameras(log)
+    configure_cameras(log)
 
     while not (right_button.is_held and left_button.is_held):
         # left_button.when_pressed = lambda: numFrames(log)
