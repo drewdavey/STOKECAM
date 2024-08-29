@@ -41,7 +41,7 @@ def configure_cameras(log):
 
         config['main']['size'] = (1440, 1080)
         config['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
-        config['controls']['ExposurteTime'] = 10000  # Frame rate for cam1
+        config['controls']['ExposureTime'] = 10000  # Frame rate for cam1
 
         # for setting, value in settings['config'].items():
         #     # exec(f"{setting} = {value}")
