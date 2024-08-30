@@ -22,8 +22,8 @@ def run(path0,path1,pathLog,num_frames,dt):
 	for cam in [cam0, cam1]:
 		cam.configure(config)
 		cam.start()
-		log.write(f"{cam} configuration: {cam.camera_configuration()}\n")
-		log.write(f"{cam} metadata: {cam.capture_metadata()}\n")
+		log.write(f"{str(cam)} configuration: {cam.camera_configuration()}\n")
+		log.write(f"{str(cam)} metadata: {cam.capture_metadata()}\n")
 
 	for i in range(int(num_frames)):
 		timestamp = datetime.utcnow()
