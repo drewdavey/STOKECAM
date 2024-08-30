@@ -16,7 +16,6 @@ from settings import *
 # Connect to the VN-200 
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
-# ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
@@ -64,6 +63,7 @@ def numFrames(fdir, log, dt, num_frames):
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
 
+        ####################### IMU #######################
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
         gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins_solution = s.read_ins_solution_lla() # Read the INS solution
@@ -73,7 +73,8 @@ def numFrames(fdir, log, dt, num_frames):
         imu.write(f"{tstr}: GPS_LLA: {gps_solution}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
         imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
         imu.write(f"{tstr}: EzAsyncData: {ezData}" + '\n')
-
+        ###################################################
+        
         time.sleep(dt)
     imu.close()
     busy = False

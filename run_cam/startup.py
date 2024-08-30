@@ -43,7 +43,7 @@ def sync_clock_and_imu(pathLog):
         serial_num = s.read_serial_number()
         log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
 
-        time_utc = str(CompositeData.time_utc)
+        time_utc = CompositeData.time_utc
         log.write(f"Time from VN-200: {time_utc}\n")
 
     # while True:
