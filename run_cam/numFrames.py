@@ -19,11 +19,11 @@ def run(path0,path1,pathLog,num_frames,dt):
 	log = open(pathLog, 'a')
 	log.write(f"Entered numFrames mode.\n")
 
-	for cam in [cam0, cam1]:
+	for idx, cam in enumerate([cam0, cam1]):
 		cam.configure(config)
 		cam.start()
-		log.write(f"cam{cam._camera.index} configuration: {cam.camera_configuration()}\n")
-		log.write(f"cam{cam._camera.index} metadata: {cam.capture_metadata()}\n")
+		log.write(f"cam{idx} configuration: {cam.camera_configuration()}\n")
+		log.write(f"cam{idx} metadata: {cam.capture_metadata()}\n")
 
 	for i in range(int(num_frames)):
 		timestamp = datetime.utcnow()
