@@ -74,7 +74,7 @@ def numFrames(fdir, log, dt, num_frames):
 
         imu.write(f"{tstr}: GPS_LLA: {gps_solution}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
         imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
-        imu.write(f"{tstr}: EzAsyncData: {dir(ezData)}" + '\n')
+        imu.write(f"{tstr}: EzAsyncData: {str(ezData)}" + '\n')
         ###################################################
 
         time.sleep(dt)
