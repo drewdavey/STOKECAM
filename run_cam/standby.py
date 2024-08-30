@@ -14,8 +14,9 @@ from vnpy import *
 from settings import *
 
 # Connect to the VN-200 
-s = VnSensor()
-s.connect('/dev/ttyUSB0', 115200)
+s = VnSensor.connect('/dev/ttyUSB0', 115200)
+ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
+comp = CompositeData.connect('/dev/ttyUSB0', 115200)
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
@@ -30,11 +31,11 @@ cam1 = Picamera2(1)
 busy = False
 
 def configure_cameras(log):
-    for cam in [cam0, cam1]:
+    for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
-        log.write(f"{cam} configuration: {cam.camera_configuration()}\n")
-        log.write(f"{cam} metadata: {cam.capture_metadata()}\n")
+        log.write(f"cam{idx} configuration: {cam.camera_configuration()}\n")
+        log.write(f"cam{idx} metadata: {cam.capture_metadata()}\n")
 
 def burst(fdir, log, dt): 
     global busy
@@ -67,11 +68,11 @@ def numFrames(fdir, log, dt, num_frames):
         gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins_solution = s.read_ins_solution_lla() # Read the INS solution
         imu_measurements = s.read_imu_measurements() # Read the IMU measurements
-        data = s.currentdata # Read the current data
+        ezData = ez.current_data # Read the current data
 
-        imu.write(f"{tstr}: GPS_LLA: {gps_solution.datastr}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
+        imu.write(f"{tstr}: GPS_LLA: {gps_solution}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
         imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
-        imu.write(f"{tstr}: Data: {data}" + '\n')
+        imu.write(f"{tstr}: EzAsyncData: {ezData}" + '\n')
 
         time.sleep(dt)
     imu.close()
