@@ -8,12 +8,12 @@ import os
 import sys
 import time
 import datetime
-import yaml
 from picamera2 import Picamera2
 from libcamera import ColorSpace, Transform
 from gpiozero import Button
 from signal import pause
 from vnpy import *
+from settings import *
 
 # Connect to the VN-200 
 s = VnSensor()
@@ -30,43 +30,10 @@ cam1 = Picamera2(1)
 busy = False
 
 def configure_cameras(log):
-
-    camera_settings='../settings.yaml'
-    with open(camera_settings, 'r') as file:
-        settings = yaml.safe_load(file)
-
     for cam in [cam0, cam1]:
-
-        config = cam.create_still_configuration() #colour_space=ColorSpace.Sycc()
-
-        config['main']['size'] = (1440, 1080)
-        config['main']['format'] = 'BGR888'
-        # config['lores']['size'] = (320, 240)
-        config['lores']['format'] = 'BGR888'
-        config['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
-        config['controls']['ExposureTime'] = 10000  # Frame rate for cam1
-
-        # for setting, value in settings['config'].items():
-        #     # exec(f"{setting} = {value}")
-        #     config[str(setting)] = value
-        # for setting in settings['config']:
-        #     config[setting] = settings['config'][setting]
-            # Handle tuple conversion for lists
-            # if isinstance(value, list):
-            #     if len(value) == 2:  # Assuming tuples are used for size and white balance settings
-            #         value = tuple(value)
-            #         print(settings['config'][setting])
-
-
-        # Apply control settings
-        # if 'controls' in settings['config']:
-        #     for control, value in settings['config']['controls'].items():
-        #         config['controls'][control] = value
-
-        # Configure the camera with the updated configuration
+        config = get_still_configuration() 
         cam.configure(config)
         cam.start()
-        
         log.write(f"Camera configuration: {cam.camera_configuration()}\n")
 
 def burst(fdir, log, dt): 
