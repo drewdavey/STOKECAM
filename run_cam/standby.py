@@ -31,7 +31,7 @@ busy = False
 
 def configure_cameras(log):
     for cam in [cam0, cam1]:
-        config = get_still_configuration() 
+        config = cam.create_still_configuration() 
         cam.configure(config)
         cam.start()
         log.write(f"Camera configuration: {cam.camera_configuration()}\n")
