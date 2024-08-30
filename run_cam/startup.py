@@ -37,13 +37,13 @@ def sync_clock_and_imu(pathLog):
     # at the baud rate of 115200 (115,200 bytes/s) 
     s = VnSensor()
     s.connect('/dev/ttyUSB0', 115200)
-    comp = CompositeData.connect('/dev/ttyUSB0', 115200)
+    comp = s.CompositeData
 
     with open(pathLog, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
         log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
-        
+
         time_utc = comp.time_utc
         log.write(f"Time from VN-200: {time_utc}\n")
 
