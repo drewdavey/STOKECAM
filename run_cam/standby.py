@@ -35,6 +35,7 @@ def configure_cameras(log):
         cam.configure(config)
         cam.start()
         log.write(f"{cam} configuration: {cam.camera_configuration()}\n")
+        log.write(f"{cam} metadata: {cam.capture_metadata()}\n")
 
 def burst(fdir, log, dt): 
     global busy

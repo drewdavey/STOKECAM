@@ -8,61 +8,24 @@ import sys
 import time
 from picamera2 import Picamera2
 from datetime import datetime
-# from libcamera import Transform
-# import xarray as xr
+from settings import *
+
+config = get_still_configuration()
+
+cam0 = Picamera2(0)
+cam1 = Picamera2(1)
+
 
 def run(path0,path1,pathLog,num_frames,dt):
-	cam0 = Picamera2(0)
-	cam1 = Picamera2(1)
+	log = open(pathLog, 'a')
+	log.write(f"Entered numFrames mode.\n")
 
-	# Define camera configurations
-	config0 = cam0.create_still_configuration()
-	config1 = cam1.create_still_configuration()
-	
-	# Configuration settings
-	config0['main']['size'] = (1440, 1080)  # Resolution for cam0
-	config1['main']['size'] = (1440, 1080)  # Resolution for cam1
-	config0['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate (in microseconds) for cam0
-	config1['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
-	
-	# Try this .. maybe import xarray
-	# config0.main.size = (1920, 1080)  # Resolution for cam0
-	# config1.main.size = (1920, 1080)  # Resolution for cam1
-	# config0.controls.FrameDurationLimits = (33333, 33333)  # Frame rate (in microseconds) for cam0
-	# config1.controls.FrameDurationLimits = (33333, 33333)  # Frame rate for cam1
+	for cam in [cam0, cam1]:
+		cam.configure(config)
+		cam.start()
+		log.write(f"{cam} configuration: {cam.camera_configuration()}\n")
+		log.write(f"{cam} metadata: {cam.capture_metadata()}\n")
 
-	# More config settings, why?
-	# cam0.rotation = 180
-	# cam1.rotation = 180
-	# config0['main']['transform'] = Transform(hflip=1, vflip=1)
-	# config1['main']['transform'] = Transform(hflip=1, vflip=1)
-
-	# config0['main']['format'] = 'XRGB8888'
-	# config1['main']['format'] = 'XRGB8888'
-
-	# Apply configurations
-	cam0.configure(config0)
-	cam1.configure(config1)
-
-	cam0.start()
-	cam1.start()
-
-	meta0 = cam0.capture_metadata()
-	meta1 = cam1.capture_metadata()
-
-	# Write to log file
-	outfile = open(pathLog, 'a')
-	outfile.write('\n' + 'Start Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
-	outfile.write('\n' + 'Cam0 Metadata:' + '\n')
-	outfile.write(str(meta0) + '\n')
-	outfile.write('\n' + 'Cam0 Config:' + '\n')
-	outfile.write(str(config0) + '\n')
-	outfile.write('' + '\n')
-	outfile.write('Cam1 Metadata:' + '\n')
-	outfile.write(str(meta1) + '\n')
-	outfile.write('\n' + 'Cam1 Config:' + '\n')
-	outfile.write(str(config1) + '\n')
-	
 	for i in range(int(num_frames)):
 		timestamp = datetime.utcnow()
 		tstr = timestamp.strftime('%H%M%S%f')[:-3] 
@@ -72,10 +35,6 @@ def run(path0,path1,pathLog,num_frames,dt):
 	
 	cam0.stop()
 	cam1.stop()
-
-	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
-	outfile.write('Done collecting images.' + '\n')
-	outfile.close()
 	
 	cam0.close()
 	cam1.close()
