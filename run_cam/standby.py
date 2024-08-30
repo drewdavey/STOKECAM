@@ -7,7 +7,6 @@
 import os
 import sys
 import time
-import datetime
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause

@@ -6,7 +6,6 @@
 
 import os
 import time
-import datetime
 import subprocess
 from vnpy import *
 

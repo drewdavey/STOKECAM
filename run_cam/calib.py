@@ -7,8 +7,6 @@
 import sys
 import time
 from picamera2 import Picamera2
-from datetime import datetime
-from signal import pause
 from settings import *
 
 config = get_still_configuration()
@@ -27,8 +25,7 @@ def run(path0,path1,pathLog,calib_frames,dt):
 		log.write(f"cam{idx} metadata: {cam.capture_metadata()}\n")
 
 	for i in range(int(calib_frames)):
-		timestamp = datetime.utcnow()
-		tstr = timestamp.strftime('%H%M%S%f')[:-3]
+		tstr = time.strftime('%H%M%S%f')[:-3]
 		cam0.capture_file(f"{path0}0_{tstr}_{i+1:05}.jpg")
 		cam1.capture_file(f"{path1}1_{tstr}_{i+1:05}.jpg")
 		time.sleep(dt)

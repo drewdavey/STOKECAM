@@ -7,7 +7,6 @@
 import sys
 from picamera2 import Picamera2
 import time
-from datetime import datetime
 from gpiozero import Button
 from signal import pause
 from threading import Timer
@@ -34,8 +33,7 @@ def run(path0,path1,pathLog,dt,duration):
 
 	def capture(i):
 		while button.is_pressed:
-			timestamp = datetime.utcnow()
-			tstr = timestamp.strftime('%H%M%S%f')[:-3]
+			tstr = time.strftime('%H%M%S%f')[:-3]
 			cam0.capture_file(f"{path0}0_{tstr}_{i+1:05}.jpg")
 			cam1.capture_file(f"{path1}1_{tstr}_{i+1:05}.jpg")
 			i += 1
