@@ -67,9 +67,12 @@ def numFrames(fdir, log, dt, num_frames):
         gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins_solution = s.read_ins_solution_lla() # Read the INS solution
         imu_measurements = s.read_imu_measurements() # Read the IMU measurements
+        data = s.currentdata # Read the current data
 
-        imu.write(f"{tstr}: GPS_LLA: {gps_solution}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
+        imu.write(f"{tstr}: GPS_LLA: {gps_solution.datastr}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
         imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
+        imu.write(f"{tstr}: Data: {data}" + '\n')
+
         time.sleep(dt)
     imu.close()
     busy = False
