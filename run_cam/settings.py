@@ -10,7 +10,7 @@ def get_preview_configuration():
     config['controls']['FrameDurationLimits'] = (33333, 33333)  
     config['controls']['ExposureTime'] = 10000 
     cam.stop()
-    cam.close()
+    # cam.close()
     return config
 
 def get_still_configuration():
@@ -24,5 +24,5 @@ def get_still_configuration():
     config['controls']['ExposureTime'] = 10000 
 
     cam.stop()
-    cam.close()
+    # cam.close()
     return config
