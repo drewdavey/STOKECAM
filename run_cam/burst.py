@@ -26,11 +26,11 @@ def run(path0,path1,pathLog,dt,duration):
 	log = open(pathLog, 'a')
 	log.write(f"Entered burst mode.\n")
 
-	for cam in [cam0, cam1]:
+	for idx, cam in enumerate([cam0, cam1]):
 		cam.configure(config)
 		cam.start()
-		log.write(f"{cam} configuration: {cam.camera_configuration()}\n")
-		log.write(f"{cam} metadata: {cam.capture_metadata()}\n")
+		log.write(f"cam{idx} configuration: {cam.camera_configuration()}\n")
+		log.write(f"cam{idx} metadata: {cam.capture_metadata()}\n")
 
 	def capture(i):
 		while button.is_pressed:

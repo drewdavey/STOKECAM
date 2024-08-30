@@ -9,7 +9,7 @@ def get_preview_configuration():
     
     # Customizing the configuration
     config['main']['size'] = (1440, 1080)
-    config['main']['format'] = 'BGR888' 
+    config['main']['format'] = 'RGB888' 
     config['controls']['FrameDurationLimits'] = (33333, 33333)  
     config['controls']['ExposureTime'] = 10000 
     
