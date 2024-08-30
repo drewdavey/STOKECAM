@@ -62,8 +62,14 @@ def numFrames(fdir, log, dt, num_frames):
         tstr = time.strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
-        imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n') # Print the yaw, pitch, and roll values
+        gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
+        ins_solution = s.read_ins_solution() # Read the INS solution
+        imu_measurements = s.read_imu_measurements() # Read the IMU measurements
+
+        imu.write(f"{tstr}: GPS_LLA: {gps_solution}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
+        imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
         time.sleep(dt)
     imu.close()
     busy = False

@@ -32,15 +32,18 @@ def read_inputs_yaml(pathLog):
             log.write(f"Error parsing YAML file: {exc}")
             return None
     
-def sync_clock(pathLog):
-
-    with open(pathLog, 'a') as log:
-        log.write(f"SYNCING TIME blah blah.\n")
-
+def sync_clock_and_imu(pathLog):
     # Create sensor object and connect to the VN-200 
-    # at the baud rate of 115200 (115,200 bytes/s)
+    # at the baud rate of 115200 (115,200 bytes/s) 
     s = VnSensor()
     s.connect('/dev/ttyUSB0', 115200)
+
+    with open(pathLog, 'a') as log:
+        model_num = s.read_model_number()
+        serial_num = s.read_serial_number()
+        log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
+    
+
     # while True:
     #     gps_data = gps_serial.readline().decode('ascii', errors='replace')
     #     if gps_data.startswith('$GPRMC'):
@@ -65,13 +68,13 @@ def startup():
     calib_on_boot = inputs['calib_on_boot']
     launch_standby = inputs['launch_standby']
 
-    # sync_clock(pathLog)                            # Sync clock from GPS
+    sync_clock_and_imu(pathLog)                    # Connect to VecNav and sync clock
 
     if calib_on_boot:
         subprocess.Popen(['python3', 'calib.py', fdir, pathLog, num_frames, dt])
 
     if launch_standby:
-        enter_standby(fdir, pathLog, dt, num_frames)                    # Enter standby mode
+        enter_standby(fdir, pathLog, dt, num_frames)    # Enter standby mode
 
 if __name__ == "__main__":
     startup()
