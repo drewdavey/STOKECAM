@@ -24,6 +24,7 @@ right_button = Button(18, hold_time=3)  #
 left_button = Button(17, hold_time=3)   # 
 
 # Connect to the cameras
+config = get_still_configuration()
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
@@ -31,7 +32,7 @@ busy = False
 
 def configure_cameras(log):
     for cam in [cam0, cam1]:
-        config = get_still_configuration() 
+        # config = get_still_configuration() 
         cam.configure(config)
         cam.start()
         log.write(f"Camera configuration: {cam.camera_configuration()}\n")
