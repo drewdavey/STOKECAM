@@ -1,5 +1,5 @@
 
-num_frames: 8        # Number of frames to be captured by numFrames mode
+num_frames: 10        # Number of frames to be captured by numFrames mode
 dt: 0                 # Time between frames in seconds 
 
 calib_on_boot: false   # Ask to calibrate on boot?

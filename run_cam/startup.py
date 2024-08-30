@@ -55,13 +55,13 @@ def sync_clock(pathLog):
 def enter_standby(fdir, pathLog, dt, num_frames):
     with open(pathLog, 'a') as log:
         log.write(f"Startup complete - created log for today blah blah.\n")
-    subprocess.Popen(['python3', 'standby.py', fdir, pathLog, dt, num_frames])
+    subprocess.Popen(['python3', 'standby.py', fdir, pathLog, str(dt), str(num_frames)])
 
 def startup():
     fdir, pathLog = setup_logging()               # Setup logging
     inputs = read_inputs_yaml(pathLog)            # Read inputs from inputs.yaml
-    num_frames = str(inputs['num_frames'])
-    dt = str(inputs['dt'])
+    num_frames = inputs['num_frames']
+    dt = inputs['dt']
     calib_on_boot = inputs['calib_on_boot']
     launch_standby = inputs['launch_standby']
 
