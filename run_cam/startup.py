@@ -38,13 +38,12 @@ def sync_clock_and_imu(pathLog):
     s = VnSensor()
     s.connect('/dev/ttyUSB0', 115200)
 
-
     with open(pathLog, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
         log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
 
-        time_utc = CompositeData.time_utc
+        time_utc = str(CompositeData.time_utc)
         log.write(f"Time from VN-200: {time_utc}\n")
 
     # while True:

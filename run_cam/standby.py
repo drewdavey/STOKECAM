@@ -14,9 +14,9 @@ from vnpy import *
 from settings import *
 
 # Connect to the VN-200 
-s = VnSensor.connect('/dev/ttyUSB0', 115200)
+s = VnSensor()
+s.connect('/dev/ttyUSB0', 115200)
 ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
