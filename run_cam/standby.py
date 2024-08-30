@@ -108,4 +108,4 @@ def standby(fdir, pathLog, dt, num_frames):
     exit_standby(log)
 
 if __name__ == "__main__":
-    standby(sys.argv[1], sys.argv[2], 0, 10)
+    standby(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])

@@ -6,6 +6,7 @@
 
 import os
 import time
+import yaml
 import subprocess
 from vnpy import *
 
@@ -16,7 +17,26 @@ def setup_logging():
     pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
     return fdir, pathLog
 
-def sync_clock():
+def read_inputs_yaml(pathLog):
+    inputs_path = '../inputs.yaml'
+    with open(pathLog, 'a') as log:
+        try:
+            with open(inputs_path, 'r') as file:
+                inputs = yaml.safe_load(file)
+                log.write(f"Reading inputs...\n")
+            return inputs
+        except FileNotFoundError:
+            log.write(f"Error: The file {inputs_path} was not found.")
+            return None
+        except yaml.YAMLError as exc:
+            log.write(f"Error parsing YAML file: {exc}")
+            return None
+    
+def sync_clock(pathLog):
+
+    with open(pathLog, 'a') as log:
+        log.write(f"SYNCING TIME blah blah.\n")
+
     # Create sensor object and connect to the VN-200 
     # at the baud rate of 115200 (115,200 bytes/s)
     s = VnSensor()
@@ -38,11 +58,20 @@ def enter_standby(fdir, pathLog):
     subprocess.Popen(['python3', 'standby.py', fdir, pathLog])
 
 def startup():
-    fdir, pathLog = setup_logging()  # Setup logging
-    # sync_clock(pathLog)  # Sync clock from GPS
-    # dt = 0
-    # num_frames = 10
-    enter_standby(fdir, pathLog)  # Enter standby mode
+    fdir, pathLog = setup_logging()               # Setup logging
+    inputs = read_inputs_yaml(pathLog)            # Read inputs from inputs.yaml
+    num_frames = inputs['num_frames']
+    dt = inputs['dt']
+    calib_on_boot = inputs['calib_on_boot']
+    launch_standby = inputs['launch_standby']
+    
+    # sync_clock(pathLog)                            # Sync clock from GPS
+
+    if calib_on_boot:
+        subprocess.Popen(['python3', 'calib.py', fdir, pathLog, num_frames, dt])
+
+    if launch_standby:
+        enter_standby(fdir, pathLog, dt, num_frames)                    # Enter standby mode
 
 if __name__ == "__main__":
     startup()
