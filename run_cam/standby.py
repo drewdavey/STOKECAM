@@ -22,7 +22,7 @@ s.connect('/dev/ttyUSB0', 115200)
 right_button = Button(18, hold_time=3)  # 
 left_button = Button(17, hold_time=3)   # 
 
-config = get_still_configuration()
+config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
 # Connect to the cameras
 cam0 = Picamera2(0)

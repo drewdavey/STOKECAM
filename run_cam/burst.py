@@ -12,46 +12,25 @@ from gpiozero import Button
 from signal import pause
 from threading import Timer
 from functools import partial
+from settings import *
 
 i = 0  # Global index variable
 
+config = get_still_configuration()
+
+cam0 = Picamera2(0)
+cam1 = Picamera2(1)
+
 def run(path0,path1,pathLog,dt,duration):
-	button = Button(17)
-	cam0 = Picamera2(0)
-	cam1 = Picamera2(1)
+	button = Button(18)
+	log = open(pathLog, 'a')
+	log.write(f"Entered burst mode.\n")
 
-	# Define camera configurations
-	config0 = cam0.create_still_configuration()
-	config1 = cam1.create_still_configuration()
-
-	# Configuration settings
-	config0['main']['size'] = (1440, 1080)  # Resolution for cam0
-	config1['main']['size'] = (1440, 1080)  # Resolution for cam1
-	config0['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate (in microseconds) for cam0
-	config1['controls']['FrameDurationLimits'] = (33333, 33333)  # Frame rate for cam1
-
-	# Apply configurations
-	cam0.configure(config0)
-	cam1.configure(config1)
-
-	cam0.start()
-	cam1.start()
-
-	meta0 = cam0.capture_metadata()
-	meta1 = cam1.capture_metadata()
-
-	# Write to log file
-	outfile = open(pathLog, 'a')
-	outfile.write('\n' + 'Start Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
-	outfile.write('\n' + 'Cam0 Metadata:' + '\n')
-	outfile.write(str(meta0) + '\n')
-	outfile.write('\n' + 'Cam0 Config:' + '\n')
-	outfile.write(str(config0) + '\n')
-	outfile.write('' + '\n')
-	outfile.write('Cam1 Metadata:' + '\n')
-	outfile.write(str(meta1) + '\n')
-	outfile.write('\n' + 'Cam1 Config:' + '\n')
-	outfile.write(str(config1) + '\n')
+	for cam in [cam0, cam1]:
+		cam.configure(config)
+		cam.start()
+		log.write(f"{cam} configuration: {cam.camera_configuration()}\n")
+		log.write(f"{cam} metadata: {cam.capture_metadata()}\n")
 
 	def capture(i):
 		while button.is_pressed:
@@ -74,9 +53,5 @@ def run(path0,path1,pathLog,dt,duration):
 
 	button.when_pressed = lambda: capture(i)
 	
-	outfile.write('\n' + 'Stop Time: ' + datetime.utcnow().strftime('%H%M%S%f')[:-3] + '\n')
-	outfile.write('Done collecting images.' + '\n')
-	outfile.close()
-
 if __name__ == '__main__':
     run(sys.argv[1],sys.argv[2],sys.argv[3],float(sys.argv[4]),int(sys.argv[5]))

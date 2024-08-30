@@ -15,7 +15,6 @@ config = get_still_configuration()
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
-
 def run(path0,path1,pathLog,num_frames,dt):
 	log = open(pathLog, 'a')
 	log.write(f"Entered numFrames mode.\n")
