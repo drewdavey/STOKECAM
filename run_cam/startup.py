@@ -68,7 +68,7 @@ def startup():
     # sync_clock(pathLog)                            # Sync clock from GPS
 
     if calib_on_boot:
-        subprocess.Popen(['python3', 'calib.py', fdir, pathLog, num_frames, dt])
+        subprocess.Popen(['python3', 'calib.py', fdir, pathLog, str(num_frames), str(dt)])
 
     if launch_standby:
         enter_standby(fdir, pathLog, dt, num_frames)                    # Enter standby mode
