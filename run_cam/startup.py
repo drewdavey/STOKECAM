@@ -60,15 +60,15 @@ def enter_standby(fdir, pathLog, dt, num_frames):
 def startup():
     fdir, pathLog = setup_logging()               # Setup logging
     inputs = read_inputs_yaml(pathLog)            # Read inputs from inputs.yaml
-    num_frames = inputs['num_frames']
-    dt = inputs['dt']
+    num_frames = str(inputs['num_frames'])
+    dt = str(inputs['dt'])
     calib_on_boot = inputs['calib_on_boot']
     launch_standby = inputs['launch_standby']
 
     # sync_clock(pathLog)                            # Sync clock from GPS
 
     if calib_on_boot:
-        subprocess.Popen(['python3', 'calib.py', fdir, pathLog, str(num_frames), str(dt)])
+        subprocess.Popen(['python3', 'calib.py', fdir, pathLog, num_frames, dt])
 
     if launch_standby:
         enter_standby(fdir, pathLog, dt, num_frames)                    # Enter standby mode
