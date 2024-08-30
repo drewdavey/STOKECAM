@@ -24,6 +24,7 @@ right_button = Button(18, hold_time=3)  #
 left_button = Button(17, hold_time=3)   # 
 
 config = get_still_configuration()
+
 # Connect to the cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
@@ -34,7 +35,7 @@ def configure_cameras(log):
     for cam in [cam0, cam1]:
         cam.configure(config)
         cam.start()
-        log.write(f"Camera configuration: {cam.camera_configuration()}\n")
+        log.write(f"{cam} configuration: {cam.camera_configuration()}\n")
 
 def burst(fdir, log, dt): 
     global busy
@@ -103,7 +104,7 @@ def standby(fdir, pathLog, dt, num_frames):
         if left_button.is_pressed and not right_button.is_pressed and not busy:
             busy = True
             numFrames(fdir, log, dt, num_frames)
-        time.sleep(0.1)
+        time.sleep(0.2)
 
     exit_standby(log)
 

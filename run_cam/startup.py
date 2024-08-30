@@ -9,7 +9,6 @@ import time
 import datetime
 import subprocess
 from vnpy import *
-from settings import *
 
 def setup_logging():
     fdir = f"../../DATA/{time.strftime('%Y%m%d')}/"
@@ -41,7 +40,6 @@ def enter_standby(fdir, pathLog):
 
 def startup():
     fdir, pathLog = setup_logging()  # Setup logging
-    # config = get_still_configuration()
     # sync_clock(pathLog)  # Sync clock from GPS
     # dt = 0
     # num_frames = 10
