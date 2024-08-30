@@ -45,7 +45,7 @@ def startup():
     # sync_clock(pathLog)  # Sync clock from GPS
     # dt = 0
     # num_frames = 10
-    enter_standby(fdir, pathLog, config)  # Enter standby mode
+    enter_standby(fdir, pathLog)  # Enter standby mode
 
 if __name__ == "__main__":
     startup()
