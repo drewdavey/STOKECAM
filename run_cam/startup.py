@@ -6,7 +6,7 @@
 
 import os
 import time
-import datetime
+from datetime import datetime
 import yaml
 import subprocess
 from vnpy import *
