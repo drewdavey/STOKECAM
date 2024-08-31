@@ -6,15 +6,17 @@
 
 import os
 import time
+import datetime
 import yaml
 import subprocess
 from vnpy import *
 
 def setup_logging():
-    fdir = f"../../DATA/{time.strftime('%Y%m%d')}/"
+    fdir = f"../../DATA/{datetime.UTC.strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
         os.makedirs(fdir)
-    pathLog = os.path.join(fdir, f"{time.strftime('%Y%m%d')}_LOG.txt")
+    pathLog = os.path.join(fdir, f"{datetime.UTC.strftime('%Y%m%d')}_LOG.txt")
+    #if empty, write header
     return fdir, pathLog
 
 def read_inputs_yaml(pathLog):
@@ -69,11 +71,12 @@ def startup():
     dt = inputs['dt']
     calib_on_boot = inputs['calib_on_boot']
     launch_standby = inputs['launch_standby']
+    mode = inputs['shooting_mode'] # pass to settings.py
 
     sync_clock_and_imu(pathLog)                    # Connect to VecNav and sync clock
 
     if calib_on_boot:
-        subprocess.Popen(['python3', 'calib.py', fdir, pathLog, num_frames, dt])
+        subprocess.Popen(['python3', 'calib.py', fdir, pathLog, num_frames, dt]) # path0,path1,pathLog,calib_frames,dt
 
     if launch_standby:
         enter_standby(fdir, pathLog, dt, num_frames)    # Enter standby mode

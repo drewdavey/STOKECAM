@@ -5,4 +5,5 @@ dt: 0                 # Time between frames in seconds
 calib_on_boot: false   # Ask to calibrate on boot?
 launch_standby: true  # Launch into standby mode on boot?
 
+shooting_mode: 'bright'
 

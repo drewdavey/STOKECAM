@@ -7,6 +7,7 @@
 import os
 import sys
 import time
+import datetime
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
@@ -43,7 +44,7 @@ def burst(fdir, log, dt):
     imu = open(fname_imu, 'a')
     log.write(f"burst session: {fdir_out}\n")
     while right_button.is_pressed:
-        tstr = time.strftime('%H%M%S%f')[:-3]
+        tstr = datetime.UTC.strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
@@ -58,8 +59,10 @@ def numFrames(fdir, log, dt, num_frames):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
     imu = open(fname_imu, 'a')
     log.write(f"numFrames session: {fdir_out}\n")
+    asyn = s.read_async_data_output_frequency(10)
+
     for i in range(int(num_frames)):
-        tstr = time.strftime('%H%M%S%f')[:-3] 
+        tstr = datetime.UTC.strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
 
@@ -71,7 +74,8 @@ def numFrames(fdir, log, dt, num_frames):
         ezData = EzAsyncData.current_data # Read the current data
 
         # s.write_async_data_output_frequency(10)
-
+        
+        imu.write(asyn + '\n')
         imu.write(f"{tstr}: GPS_LLA: {gps_solution}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
         imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
         imu.write(f"{tstr}: EzAsyncData: {str(ezData)}" + '\n')
@@ -82,7 +86,7 @@ def numFrames(fdir, log, dt, num_frames):
     busy = False
 
 def create_dirs(fdir, mode):
-    session = time.strftime('%H%M%S_' + mode)
+    session = datetime.UTC.strftime('%H%M%S_' + mode)
     fdir_out = os.path.join(fdir, session + '/')
     fdir_cam0 = os.path.join(fdir_out, 'cam0/')
     fdir_cam1 = os.path.join(fdir_out, 'cam1/')
