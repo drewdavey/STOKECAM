@@ -6,16 +6,16 @@
 
 import os
 import time
-from datetime import datetime
 import yaml
 import subprocess
 from vnpy import *
+from datetime import datetime, timezone
 
 def setup_logging():
-    fdir = f"../../DATA/{datetime.now(datetime.utc).strftime('%Y%m%d')}/"
+    fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
         os.makedirs(fdir)
-    pathLog = os.path.join(fdir, f"{datetime.now(datetime.utc).strftime('%Y%m%d')}_LOG.txt")
+    pathLog = os.path.join(fdir, f"{datetime.now(timezone.utc).strftime('%Y%m%d')}_LOG.txt")
     #if empty, write header
     return fdir, pathLog
 

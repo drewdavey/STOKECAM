@@ -7,12 +7,12 @@
 import os
 import sys
 import time
-import datetime
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
 from vnpy import *
 from settings import *
+from datetime import datetime, timezone
 
 # Connect to the VN-200 
 s = VnSensor()
@@ -44,7 +44,7 @@ def burst(fdir, log, dt):
     imu = open(fname_imu, 'a')
     log.write(f"burst session: {fdir_out}\n")
     while right_button.is_pressed:
-        tstr = datetime.UTC.strftime('%H%M%S%f')[:-3]
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
@@ -62,7 +62,7 @@ def numFrames(fdir, log, dt, num_frames):
     asyn = s.read_async_data_output_frequency(10)
 
     for i in range(int(num_frames)):
-        tstr = datetime.UTC.strftime('%H%M%S%f')[:-3] 
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
 
@@ -86,7 +86,7 @@ def numFrames(fdir, log, dt, num_frames):
     busy = False
 
 def create_dirs(fdir, mode):
-    session = datetime.UTC.strftime('%H%M%S_' + mode)
+    session = datetime.now(timezone.utc).strftime('%H%M%S_' + mode)
     fdir_out = os.path.join(fdir, session + '/')
     fdir_cam0 = os.path.join(fdir_out, 'cam0/')
     fdir_cam1 = os.path.join(fdir_out, 'cam1/')
