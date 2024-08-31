@@ -46,7 +46,7 @@ def sync_clock_and_imu(pathLog):
         log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
 
         time_utc = CompositeData.time_utc.fget
-        log.write(f"Time from VN-200: {time_utc}\n")
+        log.write(f"Time from VN-200: {time_utc.datastr}\n")
 
     # while True:
     #     gps_data = gps_serial.readline().decode('ascii', errors='replace')
