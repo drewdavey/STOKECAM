@@ -59,7 +59,7 @@ def numFrames(fdir, log, dt, num_frames):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
     imu = open(fname_imu, 'a')
     log.write(f"numFrames session: {fdir_out}\n")
-
+    imu.write("Timestamp, EzAsyncData, Yaw, Pitch, Roll, Aceel, Gyro, Mag, GPS_LLA, INS_LLA\n")  # Header line
     for i in range(int(num_frames)):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
@@ -69,15 +69,9 @@ def numFrames(fdir, log, dt, num_frames):
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
         gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins_solution = s.read_ins_solution_lla() # Read the INS solution
-        imu_measurements = s.read_imu_measurements() # Read the IMU measurements
-        ezData = EzAsyncData.current_data # Read the current data
-
-        # s.write_async_data_output_frequency(10)
-        # asyn = s.read_async_data_output_frequency(10)
-
-        imu.write(f"{tstr}: GPS_LLA: {dir(gps_solution)}, INS_LLA: {dir(ins_solution)}, IMU: {dir(imu_measurements)}" + '\n') # Print the yaw, pitch, and roll values
-        imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
-        imu.write(f"{tstr}: EzAsyncData: {dir(ezData)}" + '\n')
+        imu_out = s.read_imu_measurements() # Read the IMU measurements
+        ezData = EzAsyncData.current_data # Read the current data from the EzAsyncData class
+        imu.write(f"{tstr}, {ezData.fget}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro}, {imu_out.mag}, {gps_solution.lLa}, {ins_solution.position}" + '\n')
         ###################################################
 
         time.sleep(dt)
