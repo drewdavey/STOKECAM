@@ -70,8 +70,8 @@ def numFrames(fdir, log, dt, num_frames):
         gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins_solution = s.read_ins_solution_lla() # Read the INS solution
         imu_out = s.read_imu_measurements() # Read the IMU measurements
-        ezData = EzAsyncData.current_data # Read the current data from the EzAsyncData class
-        imu.write(f"{tstr}, {ezData.getter}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro}, {imu_out.mag}, {gps_solution.lla}, {ins_solution.position}" + '\n')
+        ez = EzAsyncData.current_data # Read the current data from the EzAsyncData class
+        imu.write(f"{tstr}, {ez.datastr}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro}, {imu_out.mag}, {gps_solution.lla}, {ins_solution.position}" + '\n')
         ###################################################
 
         time.sleep(dt)
