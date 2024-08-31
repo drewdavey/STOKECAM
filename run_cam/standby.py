@@ -59,7 +59,6 @@ def numFrames(fdir, log, dt, num_frames):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
     imu = open(fname_imu, 'a')
     log.write(f"numFrames session: {fdir_out}\n")
-    asyn = s.read_async_data_output_frequency(10)
 
     for i in range(int(num_frames)):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
@@ -74,8 +73,8 @@ def numFrames(fdir, log, dt, num_frames):
         ezData = EzAsyncData.current_data # Read the current data
 
         # s.write_async_data_output_frequency(10)
-        
-        imu.write(asyn + '\n')
+        # asyn = s.read_async_data_output_frequency(10)
+
         imu.write(f"{tstr}: GPS_LLA: {gps_solution}, INS_LLA: {ins_solution}, IMU: {imu_measurements}" + '\n') # Print the yaw, pitch, and roll values
         imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n')
         imu.write(f"{tstr}: EzAsyncData: {str(ezData)}" + '\n')
