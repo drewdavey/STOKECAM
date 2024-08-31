@@ -70,7 +70,7 @@ def numFrames(fdir, log, dt, num_frames):
         gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins_solution = s.read_ins_solution_lla() # Read the INS solution
         imu_measurements = s.read_imu_measurements() # Read the IMU measurements
-        ezData = EzAsyncData.current_data # Read the current data
+        ezData = EzAsyncData.currentdata # Read the current data
 
         # s.write_async_data_output_frequency(10)
         # asyn = s.read_async_data_output_frequency(10)

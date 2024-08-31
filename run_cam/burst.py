@@ -5,13 +5,14 @@
 ##################################
 
 import sys
-from picamera2 import Picamera2
 import time
 from gpiozero import Button
 from signal import pause
 from threading import Timer
 from functools import partial
 from settings import *
+from picamera2 import Picamera2
+from datetime import datetime, timezone
 
 i = 0  # Global index variable
 
@@ -33,7 +34,7 @@ def run(path0,path1,pathLog,dt,duration):
 
 	def capture(i):
 		while button.is_pressed:
-			tstr = time.strftime('%H%M%S%f')[:-3]
+			tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
 			cam0.capture_file(f"{path0}0_{tstr}_{i+1:05}.jpg")
 			cam1.capture_file(f"{path1}1_{tstr}_{i+1:05}.jpg")
 			i += 1

@@ -6,8 +6,9 @@
 
 import sys
 import time
-from picamera2 import Picamera2
 from settings import *
+from picamera2 import Picamera2
+from datetime import datetime, timezone
 
 config = get_still_configuration()
 
@@ -25,7 +26,7 @@ def run(path0,path1,pathLog,num_frames,dt):
 		log.write(f"cam{idx} metadata: {cam.capture_metadata()}\n")
 
 	for i in range(int(num_frames)):
-		tstr = time.strftime('%H%M%S%f')[:-3] 
+		tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
 		cam0.capture_file(f"{path0}0_{tstr}_{i+1:05}.jpg")
 		cam1.capture_file(f"{path1}1_{tstr}_{i+1:05}.jpg")
 		time.sleep(dt)
