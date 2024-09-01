@@ -3,6 +3,7 @@
 
 import time
 import os
+import sys
 import subprocess
 from settings import *
 from picamera2 import Picamera2
@@ -13,7 +14,7 @@ from standby import create_dirs
 def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,num_frames,dt):
 	
 	config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
-	time.sleep(5)
+	time.sleep(1)
 	# Connect to the cameras
 	cam0 = Picamera2(0)
 	cam1 = Picamera2(1)
@@ -32,6 +33,7 @@ def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,num_frames,dt):
 		cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
 		time.sleep(dt)
 	imu_process.terminate()
+	
 	cam0.stop()
 	cam1.stop()
 	cam0.close()
