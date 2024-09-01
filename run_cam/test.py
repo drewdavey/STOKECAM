@@ -20,9 +20,9 @@ num_sats = ez.current_data.num_sats
 print("Number of satellites: ", num_sats, "\n")
 
 vn_pos = s.read_gps_solution_lla()
-print('Pos: ' + vn_pos)
+print('Pos: ', vn_pos, '\n')
 
 vn_time = ez.current_data.time_utc
-print('Time: ' + vn_time)
+print('Time: ', vn_time, '\n')
 
 s.disconnect()
