@@ -3,7 +3,7 @@
 from settings import *
 from picamera2 import Picamera2
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
-# import time
+import time
 # import subprocess
 
 # from datetime import datetime, timezone
