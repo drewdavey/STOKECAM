@@ -41,7 +41,7 @@ def sync_clock_and_imu(fname_log):
     # s.connect('/dev/ttyUSB0', 115200)
     ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
     s = ez.sensor
-    
+
     with open(fname_log, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
@@ -52,6 +52,7 @@ def sync_clock_and_imu(fname_log):
         log.write(f"Current position (LLA): ({vn_pos.lla.x}, {vn_pos.lla.y}, {vn_pos.lla.z})\n")
         log.write(f"Time from VN-200: {vn_time}\n")
 
+    s.disconnect()
     # while True:
     #     gps_data = gps_serial.readline().decode('ascii', errors='replace')
     #     if gps_data.startswith('$GPRMC'):

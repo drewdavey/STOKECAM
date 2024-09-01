@@ -35,7 +35,7 @@ def imu_run(fname_imu,fname_log):
     sys.exit(0)
 
 # Signal handler function
-def imu_disconnect():
+def imu_disconnect(signum, frame):
     global running
     running = False  # Set the flag to False to stop the loop
 
