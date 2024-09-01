@@ -12,6 +12,8 @@ config = get_still_configuration() # get still config from settings.py. add stat
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
+cam0.configure(config)
+cam1.configure(config)
 # cam0.stop()
 # cam1.stop()
 # cam0.close()
