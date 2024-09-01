@@ -20,7 +20,8 @@ def imu_run(fname_imu,fname_log,imu_dt):
     global running
     imu = open(fname_imu, 'a')
     log = open(fname_log, 'a')
-    log.write(f"STARTING IMU.\n")
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    log.write(f"{tstr}:     IMU started.\n")
     imu.write(imu_headerLine)
     while running:
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
@@ -32,7 +33,8 @@ def imu_run(fname_imu,fname_log,imu_dt):
         # imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
         imu.write(f"{tstr}, {ypr.x}, {ypr.y}, {ypr.z}" + '\n')
         time.sleep(imu_dt)
-    log.write('STOPPING IMU' + '\n')
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    log.write(f"{tstr}:     IMU stopped.\n")
     log.close()
     imu.close()
     s.disconnect()

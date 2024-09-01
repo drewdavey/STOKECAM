@@ -34,7 +34,7 @@ def setup_logging():
 """.format(datetime.now(timezone.utc).strftime('%Y-%m-%d-%H-%M-%S'))
         with open(fname_log, 'w') as log:
             log.write(header_block)
-            log.write("\n")
+            log.write("\n\n\n\n\n\n\n")
     return fdir, fname_log
 
 def read_inputs_yaml(fname_log):
@@ -67,7 +67,7 @@ def sync_clock_and_imu(fname_log):
 
         log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"Current position (LLA): ({vn_pos.lla.x}, {vn_pos.lla.y}, {vn_pos.lla.z})\n")
-        log.write(f"Time from VN-200: {vn_time}\n")
+        log.write(f"Time from VN-200: {vn_time}\n\n\n\n\n")
 
     s.disconnect()
     # while True:

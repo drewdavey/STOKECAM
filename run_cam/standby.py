@@ -33,8 +33,8 @@ def configure_cameras(log):
         cam.start()
         format_config = pprint.pformat(cam.camera_configuration(), width=100, indent=2)
         format_meta = pprint.pformat(cam.capture_metadata(), width=100, indent=2)  
-        log.write(f"cam{idx} configuration: {format_config}\n")
-        log.write(f"cam{idx} metadata: {format_meta}\n")
+        log.write(f"cam{idx} configuration: {format_config}\n\n\n\n\n")
+        log.write(f"cam{idx} metadata: {format_meta}\n\n\n\n\n")
 
 def burst(fdir, fname_log, dt): 
     global busy
@@ -42,7 +42,8 @@ def burst(fdir, fname_log, dt):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
-    log.write(f"burst session: {fdir_out}\n")
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    log.write(f"{tstr}:     burst session: {fdir_out}\n")
     while right_button.is_pressed:
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
@@ -57,7 +58,8 @@ def numFrames(fdir, fname_log, dt, num_frames):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
-    log.write(f"numFrames session: {fdir_out}\n")
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    log.write(f"{tstr}:     numFrames session: {fdir_out}\n")
     for i in range(int(num_frames)):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
@@ -74,11 +76,11 @@ def create_dirs(fdir, mode):
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
     fname_imu = f'{fdir_out}IMU_{session}.txt'
-    # print(f'--Created output folders: {fdir_cam0} and {fdir_cam1}')
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def exit_standby(log):
-    log.write(f"EXITING STANDBY.\n")
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    log.write(f"{tstr}:     Exiting standby.\n\n")
     log.close()
     cam0.stop() 
     cam1.stop() # Close the cameras
@@ -89,7 +91,8 @@ def exit_standby(log):
 def standby(fdir, fname_log, dt, num_frames):
     global busy
     log = open(fname_log, 'a')
-    log.write(f"Entered standby mode.\n")
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    log.write(f"{tstr}:     Entering standby...\n\n")
     configure_cameras(log)
 
     while not (right_button.is_held and left_button.is_held):
