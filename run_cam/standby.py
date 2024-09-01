@@ -73,7 +73,7 @@ def numFrames(fdir, log, dt, num_frames):
         imu_out = s.read_imu_measurements() # Read the IMU measurements
         cd = ez.current_data # Read the current data from the EzAsyncData class
         
-        imu.write(f"{tstr}, {cd.datastr}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro}, {imu_out.mag}, {gps_solution.lla}, {ins_solution.position}" + '\n')
+        imu.write(f"{tstr}, {dir(cd)}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro}, {imu_out.mag}, {gps_solution.lla}, {ins_solution.position}" + '\n')
         ###################################################
 
         time.sleep(dt)
