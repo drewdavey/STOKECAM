@@ -1,7 +1,7 @@
 # Generate configuration settings
 
 from picamera2 import Picamera2
-# from libcamera import ColorSpace, Transform
+from libcamera import ColorSpace, Transform
 
 def get_preview_configuration():
     cam = Picamera2()
