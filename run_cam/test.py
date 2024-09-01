@@ -16,6 +16,9 @@ serial_num = s.read_serial_number()
 pos = ez.current_data.has_any_position
 print('Has position: ', str(pos), "\n")
 
+gpstime = ez.current_data.has_time_gps
+print('Has position: ', str(gpstime), "\n")
+
 num_sats = ez.current_data.num_sats
 print("Number of satellites: ", str(num_sats), "\n")
 
