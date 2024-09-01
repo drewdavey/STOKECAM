@@ -4,11 +4,13 @@
 import time
 import os
 import subprocess
+from settings import *
 from picamera2 import Picamera2
 from datetime import datetime, timezone
-from settings import *
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
+
+config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
 # Connect to the cameras
 cam0 = Picamera2(0)
@@ -40,6 +42,6 @@ fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 num_frames = inputs['num_frames']
 dt = inputs['dt']
-config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
+
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
 run(fdir_cam0,fdir_cam1,fname_log,num_frames,dt)
