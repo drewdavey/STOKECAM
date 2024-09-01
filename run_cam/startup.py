@@ -46,7 +46,8 @@ def sync_clock_and_imu(pathLog):
         log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         vn_pos = s.read_gps_solution_lla()
         log.write(f"Current position (LLA): ({vn_pos.lla.x}, {vn_pos.lla.y}, {vn_pos.lla.z})\n")
-        vn_time = vn_pos.time
+        # vn_time = vn_pos.time
+        vn_time = CompositeData.time_utc(vn_pos)
         log.write(f"Time from VN-200: {vn_time}\n")
 
     # while True:
