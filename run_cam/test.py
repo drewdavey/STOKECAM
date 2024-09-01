@@ -4,7 +4,7 @@ from settings import *
 from picamera2 import Picamera2
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 import time
-# import subprocess
+import subprocess
 
 # from datetime import datetime, timezone
 # from startup import setup_logging, read_inputs_yaml
