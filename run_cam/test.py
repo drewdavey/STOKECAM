@@ -13,7 +13,7 @@ s = ez.sensor
 model_num = s.read_model_number()
 serial_num = s.read_serial_number()
 
-fix = ez.current_data.has_fix
+fix = ez.current_data.has_any_position
 print('Fix: ', str(fix), "\n")
 
 num_sats = ez.current_data.num_sats
