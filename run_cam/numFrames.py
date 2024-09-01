@@ -4,9 +4,9 @@
 import time
 import os
 import subprocess
-from settings import *
 from picamera2 import Picamera2
 from datetime import datetime, timezone
+from settings import *
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
 
