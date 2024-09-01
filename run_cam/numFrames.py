@@ -44,4 +44,5 @@ num_frames = inputs['num_frames']
 dt = inputs['dt']
 
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
+time.sleep(5)
 run(fdir_cam0,fdir_cam1,fname_log,num_frames,dt)
