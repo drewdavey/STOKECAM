@@ -37,18 +37,20 @@ def read_inputs_yaml(pathLog):
 def sync_clock_and_imu(pathLog):
     # Create sensor object and connect to the VN-200 
     # at the baud rate of 115200 (115,200 bytes/s) 
-    s = VnSensor()
-    s.connect('/dev/ttyUSB0', 115200)
+    # s = VnSensor()
+    # s.connect('/dev/ttyUSB0', 115200)
+    ez = EzAsyncData.connect('COM1', 115200)
+    s = ez.sensor
 
     with open(pathLog, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
         vn_pos = s.read_gps_solution_lla()
-        vn_time = s.CompositeData.time_utc
+        vn_time = ez.current_data
 
         log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"Current position (LLA): ({vn_pos.lla.x}, {vn_pos.lla.y}, {vn_pos.lla.z})\n")
-        log.write(f"Time from VN-200: {vn_time}\n")
+        log.write(f"Time from VN-200: {dir(vn_time)}\n")
 
     # while True:
     #     gps_data = gps_serial.readline().decode('ascii', errors='replace')
