@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
 
+time.sleep(1)
+
 def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,num_frames,dt):
 	
 	config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
