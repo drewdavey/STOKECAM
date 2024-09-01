@@ -20,16 +20,14 @@ else
   dt=$2
 fi
 
-# Generate IMU dt
-imu_dt=$(echo "$dt * 0.1" | bc)
-# echo $imu_dt
 # Output IMU file name
 fname_imu='IMU_'$(date -u +'%H%M%S_numFrames.txt')''
 
 # Output log file name
-fname_log='LOG_'$(date -u +'%H%M%S_numFrames.txt')''
+fname_log=$(date -u +'%Y%m%d_LOG.txt')''
 
 # Create directory for data and log file export, if necessary
+fdir='../../DATA/'$(date -u +'%Y%m%d')'/'
 fdir_out='../../DATA/'$(date -u +'%Y%m%d')'/'$(date -u +'%H%M%S_numFrames')'/'
 fdir_cam0=$fdir_out'cam0/'
 fdir_cam1=$fdir_out'cam1/'
@@ -43,29 +41,29 @@ if [ ! -d '$fdir_out' ]; then
   echo '--Created cam1 folder: ' $fdir_cam1
 fi
 
-echo 'Running numFrames.py [' $num_frames '] frames' |& tee -a $fdir_out$fname_log
-echo '' |& tee -a $fdir_out$fname_log
-echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
-echo '  Output folder:            ' $fdir_out |& tee -a $fdir_out$fname_log
-echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir_out$fname_log
-echo '' |& tee -a $fdir_out$fname_log
-echo 'Getting camera specs' |& tee -a $fdir_out$fname_log
-echo '' |& tee -a $fdir_out$fname_log
+echo 'Running numFrames.py [' $num_frames '] frames' |& tee -a $fdir$fname_log
+echo '' |& tee -a $fdir$fname_log
+echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir$fname_log
+echo '  Output folder:            ' $fdir_out |& tee -a $fdir$fname_log
+echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++' |& tee -a $fdir$fname_log
+echo '' |& tee -a $fdir$fname_log
+echo 'Getting camera specs' |& tee -a $fdir$fname_log
+echo '' |& tee -a $fdir$fname_log
 
 # Run image collection script
-python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir_out$fname_log $num_frames $dt >> $fdir_out$fname_log 2>&1 &
+python3 numFrames.py $fdir_cam0 $fdir_cam1 $fdir$fname_log >> $fdir$fname_log 2>&1 &
 
 # Check if the background job was successfully started
 if [ $? -eq 0 ]; then
     # Get process ID of the background script
     PID=$!
-    echo 'Starting Camera: PID = ' $PID |& tee -a $fdir_out$fname_log
+    echo 'Starting Camera: PID = ' $PID |& tee -a $fdir$fname_log
 
     # Run IMU script
-    python3 imu.py $fdir_out$fname_log $fdir_out$fname_imu $imu_dt $PID >> $fdir_out$fname_log 2>&1 &
+    python3 imu.py $fdir_out$fname_log $fdir_out$fname_imu $imu_dt $PID >> $fdir$fname_log 2>&1 &
     # Get process ID of the IMU script
     IMU_PID=$!
-    echo 'Starting IMU: PID = ' $IMU_PID  |& tee -a $fdir_out$fname_log
+    echo 'Starting IMU: PID = ' $IMU_PID  |& tee -a $fdir$fname_log
     echo '' |& tee -a $fdir_out$fname_log
 
     # Wait for the camera to finish

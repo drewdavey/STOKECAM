@@ -11,23 +11,14 @@ from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
 import subprocess
-from vnpy import *
 from settings import *
 from datetime import datetime, timezone
-
-# Connect to the VN-200 
-# ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-# s = ez.sensor                                       # create sensor object for VN-200
-# s = VnSensor() # Create sensor object for VN-200
-# s.connect('/dev/ttyUSB0', 115200)
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
 left_button = Button(17, hold_time=3)   # 
 
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
-
-# imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n"
 
 # Connect to the cameras
 cam0 = Picamera2(0)
@@ -46,7 +37,7 @@ def burst(fdir, fname_log, dt):
     global busy
     i = 0
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
-    imu_process = subprocess.Popen(['python3', 'imu2.py', fname_imu, fname_log])
+    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
     log.write(f"burst session: {fdir_out}\n")
     while right_button.is_pressed:
@@ -61,15 +52,15 @@ def burst(fdir, fname_log, dt):
 def numFrames(fdir, fname_log, dt, num_frames):
     global busy
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
+    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
     log.write(f"numFrames session: {fdir_out}\n")
-
     for i in range(int(num_frames)):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         time.sleep(dt)
-
+    imu_process.terminate()
     busy = False
 
 def create_dirs(fdir, mode):
