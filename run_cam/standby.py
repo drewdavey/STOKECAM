@@ -7,6 +7,7 @@
 import os
 import sys
 import time
+import pprint
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
@@ -30,8 +31,10 @@ def configure_cameras(log):
     for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
-        log.write(f"cam{idx} configuration: {cam.camera_configuration()}\n")
-        log.write(f"cam{idx} metadata: {cam.capture_metadata()}\n")
+        format_config = pprint.pformat(cam.camera_configuration(), width=80)
+        format_meta = pprint.pformat(cam.camera_metadata(), width=80)  
+        log.write(f"cam{idx} configuration: {format_config}\n")
+        log.write(f"cam{idx} metadata: {format_meta}\n")
 
 def burst(fdir, fname_log, dt): 
     global busy
