@@ -15,6 +15,7 @@ serial_num = s.read_serial_number()
 
 while not ez.current_data.has_fix:
 
+    print('#####################################################')
     pos = ez.current_data.has_any_position
     print('Has position: ', str(pos), "\n")
 
@@ -33,6 +34,7 @@ while not ez.current_data.has_fix:
     has_num_sats = ez.current_data.has_num_sats
     print("Has Number of satellites: ", str(has_num_sats), "\n")
 
+    print('#####################################################')
     time.sleep(2)
-    
+
 s.disconnect()
