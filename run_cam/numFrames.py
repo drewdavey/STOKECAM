@@ -10,7 +10,6 @@ from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
 
-
 def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,num_frames,dt):
 	
 	config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
@@ -45,5 +44,4 @@ num_frames = inputs['num_frames']
 dt = inputs['dt']
 
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
-time.sleep(5)
-run(fdir_cam0,fdir_cam1,fname_log,num_frames,dt)
+run(fdir_cam0, fdir_cam1, fname_log, fname_imu, num_frames, dt)
