@@ -9,8 +9,10 @@ from startup import setup_logging, read_inputs_yaml
 imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n"
 
 # Connect to the VN-200 
-ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-s = ez.sensor
+# ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
+# s = ez.sensor
+s = VnSensor()
+s.connect('/dev/ttyUSB0', 115200)
 
 running = True
 
