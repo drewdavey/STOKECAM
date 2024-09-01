@@ -24,6 +24,8 @@ left_button = Button(17, hold_time=3)   #
 
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
+imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n"
+
 # Connect to the cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
@@ -43,12 +45,19 @@ def burst(fdir, log, dt):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
     imu = open(fname_imu, 'a')
     log.write(f"burst session: {fdir_out}\n")
+    imu.write(imu_headerLine)  # Header line
     while right_button.is_pressed:
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+        ####################### IMU #######################
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
-        imu.write(f"{tstr}: Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}" + '\n') # Print the yaw, pitch, and roll values
+        gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
+        ins = s.read_ins_solution_lla() # Read the INS solution
+        imu_out = s.read_imu_measurements() # Read the IMU measurements
+        cd = ez.current_data # Read current data as CompositeData class from the EzAsyncData
+        imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
+        ###################################################
         i += 1
         time.sleep(dt)
     imu.close()
@@ -59,25 +68,34 @@ def numFrames(fdir, log, dt, num_frames):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
     imu = open(fname_imu, 'a')
     log.write(f"numFrames session: {fdir_out}\n")
-    imu.write("Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n")  # Header line
+    imu.write(imu_headerLine)  # Header line
     for i in range(int(num_frames)):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
-
         ####################### IMU #######################
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
         gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins = s.read_ins_solution_lla() # Read the INS solution
         imu_out = s.read_imu_measurements() # Read the IMU measurements
         cd = ez.current_data # Read current data as CompositeData class from the EzAsyncData
-        
         imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
         ###################################################
-
         time.sleep(dt)
     imu.close()
     busy = False
+
+# def write_imu(fname_imu, tstr):
+#     imu = open(fname_imu, 'a')
+#     imu.write(imu_headerLine)  # Header line
+#     ####################### IMU #######################
+#     ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
+#     gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
+#     ins = s.read_ins_solution_lla() # Read the INS solution
+#     imu_out = s.read_imu_measurements() # Read the IMU measurements
+#     cd = ez.current_data # Read current data as CompositeData class from the EzAsyncData
+#     imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
+#     ###################################################
 
 def create_dirs(fdir, mode):
     session = datetime.now(timezone.utc).strftime('%H%M%S_' + mode)
