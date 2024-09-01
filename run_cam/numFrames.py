@@ -12,11 +12,10 @@ from standby import create_dirs
 
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
-# Connect to the cameras
-cam0 = Picamera2(0)
-cam1 = Picamera2(1)
-
 def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,num_frames,dt):
+	# Connect to the cameras
+	cam0 = Picamera2(0)
+	cam1 = Picamera2(1)
 
 	log = open(fname_log, 'a')
 	log.write(f"Running numFrames mode manually.\n")
