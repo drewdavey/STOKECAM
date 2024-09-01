@@ -17,10 +17,13 @@ pos = ez.current_data.has_any_position
 print('Has position: ', str(pos), "\n")
 
 gpstime = ez.current_data.has_time_gps
-print('Has position: ', str(gpstime), "\n")
+print('Has GPS time: ', str(gpstime), "\n")
 
 num_sats = ez.current_data.num_sats
 print("Number of satellites: ", str(num_sats), "\n")
+
+has_num_sats = ez.current_data.has_num_sats
+print("Number of satellites: ", str(has_num_sats), "\n")
 
 vn_pos = s.read_gps_solution_lla()
 print('Pos: ', vn_pos.lla, '\n')
