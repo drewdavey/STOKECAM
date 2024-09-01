@@ -7,10 +7,6 @@ from picamera2 import Picamera2
 from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
-from gpiozero import Button
-# GPIO pin definitions
-right_button = Button(18, hold_time=3)  # 
-left_button = Button(17, hold_time=3)   # 
 
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
