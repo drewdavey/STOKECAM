@@ -25,7 +25,6 @@ def read_inputs_yaml(fname_log):
         try:
             with open(inputs_path, 'r') as file:
                 inputs = yaml.safe_load(file)
-                log.write(f"Reading inputs...\n")
             return inputs
         except FileNotFoundError:
             log.write(f"Error: The file {inputs_path} was not found.")
