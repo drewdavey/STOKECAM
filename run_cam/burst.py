@@ -29,8 +29,8 @@ def run(fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt):
 		cam.start()
 		format_config = pprint.pformat(cam.camera_configuration(), width=100, indent=2)
 		format_meta = pprint.pformat(cam.capture_metadata(), width=100, indent=2)  
-		log.write(f"cam{idx} configuration: {format_config}\n\n\n\n\n")
-		log.write(f"cam{idx} metadata: {format_meta}\n\n\n\n\n")
+		log.write(f"cam{idx} configuration: {format_config}\n\n\n")
+		log.write(f"cam{idx} metadata: {format_meta}\n\n\n")
 
 	def capture(i):
 		while button.is_pressed:
