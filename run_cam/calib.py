@@ -8,13 +8,12 @@ from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
 
+config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
+
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
 def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,calib_frames,dt):
-	
-	# config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
-
 	log = open(fname_log, 'a')
 	log.write(f"Running calibration mode manually.\n")
 	for idx, cam in enumerate([cam0, cam1]):
