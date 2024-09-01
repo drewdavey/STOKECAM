@@ -7,7 +7,9 @@ from picamera2 import Picamera2
 from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
-Picamera2().close()
+
+time.sleep(5) # Wait for the system to boot up
+
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
 fdir, fname_log = setup_logging()               # Setup logging
