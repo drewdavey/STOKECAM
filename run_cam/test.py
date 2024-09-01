@@ -14,7 +14,10 @@ model_num = s.read_model_number()
 serial_num = s.read_serial_number()
 
 fix = ez.current_data.has_fix
-print('Fix: ' + fix)
+print('Fix: ', str(fix), "\n")
+
+num_sats = ez.current_data.num_sats
+print("Number of satellites: ", num_sats, "\n")
 
 vn_pos = s.read_gps_solution_lla()
 print('Pos: ' + vn_pos)
