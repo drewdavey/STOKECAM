@@ -16,7 +16,25 @@ def setup_logging():
     if not os.path.exists(fdir):
         os.makedirs(fdir)
     fname_log = os.path.join(fdir, f"{datetime.now(timezone.utc).strftime('%Y%m%d')}_LOG.txt")
-    #if empty, write header
+    if not os.path.exists(fname_log) or os.stat(fname_log).st_size == 0:
+        header_block = """
+        ########################################
+        #                                       #
+        #     *****   *****   *****   *****     #
+        #    *       *       *       *          #
+        #     *****   *****   *****   *****     #
+        #          *       *       *       *    #
+        #     *****   *****   *****   *****     #
+        #                                       #
+        ########################################
+        # STereo camera system for Overturning wave KinEmatics #
+        # Developed at Scripps Institution of Oceanography     #
+        # Date: {}                                             #
+        ########################################################
+        """.format(datetime.now(timezone.utc).strftime('%Y-%m-%d-%H-%M-%S'))
+        with open(fname_log, 'w') as log:
+            log.write(header_block)
+            log.write("\n")
     return fdir, fname_log
 
 def read_inputs_yaml(fname_log):
