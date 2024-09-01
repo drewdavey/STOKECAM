@@ -9,7 +9,7 @@ from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
 
 	
-config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
+# config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
@@ -29,7 +29,9 @@ for idx, cam in enumerate([cam0, cam1]):
 	cam.start()
 	log.write(f"cam{idx} configuration: {cam.camera_configuration()}\n")
 	log.write(f"cam{idx} metadata: {cam.capture_metadata()}\n")
+
 imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
+
 for i in range(int(num_frames)):
 	tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
 	cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
@@ -41,6 +43,5 @@ cam0.stop()
 cam1.stop()
 cam0.close()
 cam1.close()
-exit() 
 
 
