@@ -62,10 +62,13 @@ def sync_clock_and_imu(fname_log):
     with open(fname_log, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
+        log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
+
+        while not ez.current_data.has_fix:
+            log.write("Waiting for VN-200 to acquire GPS fix...\n")
+            time.sleep(1)
         vn_pos = s.read_gps_solution_lla()
         vn_time = ez.current_data.time_utc
-
-        log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"Current position (LLA): ({vn_pos.lla.x}, {vn_pos.lla.y}, {vn_pos.lla.z})\n")
         log.write(f"Time from VN-200: {vn_time}\n")
 
