@@ -1,43 +1,45 @@
 # Last updated: 2024-04-10
-##################################
-# This script is passed 5 arguments from run_calib.sh
-# Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames for calibration (5) dt
-##################################
 
-import sys
 import time
+import subprocess
 from settings import *
 from picamera2 import Picamera2
 from datetime import datetime, timezone
-
-config = get_still_configuration()
+from startup import setup_logging, read_inputs_yaml
+from standby import create_dirs
 
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
-def run(path0,path1,pathLog,calib_frames,dt):
-	log = open(pathLog, 'a')
-	log.write(f"Entered calibration mode.\n")
+def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,calib_frames,dt):
+	
+	# config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
+	log = open(fname_log, 'a')
+	log.write(f"Running calibration mode manually.\n")
 	for idx, cam in enumerate([cam0, cam1]):
 		cam.configure(config)
 		cam.start()
 		log.write(f"cam{idx} configuration: {cam.camera_configuration()}\n")
 		log.write(f"cam{idx} metadata: {cam.capture_metadata()}\n")
-
+	imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
 	for i in range(int(calib_frames)):
-		tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-		cam0.capture_file(f"{path0}0_{tstr}_{i+1:05}.jpg")
-		cam1.capture_file(f"{path1}1_{tstr}_{i+1:05}.jpg")
+		tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
+		cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
+		cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
 		time.sleep(dt)
+	imu_process.terminate()
 	
 	cam0.stop()
 	cam1.stop()
-
 	cam0.close()
 	cam1.close()
-	exit()
+	exit() 
 
-if __name__ == '__main__':
-    run(sys.argv[1],sys.argv[2],sys.argv[3],int(sys.argv[4]),int(sys.argv[5]))
+fdir, fname_log = setup_logging()               # Setup logging
+inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
+calib_frames = inputs['calib_frames']
+dt = inputs['dt']
 
+fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'calib')
+run(fdir_cam0, fdir_cam1, fname_log, fname_imu, calib_frames, dt)
