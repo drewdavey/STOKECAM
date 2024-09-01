@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 # Connect to the VN-200 
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
+ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
@@ -70,9 +71,9 @@ def numFrames(fdir, log, dt, num_frames):
         gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins_solution = s.read_ins_solution_lla() # Read the INS solution
         imu_out = s.read_imu_measurements() # Read the IMU measurements
-        # ez = EzAsyncData.current_data # Read the current data from the EzAsyncData class
-        ez = s.Packet
-        imu.write(f"{tstr}, {ez.datastr}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro}, {imu_out.mag}, {gps_solution.lla}, {ins_solution.position}" + '\n')
+        cd = ez.current_data # Read the current data from the EzAsyncData class
+        
+        imu.write(f"{tstr}, {cd.datastr}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro}, {imu_out.mag}, {gps_solution.lla}, {ins_solution.position}" + '\n')
         ###################################################
 
         time.sleep(dt)

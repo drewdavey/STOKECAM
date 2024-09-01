@@ -39,7 +39,6 @@ def sync_clock_and_imu(pathLog):
     # at the baud rate of 115200 (115,200 bytes/s) 
     s = VnSensor()
     s.connect('/dev/ttyUSB0', 115200)
-    ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
     cd = CompositeData()
 
     with open(pathLog, 'a') as log:
