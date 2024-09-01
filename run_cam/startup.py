@@ -37,10 +37,11 @@ def read_inputs_yaml(fname_log):
 def sync_clock_and_imu(fname_log):
     # Create sensor object and connect to the VN-200 
     # at the baud rate of 115200 (115,200 bytes/s) 
-    s = VnSensor()
-    s.connect('/dev/ttyUSB0', 115200)
+    # s = VnSensor()
+    # s.connect('/dev/ttyUSB0', 115200)
     ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-
+    s = ez.sensor
+    
     with open(fname_log, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
