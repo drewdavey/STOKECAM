@@ -71,7 +71,7 @@ def create_dirs(fdir, mode):
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
     fname_imu = f'{fdir_out}IMU_{session}.txt'
-    print(f'--Created output folders: {fdir_cam0} and {fdir_cam1}')
+    # print(f'--Created output folders: {fdir_cam0} and {fdir_cam1}')
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def exit_standby(log):
