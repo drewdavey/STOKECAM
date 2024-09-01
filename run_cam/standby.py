@@ -59,7 +59,7 @@ def numFrames(fdir, log, dt, num_frames):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
     imu = open(fname_imu, 'a')
     log.write(f"numFrames session: {fdir_out}\n")
-    imu.write("Timestamp, CurrentData, Yaw, Pitch, Roll, Aceel, Gyro, Mag, GPS_LLA, INS_LLA\n")  # Header line
+    imu.write("Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n")  # Header line
     for i in range(int(num_frames)):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
@@ -67,12 +67,14 @@ def numFrames(fdir, log, dt, num_frames):
 
         ####################### IMU #######################
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
-        gps_solution = s.read_gps_solution_lla() # Read the GPS solution in LLA format
-        ins_solution = s.read_ins_solution_lla() # Read the INS solution
+        gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
+        ins = s.read_ins_solution_lla() # Read the INS solution
         imu_out = s.read_imu_measurements() # Read the IMU measurements
-        cd = ez.current_data # Read the current data from the EzAsyncData class
+        cd = ez.current_data # Read current data as CompositeData class from the EzAsyncData
         
-        imu.write(f"{tstr}, {cd}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro}, {imu_out.mag}, {gps_solution.lla}, {ins_solution.position}" + '\n')
+        imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel}, {imu_out.gyro},
+                   {imu_out.mag}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, 
+                   {ins.position.z})" + '\n')
         ###################################################
 
         time.sleep(dt)
