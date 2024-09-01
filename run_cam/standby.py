@@ -31,8 +31,8 @@ def configure_cameras(log):
     for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
-        format_config = pprint.pformat(cam.camera_configuration(), width=80)
-        format_meta = pprint.pformat(cam.camera_metadata(), width=80)  
+        format_config = pprint.pformat(cam.camera_configuration(), width=100, indent=2)
+        format_meta = pprint.pformat(cam.camera_metadata(), width=100, indent=2)  
         log.write(f"cam{idx} configuration: {format_config}\n")
         log.write(f"cam{idx} metadata: {format_meta}\n")
 
