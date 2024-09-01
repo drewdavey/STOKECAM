@@ -15,8 +15,10 @@ from settings import *
 from datetime import datetime, timezone
 
 # Connect to the VN-200 
-ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-s = ez.sensor                                       # create sensor object for VN-200
+# ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
+# s = ez.sensor                                       # create sensor object for VN-200
+s = VnSensor() # Create sensor object for VN-200
+s.connect('/dev/ttyUSB0', 115200)
 
 # GPIO pin definitions
 right_button = Button(18, hold_time=3)  # 
