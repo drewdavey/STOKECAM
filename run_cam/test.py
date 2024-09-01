@@ -13,22 +13,24 @@ s = ez.sensor
 model_num = s.read_model_number()
 serial_num = s.read_serial_number()
 
-pos = ez.current_data.has_any_position
-print('Has position: ', str(pos), "\n")
+while not ez.current_data.has_fix:
 
-gpstime = ez.current_data.has_time_gps
-print('Has GPS time: ', str(gpstime), "\n")
+    pos = ez.current_data.has_any_position
+    print('Has position: ', str(pos), "\n")
 
-num_sats = ez.current_data.num_sats
-print("Number of satellites: ", str(num_sats), "\n")
+    gpstime = ez.current_data.has_time_gps
+    print('Has GPS time: ', str(gpstime), "\n")
 
-has_num_sats = ez.current_data.has_num_sats
-print("Number of satellites: ", str(has_num_sats), "\n")
+    vn_pos = s.read_gps_solution_lla()
+    print('GPS Pos: ', vn_pos.lla, '\n')
 
-vn_pos = s.read_gps_solution_lla()
-print('Pos: ', vn_pos.lla, '\n')
+    vn_time = ez.current_data.time_utc
+    print('GPS Time: ', vn_time, '\n')
 
-vn_time = ez.current_data.time_utc
-print('Time: ', vn_time, '\n')
+    num_sats = ez.current_data.num_sats
+    print("Number of satellites: ", str(num_sats), "\n")
+
+    has_num_sats = ez.current_data.has_num_sats
+    print("Has Number of satellites: ", str(has_num_sats), "\n")
 
 s.disconnect()
