@@ -12,6 +12,7 @@ from standby import create_dirs
 
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 from picamera2 import Picamera2
+
 # Connect to the cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
