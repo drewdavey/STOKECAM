@@ -10,6 +10,7 @@ import time
 from picamera2 import Picamera2
 from gpiozero import Button
 from signal import pause
+import subprocess
 from vnpy import *
 from settings import *
 from datetime import datetime, timezone
@@ -45,46 +46,29 @@ def burst(fdir, log, dt):
     global busy
     i = 0
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
-    imu = open(fname_imu, 'a')
+    imu_process = subprocess.Popen(['python3', 'imu2.py', fname_imu, log])
     log.write(f"burst session: {fdir_out}\n")
-    imu.write(imu_headerLine)  # Header line
     while right_button.is_pressed:
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
-        ###################### IMU #######################
-        # ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
-        # gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
-        # ins = s.read_ins_solution_lla() # Read the INS solution
-        # imu_out = s.read_imu_measurements() # Read the IMU measurements
-        # # cd = ez.current_data # Read current data as CompositeData class from the EzAsyncData
-        # imu.write(f"{tstr}, {imu_out.temp}, {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
-        ##################################################
         i += 1
         time.sleep(dt)
-    imu.close()
+    imu_process.terminate()
     busy = False
 
 def numFrames(fdir, log, dt, num_frames):
     global busy
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
-    imu = open(fname_imu, 'a')
+
     log.write(f"numFrames session: {fdir_out}\n")
-    imu.write(imu_headerLine)  # Header line
+
     for i in range(int(num_frames)):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
-        ####################### IMU #######################
-        ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
-        gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
-        ins = s.read_ins_solution_lla() # Read the INS solution
-        imu_out = s.read_imu_measurements() # Read the IMU measurements
-        # cd = ez.current_data # Read current data as CompositeData class from the EzAsyncData
-        imu.write(f"{tstr}, {imu_out.temp}, {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
-        ##################################################
         time.sleep(dt)
-    imu.close()
+
     busy = False
 
 def create_dirs(fdir, mode):
@@ -101,7 +85,6 @@ def create_dirs(fdir, mode):
 def exit_standby(log):
     log.write(f"EXITING STANDBY.\n")
     log.close()
-    s.disconnect() # Disconnect from the VN-200
     cam0.stop() 
     cam1.stop() # Close the cameras
     right_button.close() 
