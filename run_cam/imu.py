@@ -26,7 +26,7 @@ def imu_run(fname_imu,fname_log):
         gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins = s.read_ins_solution_lla() # Read the INS solution
         imu_out = s.read_imu_measurements() # Read the IMU measurements
-        cd = ez.current_data # Read current data as CompositeData class from the EzAsyncData
+        cd = ez.current_data # Read current data as CompositeData class from EzAsyncData
         imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
         time.sleep(imu_dt)
     log.write('STOPPING IMU' + '\n')
@@ -35,13 +35,11 @@ def imu_run(fname_imu,fname_log):
     s.disconnect()
     sys.exit(0)
 
-# Signal handler function
 def imu_disconnect(signum, frame):
     global running
-    running = False  # Set the flag to False to stop the loop
+    running = False
 
-# Set up signal handling
-signal.signal(signal.SIGTERM, imu_disconnect)
+signal.signal(signal.SIGTERM, imu_disconnect) # signal handling
 signal.signal(signal.SIGINT, imu_disconnect)
 
 if __name__ == '__main__':
