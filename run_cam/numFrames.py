@@ -2,14 +2,17 @@
 
 import time
 import subprocess
+time.sleep(1)
 from settings import *
+time.sleep(1)
 from picamera2 import Picamera2
+time.sleep(1)
 from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
 
 config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
-
+time.sleep(1)
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
