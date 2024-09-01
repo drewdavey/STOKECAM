@@ -66,6 +66,8 @@ def sync_clock_and_imu(fname_log):
 
         while not ez.current_data.has_fix:
             log.write("Waiting for VN-200 to acquire GPS fix...\n")
+            num_sats = ez.current_data.num_sats
+            log.write(f"Number of satellites: {num_sats}\n")
             time.sleep(1)
         vn_pos = s.read_gps_solution_lla()
         vn_time = ez.current_data.time_utc
