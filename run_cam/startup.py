@@ -15,13 +15,13 @@ def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
         os.makedirs(fdir)
-    pathLog = os.path.join(fdir, f"{datetime.now(timezone.utc).strftime('%Y%m%d')}_LOG.txt")
+    fname_log = os.path.join(fdir, f"{datetime.now(timezone.utc).strftime('%Y%m%d')}_LOG.txt")
     #if empty, write header
-    return fdir, pathLog
+    return fdir, fname_log
 
-def read_inputs_yaml(pathLog):
+def read_inputs_yaml(fname_log):
     inputs_path = '../inputs.yaml'
-    with open(pathLog, 'a') as log:
+    with open(fname_log, 'a') as log:
         try:
             with open(inputs_path, 'r') as file:
                 inputs = yaml.safe_load(file)
@@ -34,14 +34,14 @@ def read_inputs_yaml(pathLog):
             log.write(f"Error parsing YAML file: {exc}")
             return None
     
-def sync_clock_and_imu(pathLog):
+def sync_clock_and_imu(fname_log):
     # Create sensor object and connect to the VN-200 
     # at the baud rate of 115200 (115,200 bytes/s) 
     s = VnSensor()
     s.connect('/dev/ttyUSB0', 115200)
     ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-    
-    with open(pathLog, 'a') as log:
+
+    with open(fname_log, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
         vn_pos = s.read_gps_solution_lla()
@@ -62,27 +62,27 @@ def sync_clock_and_imu(pathLog):
     #             os.system(f'sudo date -u --set="{formatted_time}"')
     #             break
 
-def enter_standby(fdir, pathLog, dt, num_frames):
-    with open(pathLog, 'a') as log:
+def enter_standby(fdir, fname_log, dt, num_frames):
+    with open(fname_log, 'a') as log:
         log.write(f"Startup complete - created log for today blah blah.\n")
-    subprocess.Popen(['python3', 'standby.py', fdir, pathLog, str(dt), str(num_frames)])
+    subprocess.Popen(['python3', 'standby.py', fdir, fname_log, str(dt), str(num_frames)])
 
 def startup():
-    fdir, pathLog = setup_logging()               # Setup logging
-    inputs = read_inputs_yaml(pathLog)            # Read inputs from inputs.yaml
+    fdir, fname_log = setup_logging()               # Setup logging
+    inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
     num_frames = inputs['num_frames']
     dt = inputs['dt']
     calib_on_boot = inputs['calib_on_boot']
     launch_standby = inputs['launch_standby']
     mode = inputs['shooting_mode'] # pass to settings.py
 
-    sync_clock_and_imu(pathLog)                    # Connect to VecNav and sync clock
+    sync_clock_and_imu(fname_log)                    # Connect to VecNav and sync clock
 
     if calib_on_boot:
-        subprocess.Popen(['python3', 'calib.py', fdir, pathLog, num_frames, dt]) # path0,path1,pathLog,calib_frames,dt
+        subprocess.Popen(['python3', 'calib.py', fdir, fname_log, num_frames, dt]) # path0,path1,fname_log,calib_frames,dt
 
     if launch_standby:
-        enter_standby(fdir, pathLog, dt, num_frames)    # Enter standby mode
+        enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
 
 if __name__ == "__main__":
     startup()

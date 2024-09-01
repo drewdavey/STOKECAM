@@ -12,14 +12,16 @@ imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperatur
 ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
 s = ez.sensor
 
-def imu_run(fname_imu,log):
+running = True
+
+def imu_run(fname_imu,fname_log):
+    global running
     imu = open(fname_imu, 'a')
-    # log = open(log_path, 'a')
+    log = open(fname_log, 'a')
     log.write(f"STARTING IMU.\n")
     imu.write(imu_headerLine)
-    while True:
+    while running:
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-        ####################### IMU #######################
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
         gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         ins = s.read_ins_solution_lla() # Read the INS solution
@@ -27,13 +29,15 @@ def imu_run(fname_imu,log):
         cd = ez.current_data # Read current data as CompositeData class from the EzAsyncData
         imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
         time.sleep(imu_dt)
-
-def imu_disconnect(imu):
-    # Disconnect from the sensor
     imu.write('STOPPING IMU' + '\n')
-    s.disconnect()
     imu.close()
+    s.disconnect()
     sys.exit(0)
+
+# Signal handler function
+def imu_disconnect():
+    global running
+    running = False  # Set the flag to False to stop the loop
 
 # Set up signal handling
 signal.signal(signal.SIGTERM, imu_disconnect)
