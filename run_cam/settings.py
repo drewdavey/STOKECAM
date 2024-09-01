@@ -4,7 +4,7 @@ from picamera2 import Picamera2
 from libcamera import ColorSpace, Transform
 
 def get_preview_configuration():
-    cam = Picamera2(1)
+    cam = Picamera2()
     config = cam.create_preview_configuration()
     
     # Customizing the configuration
@@ -17,7 +17,7 @@ def get_preview_configuration():
     return config
 
 def get_still_configuration():
-    cam = Picamera2(1)
+    cam = Picamera2()
     config = cam.create_still_configuration()
 
     # Customizing the configuration
