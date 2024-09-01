@@ -1,7 +1,7 @@
 
 # import time
 # import subprocess
-# from settings import *
+from settings import *
 from picamera2 import Picamera2
 # from datetime import datetime, timezone
 # from startup import setup_logging, read_inputs_yaml
