@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 from standby import create_dirs
 
-# config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
+config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
@@ -19,13 +19,10 @@ fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
 
 log = open(fname_log, 'a')
 log.write(f"Running numFrames mode manually.\n")
-try:
-	cam0 = Picamera2(0)
-	cam1 = Picamera2(1)
-except:
-	log.write(f"Error: Could not connect to cameras.\n")
-	exit()
-	
+
+cam0 = Picamera2(0)
+cam1 = Picamera2(1)
+
 for idx, cam in enumerate([cam0, cam1]):
 	cam.configure(config)
 	cam.start()
