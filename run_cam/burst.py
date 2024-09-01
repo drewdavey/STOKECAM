@@ -5,7 +5,6 @@ import subprocess
 from gpiozero import Button
 from signal import pause
 from threading import Timer
-from functools import partial
 from settings import *
 from picamera2 import Picamera2
 from datetime import datetime, timezone
@@ -57,6 +56,5 @@ fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 duration = inputs['burst_duration']
 dt = inputs['dt']
-
-fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'calib')
+fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
 run(fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt)

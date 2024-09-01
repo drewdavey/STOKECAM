@@ -39,6 +39,5 @@ fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 calib_frames = inputs['calib_frames']
 dt = inputs['dt']
-
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'calib')
 run(fdir_cam0, fdir_cam1, fname_log, fname_imu, calib_frames, dt)
