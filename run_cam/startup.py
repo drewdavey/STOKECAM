@@ -40,7 +40,7 @@ def sync_clock_and_imu(pathLog):
     s = VnSensor()
     s.connect('/dev/ttyUSB0', 115200)
     ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-    cd = CompositeData.connect('/dev/ttyUSB0', 115200)
+    cd = CompositeData()
 
     with open(pathLog, 'a') as log:
         model_num = s.read_model_number()
