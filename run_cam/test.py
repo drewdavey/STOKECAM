@@ -1,5 +1,5 @@
 
-
+import time
 from vnpy import *
 
 
@@ -33,4 +33,6 @@ while not ez.current_data.has_fix:
     has_num_sats = ez.current_data.has_num_sats
     print("Has Number of satellites: ", str(has_num_sats), "\n")
 
+    time.sleep(2)
+    
 s.disconnect()
