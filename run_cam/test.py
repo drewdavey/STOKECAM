@@ -7,7 +7,7 @@ import time
 import subprocess
 
 from datetime import datetime, timezone
-# from startup import setup_logging, read_inputs_yaml
+from startup import setup_logging, read_inputs_yaml
 # from standby import create_dirs
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
