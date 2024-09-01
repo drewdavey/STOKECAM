@@ -28,6 +28,3 @@ def get_still_configuration():
 
     cam.close()
     return config
-
-config = get_still_configuration()
-print(config)
