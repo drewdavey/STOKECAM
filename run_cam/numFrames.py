@@ -13,7 +13,7 @@ from standby import create_dirs
 def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,num_frames,dt):
 	
 	config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
-	
+	time.sleep(5)
 	# Connect to the cameras
 	cam0 = Picamera2(0)
 	cam1 = Picamera2(1)
@@ -43,6 +43,5 @@ inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 num_frames = inputs['num_frames']
 dt = inputs['dt']
 
-time.sleep(5)
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
 run(fdir_cam0, fdir_cam1, fname_log, fname_imu, num_frames, dt)
