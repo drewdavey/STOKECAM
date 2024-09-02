@@ -6,7 +6,7 @@ from settings import *
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone
-from standby import configure_cameras
+# from standby import configure_cameras
 from startup import setup_logging, read_inputs_yaml
 
 config = get_config() 
