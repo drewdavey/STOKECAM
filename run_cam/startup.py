@@ -73,7 +73,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
                 break
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         if ez.current_data.has_any_position:
-            pos = ez.current_data.position_gps_lla
+            pos = ez.current_data.position_estimated_lla
             log.write(f"{tstr}:     GPS Position (LLA): ({pos.x}, {pos.y}, {pos.z})\n")
             posun = ez.current_data.any_position_uncertainty
             log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
