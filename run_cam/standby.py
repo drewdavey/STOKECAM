@@ -15,7 +15,6 @@ from settings import *
 from datetime import datetime, timezone
 
 # GPIO pin definitions
-green = LED(12)
 yellow = LED(16)
 red = LED(26)
 right_button = Button(18, hold_time=3)  # 
