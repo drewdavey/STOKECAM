@@ -28,6 +28,7 @@ def standby():
             red.on()
         if left_button.is_pressed and not right_button.is_pressed:
             red.on()
+        red.off()
         time.sleep(0.2)
 
     exit_standby()
