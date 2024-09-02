@@ -3,7 +3,6 @@
 from picamera2 import Picamera2
 from libcamera import ColorSpace, Transform
 from startup import setup_logging, read_inputs_yaml
-from datetime import datetime, timezone
 
 def auto():
     cam = Picamera2()

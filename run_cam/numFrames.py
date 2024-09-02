@@ -6,7 +6,6 @@ from settings import *
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone
-# from standby import configure_cameras
 from startup import setup_logging, read_inputs_yaml
 
 config = get_config() 
@@ -55,6 +54,5 @@ fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 num_frames = inputs['num_frames']
 dt = inputs['dt']
-# configure_cameras(fname_log, config)
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
 run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, num_frames, dt)
