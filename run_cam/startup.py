@@ -123,11 +123,11 @@ def startup():
     dt = inputs['dt']
     calib_on_boot = inputs['calib_on_boot']
     launch_standby = inputs['launch_standby']
-    mode = inputs['shooting_mode']                   # pass to settings.py
+    mode = inputs['shooting_mode']                   # pass or everybody check?
     gps_wait_time = inputs['gps_wait_time']
-    sync_clock_and_imu(fname_log, gps_wait_time)                    # Connect to VecNav and sync clock
+    sync_clock_and_imu(fname_log, gps_wait_time)        # Connect to VecNav and sync clock
     if calib_on_boot:
-        subprocess.Popen(['python3', 'calib.py', fdir, fname_log, num_frames, dt]) # path0,path1,fname_log,calib_frames,dt
+        subprocess.Popen(['python3', 'calib.py']) 
     if launch_standby:
         enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
 
