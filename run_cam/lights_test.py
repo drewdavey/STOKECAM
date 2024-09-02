@@ -6,10 +6,12 @@ import subprocess
 from settings import *
 from datetime import datetime, timezone
 from time import sleep
+import os
+os.environ['GPIOZERO_PIN_FACTORY'] = os.environ.get('GPIOZERO_PIN_FACTORY', 'mock')
 
-# green = LED(12)
+green = LED(12)
 
-LED(12).close()
+# LED(12).close()
 
 # right_button = Button(18, hold_time=3)  # 
 # left_button = Button(17, hold_time=3)   # 
