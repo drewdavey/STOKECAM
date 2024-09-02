@@ -20,6 +20,8 @@ red = LED(26)
 right_button = Button(18, hold_time=3)  # 
 left_button = Button(17, hold_time=3)   # 
 
+config = get_config()
+
 # Connect to the cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
@@ -104,7 +106,6 @@ def standby(fdir, fname_log, dt, num_frames):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     Entering standby...\n\n")
     log.close()
-    config = get_config()
     configure_cameras(fname_log, config)
 
     while not (right_button.is_held and left_button.is_held):
