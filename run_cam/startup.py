@@ -68,15 +68,17 @@ def sync_clock_and_imu(fname_log):
             # log.write(f"Number of satellites: {num_sats}\n")
             time.sleep(1)
             i += 1
-            if i > 60:
+            if i > 10:
                 log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
                 break
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         if ez.current_data.has_any_position:
             pos = ez.current_data.any_position
-            log.write(f"{tstr}:     Position: ({pos.x}, {pos.y}, {pos.z})\n")
+            log.write(dir(pos))
+            # log.write(f"{tstr}:     Position: ({pos.x}, {pos.y}, {pos.z})\n")
             posun = ez.current_data.any_position_uncertainty
-            log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
+            log.write(dir(posun))
+            # log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
             posunes = ez.current_data.position_uncertainty_estimated
             log.write(f"{tstr}:     Position uncertainty estimated: {posunes}\n")
         if ez.current_data.has_time_gps:
