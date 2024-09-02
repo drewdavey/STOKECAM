@@ -37,6 +37,7 @@ def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,calib_frames,dt):
 	cam1.stop()
 	cam0.close()
 	cam1.close()
+	log.close()	
 	exit() 
 
 def create_dirs(fdir, mode):

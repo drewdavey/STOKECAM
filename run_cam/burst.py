@@ -46,6 +46,7 @@ def run(fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt):
 		cam1.stop()
 		cam0.close()
 		cam1.close()
+		log.close()	
 		exit()
 
 	# Set a timer to end the program after the specified duration

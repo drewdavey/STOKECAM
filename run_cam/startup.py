@@ -74,7 +74,7 @@ def sync_clock_and_imu(fname_log):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         if ez.current_data.has_any_position:
             pos = ez.current_data.any_position
-            log.write(f"{tstr}:     Position: ({pos})\n")
+            log.write(f"{tstr}:     Position: ({pos.from_lla})\n")
             posun = ez.current_data.any_position_uncertainty
             log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
             posunes = ez.current_data.position_uncertainty_estimated
@@ -86,7 +86,7 @@ def sync_clock_and_imu(fname_log):
             num_sats = ez.current_data.num_sats
             log.write(f"{tstr}:     Number of satellites: {num_sats}\n")
         gps_sol = s.read_gps_solution_lla()
-        log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n")
+        log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n\n")
     log.close()
     s.disconnect()
 
@@ -94,6 +94,7 @@ def enter_standby(fdir, fname_log, dt, num_frames):
     tstr = datetime.now(timezone.utc).strftime('%Y-%m-%d')
     with open(fname_log, 'a') as log:
         log.write(f"Startup complete - created log for {tstr}.\n\n")
+        log.close()
     subprocess.Popen(['python3', 'standby.py', fdir, fname_log, str(dt), str(num_frames)])
 
 def startup():

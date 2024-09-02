@@ -27,7 +27,8 @@ cam1 = Picamera2(1)
 
 busy = False
 
-def configure_cameras(log):
+def configure_cameras(fname_log):
+    log = open(fname_log, 'a')
     for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
@@ -35,7 +36,8 @@ def configure_cameras(log):
         format_meta = pprint.pformat(cam.capture_metadata(), width=100, indent=2)  
         log.write(f"cam{idx} configuration: {format_config}\n\n\n")
         log.write(f"cam{idx} metadata: {format_meta}\n\n\n")
-
+    log.close()
+    
 def burst(fdir, fname_log, dt): 
     global busy
     i = 0
@@ -52,6 +54,7 @@ def burst(fdir, fname_log, dt):
         time.sleep(dt)
     imu_process.terminate()
     busy = False
+    log.close()
 
 def numFrames(fdir, fname_log, dt, num_frames):
     global busy
@@ -67,6 +70,7 @@ def numFrames(fdir, fname_log, dt, num_frames):
         time.sleep(dt)
     imu_process.terminate()
     busy = False
+    log.close()
 
 def create_dirs(fdir, mode):
     session = datetime.now(timezone.utc).strftime('%H%M%S_' + mode)
@@ -78,8 +82,9 @@ def create_dirs(fdir, mode):
     fname_imu = f'{fdir_out}IMU_{session}.txt'
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
-def exit_standby(log):
+def exit_standby(fname_log):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
     log.close()
     cam0.stop() 
@@ -93,7 +98,8 @@ def standby(fdir, fname_log, dt, num_frames):
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     Entering standby...\n\n")
-    configure_cameras(log)
+    log.close()
+    configure_cameras(fname_log)
 
     while not (right_button.is_held and left_button.is_held):
 
@@ -105,7 +111,7 @@ def standby(fdir, fname_log, dt, num_frames):
             numFrames(fdir, fname_log, dt, num_frames)
         time.sleep(0.2)
 
-    exit_standby(log)
+    exit_standby(fname_log)
 
 if __name__ == "__main__":
     standby(sys.argv[1], sys.argv[2], float(sys.argv[3]), int(sys.argv[4]))
