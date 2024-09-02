@@ -87,13 +87,14 @@ def create_dirs(fdir, mode):
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def exit_standby(fname_log):
-    yellow.off()
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
     log.close()
     cam0.stop() 
     cam1.stop() # Close the cameras
+    red.close()
+    yellow.close() # Close the lights
     right_button.close() 
     left_button.close() # Close the buttons
     sys.exit(0)

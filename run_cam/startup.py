@@ -14,7 +14,6 @@ from datetime import datetime, timezone
 
 green = LED(12)
 
-
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
@@ -54,7 +53,7 @@ def read_inputs_yaml(fname_log):
         except yaml.YAMLError as exc:
             log.write(f"Error parsing YAML file: {exc}")
             return None
-    
+
 def sync_clock_and_imu(fname_log, gps_wait_time):
     ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) # Create sensor object and connect to the VN-200 
     s = ez.sensor                                    # at the baud rate of 115200 (115,200 bytes/s) 
@@ -103,7 +102,20 @@ def enter_standby(fdir, fname_log, dt, num_frames):
     with open(fname_log, 'a') as log:
         log.write(f"Startup complete - created log for {tstr}.\n\n")
         log.close()
-    subprocess.Popen(['python3', 'standby.py', fdir, fname_log, str(dt), str(num_frames)])
+    process = subprocess.Popen(['python3', 'standby.py', fdir, fname_log, str(dt), str(num_frames)])
+    
+    while not process.poll() is None:  # Check if standby.py is still running
+        right_button = Button(18, hold_time=5) 
+        left_button = Button(17, hold_time=5)
+        if (right_button.is_held and left_button.is_held):
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+            log = open(fname_log, 'a')
+            log.write(f"{tstr}:     Exiting startup.\n")
+            green.close()
+            right_button.close()
+            left_button.close()
+            log.close()
+            exit()
 
 def startup():
     fdir, fname_log = setup_logging()               # Setup logging
