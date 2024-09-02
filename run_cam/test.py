@@ -18,7 +18,7 @@ log = open(fname_log, 'a')
 
 while not ez.current_data.has_fix:
 
-    log.write('#####################################################')
+    log.write('#####################################################\n')
 
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}\n")
