@@ -13,18 +13,19 @@ config = get_still_configuration() # get still config from settings.py. add stat
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
-def run(fdir_cam0,fdir_cam1,fname_log,fname_imu,calib_frames,dt):
+def run(fdir_out, fdir_cam0,fdir_cam1,fname_log,fname_imu,calib_frames,dt):
 	log = open(fname_log, 'a')
-	log.write(f"Running calibration mode manually.\n")
+	tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
+	log.write(f"{tstr}:     calibration session (from calib.py): {fdir_out}\n")
 	imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
 
 	for idx, cam in enumerate([cam0, cam1]):
 		cam.configure(config)
 		cam.start()
-		format_config = pprint.pformat(cam.camera_configuration(), width=100, indent=2)
-		format_meta = pprint.pformat(cam.capture_metadata(), width=100, indent=2)  
-		log.write(f"cam{idx} configuration: {format_config}\n\n\n")
-		log.write(f"cam{idx} metadata: {format_meta}\n\n\n")
+		# format_config = pprint.pformat(cam.camera_configuration(), width=100, indent=2)
+		# format_meta = pprint.pformat(cam.capture_metadata(), width=100, indent=2)  
+		# log.write(f"cam{idx} configuration: {format_config}\n\n\n")
+		# log.write(f"cam{idx} metadata: {format_meta}\n\n\n")
 	
 	for i in range(int(calib_frames)):
 		tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
@@ -55,4 +56,4 @@ inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 calib_frames = inputs['calib_frames']
 dt = inputs['calib_dt']
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'calib')
-run(fdir_cam0, fdir_cam1, fname_log, fname_imu, calib_frames, dt)
+run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, calib_frames, dt)

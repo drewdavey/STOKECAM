@@ -18,19 +18,20 @@ config = get_still_configuration()
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
-def run(fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt):
+def run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt):
 	button = Button(18)
 	log = open(fname_log, 'a')
-	log.write(f"Running burst mode manually.\n")
+	tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
+	log.write(f"{tstr}:     burst session (from burst.py): {fdir_out}\n")
 	imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
 
 	for idx, cam in enumerate([cam0, cam1]):
 		cam.configure(config)
 		cam.start()
-		format_config = pprint.pformat(cam.camera_configuration(), width=100, indent=2)
-		format_meta = pprint.pformat(cam.capture_metadata(), width=100, indent=2)  
-		log.write(f"cam{idx} configuration: {format_config}\n\n\n")
-		log.write(f"cam{idx} metadata: {format_meta}\n\n\n")
+		# format_config = pprint.pformat(cam.camera_configuration(), width=100, indent=2)
+		# format_meta = pprint.pformat(cam.capture_metadata(), width=100, indent=2)  
+		# log.write(f"cam{idx} configuration: {format_config}\n\n\n")
+		# log.write(f"cam{idx} metadata: {format_meta}\n\n\n")
 
 	def capture(i):
 		while button.is_pressed:
@@ -69,4 +70,4 @@ inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 duration = inputs['burst_duration']
 dt = inputs['dt']
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
-run(fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt)
+run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt)
