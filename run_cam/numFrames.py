@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from standby import configure_cameras
 from startup import setup_logging, read_inputs_yaml
 
+config = get_config() 
+
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
@@ -53,7 +55,6 @@ fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 num_frames = inputs['num_frames']
 dt = inputs['dt']
-config = get_config() 
 configure_cameras(fname_log, config)
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
 run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, num_frames, dt)
