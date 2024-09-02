@@ -19,7 +19,7 @@ def exit_standby():
     left_button.close() # Close the buttons
     sys.exit(0)
 
-def standby(fdir, fname_log, dt, num_frames):
+def standby():
     yellow.on()
 
     while not (right_button.is_held and left_button.is_held):
