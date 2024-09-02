@@ -24,9 +24,9 @@ def standby():
 
     while not (right_button.is_held and left_button.is_held):
 
-        if right_button.is_pressed and not left_button.is_pressed:
+        while right_button.is_pressed and not left_button.is_pressed:
             red.on()
-        if left_button.is_pressed and not right_button.is_pressed:
+        while left_button.is_pressed and not right_button.is_pressed:
             red.on()
         red.off()
         time.sleep(0.2)
