@@ -19,6 +19,15 @@ while not ez.current_data.has_fix:
     pos = ez.current_data.has_any_position
     print('Has position: ', str(pos), "\n")
 
+    hasposun = ez.current_data.has_any_position_uncertainty
+    print('Has position uncertainty: ', str(hasposun), "\n")
+
+    posun = ez.current_data.any_position_uncertainty
+    print('Position uncertainty: ', str(posun), "\n")
+
+    posunes = ez.current_data.position_uncertainty_estimated
+    print('Position uncertainty estimate: ', str(posunes), "\n")
+
     gpstime = ez.current_data.has_time_gps
     print('Has GPS time: ', str(gpstime), "\n")
 
