@@ -8,13 +8,16 @@ import os
 import sys
 import time
 from picamera2 import Picamera2
-from gpiozero import Button
+from gpiozero import Button, LED
 from signal import pause
 import subprocess
 from settings import *
 from datetime import datetime, timezone
 
 # GPIO pin definitions
+green = LED(12)
+yellow = LED(16)
+red = LED(26)
 right_button = Button(18, hold_time=3)  # 
 left_button = Button(17, hold_time=3)   # 
 
@@ -45,10 +48,12 @@ def burst(fdir, fname_log, dt):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     burst session: {fdir_out}\n")
     while right_button.is_pressed:
+        red.on()
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         i += 1
+        red.off()
         time.sleep(dt)
     imu_process.terminate()
     busy = False
@@ -62,9 +67,11 @@ def numFrames(fdir, fname_log, dt, num_frames):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     numFrames session: {fdir_out}\n")
     for i in range(int(num_frames)):
+        red.on()
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+        red.off()
         time.sleep(dt)
     imu_process.terminate()
     busy = False
@@ -81,6 +88,7 @@ def create_dirs(fdir, mode):
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def exit_standby(fname_log):
+    yellow.off()
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
@@ -92,6 +100,7 @@ def exit_standby(fname_log):
     sys.exit(0)
 
 def standby(fdir, fname_log, dt, num_frames):
+    yellow.on()
     global busy
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]

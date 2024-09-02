@@ -9,7 +9,11 @@ import time
 import yaml
 import subprocess
 from vnpy import *
+from gpiozero import Button, LED
 from datetime import datetime, timezone
+
+green = LED(12)
+
 
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
@@ -64,6 +68,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
         i = 0 
         while ez.current_data.position_uncertainty_estimated > 10:
+            green.blink(0.5, 0.5)
             # num_sats = ez.current_data.num_sats
             # log.write(f"Number of satellites: {num_sats}\n")
             time.sleep(1)
@@ -71,6 +76,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
             if i > gps_wait_time:
                 log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
                 break
+        green.on()
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         if ez.current_data.has_any_position:
             pos = ez.current_data.position_estimated_lla

@@ -2,11 +2,11 @@
 import os
 import time
 import subprocess
-from gpiozero import Button
 from signal import pause
 from threading import Timer
 from settings import *
 from picamera2 import Picamera2
+from gpiozero import Button, LED
 from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 
