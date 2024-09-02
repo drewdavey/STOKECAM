@@ -1,13 +1,10 @@
 
-import os
 import sys
 import time
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from signal import pause
-import subprocess
 from settings import *
-from datetime import datetime, timezone
 
 # GPIO pin definitions
 yellow = LED(16)

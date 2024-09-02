@@ -1,6 +1,4 @@
-import os
-import sys
-import time
+
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from signal import pause
@@ -9,7 +7,9 @@ from settings import *
 from datetime import datetime, timezone
 from time import sleep
 
-green = LED(12)
+# green = LED(12)
+
+LED(12).close()
 
 # right_button = Button(18, hold_time=3)  # 
 # left_button = Button(17, hold_time=3)   # 
