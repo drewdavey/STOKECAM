@@ -52,40 +52,43 @@ def read_inputs_yaml(fname_log):
             return None
     
 def sync_clock_and_imu(fname_log):
-    # Create sensor object and connect to the VN-200 
-    # at the baud rate of 115200 (115,200 bytes/s) 
+    ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) # Create sensor object and connect to the VN-200 
+    s = ez.sensor                                    # at the baud rate of 115200 (115,200 bytes/s) 
     # s = VnSensor()
     # s.connect('/dev/ttyUSB0', 115200)
-    ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-    s = ez.sensor
-
     with open(fname_log, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
-        log.write(f"Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
-
-        while not ez.current_data.has_fix:
-            log.write("Waiting for VN-200 to acquire GPS fix...\n")
-            num_sats = ez.current_data.num_sats
-            log.write(f"Number of satellites: {num_sats}\n")
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+        log.write(f"{tstr}:     Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
+        log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
+        i = 0 
+        while ez.current_data.position_uncertainty_estimated > 10:
+            # num_sats = ez.current_data.num_sats
+            # log.write(f"Number of satellites: {num_sats}\n")
             time.sleep(1)
-        
-        vn_pos = s.read_gps_solution_lla()
-        vn_time = ez.current_data.time_utc
-        log.write(f"Current position (LLA): ({vn_pos.lla.x}, {vn_pos.lla.y}, {vn_pos.lla.z})\n")
-        log.write(f"Time from VN-200: {vn_time}\n")
-
+            i += 1
+            if i > 60:
+                log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
+                break
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+        if ez.current_data.has_any_position:
+            pos = ez.current_data.any_position
+            log.write(f"{tstr}:     Position: ({pos.x}, {pos.y}, {pos.z})\n")
+            posun = ez.current_data.any_position_uncertainty
+            log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
+            posunes = ez.current_data.position_uncertainty_estimated
+            log.write(f"{tstr}:     Position uncertainty estimated: {posunes}\n")
+        if ez.current_data.has_time_gps:
+            vn_time = ez.current_data.time_utc
+            log.write(f"{tstr}:     Time from VN-200: {vn_time}\n")
+        if ez.current_data.has_num_sats:
+            num_sats = ez.current_data.num_sats
+            log.write(f"{tstr}:     Number of satellites: {num_sats}\n")
+        gps_sol = s.read_gps_solution_lla()
+        log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n")
+    log.close()
     s.disconnect()
-    # while True:
-    #     gps_data = gps_serial.readline().decode('ascii', errors='replace')
-    #     if gps_data.startswith('$GPRMC'):
-    #         parts = gps_data.split(',')
-    #         if parts[2] == 'A':  # Check if data is valid
-    #             utc_time = parts[1]
-    #             utc_date = parts[9]
-    #             formatted_time = f"{utc_date[4:6]}-{utc_date[2:4]}-{utc_date[0:2]} {utc_time[0:2]}:{utc_time[2:4]}:{utc_time[4:6]}"
-    #             os.system(f'sudo date -u --set="{formatted_time}"')
-    #             break
 
 def enter_standby(fdir, fname_log, dt, num_frames):
     tstr = datetime.now(timezone.utc).strftime('%Y-%m-%d')
@@ -100,13 +103,10 @@ def startup():
     dt = inputs['dt']
     calib_on_boot = inputs['calib_on_boot']
     launch_standby = inputs['launch_standby']
-    mode = inputs['shooting_mode'] # pass to settings.py
-
+    mode = inputs['shooting_mode']                   # pass to settings.py
     sync_clock_and_imu(fname_log)                    # Connect to VecNav and sync clock
-
     if calib_on_boot:
         subprocess.Popen(['python3', 'calib.py', fdir, fname_log, num_frames, dt]) # path0,path1,fname_log,calib_frames,dt
-
     if launch_standby:
         enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
 
