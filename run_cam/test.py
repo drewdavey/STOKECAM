@@ -22,33 +22,33 @@ while not ez.current_data.has_fix:
 
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}\n")
-    
+
     pos = ez.current_data.has_any_position
-    log.write('Has position: ', str(pos), "\n")
+    log.write(f"Has position: {pos}\n")
 
     hasposun = ez.current_data.has_any_position_uncertainty
-    log.write('Has position uncertainty: ', str(hasposun), "\n")
+    log.write(f"Has position uncertainty:  {hasposun}\n")
 
     posun = ez.current_data.any_position_uncertainty
-    log.write('Position uncertainty: ', str(posun), "\n")
+    log.write(f"Position uncertainty: {posun}\n")
 
     posunes = ez.current_data.position_uncertainty_estimated
-    log.write('Position uncertainty estimate: ', str(posunes), "\n")
+    log.write(f"Position uncertainty estimate: {posunes}\n")
 
     gpstime = ez.current_data.has_time_gps
-    log.write('Has GPS time: ', str(gpstime), "\n")
+    log.write(f"Has GPS time: {gpstime}\n")
 
     vn_pos = s.read_gps_solution_lla()
-    log.write('GPS Pos: ', vn_pos.lla, '\n')
+    log.write(f"GPS Pos: {vn_pos.lla}\n")
 
     vn_time = ez.current_data.time_utc
-    log.write('GPS Time: ', vn_time, '\n')
+    log.write(f"GPS Time: {vn_time}\n")
 
     num_sats = ez.current_data.num_sats
-    log.write("Number of satellites: ", str(num_sats), "\n")
+    log.write(f"Number of satellites: {num_sats}\n")
 
     has_num_sats = ez.current_data.has_num_sats
-    log.write("Has Number of satellites: ", str(has_num_sats), "\n")
+    log.write(f"Has Number of satellites: {has_num_sats}\n")
 
     log.write('#####################################################')
     time.sleep(2)
