@@ -74,10 +74,10 @@ def sync_clock_and_imu(fname_log):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         if ez.current_data.has_any_position:
             pos = ez.current_data.any_position
-            log.write(dir(pos))
+            log.write(str(dir(pos)))
             # log.write(f"{tstr}:     Position: ({pos.x}, {pos.y}, {pos.z})\n")
             posun = ez.current_data.any_position_uncertainty
-            log.write(dir(posun))
+            log.write(str(dir(posun)))
             # log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
             posunes = ez.current_data.position_uncertainty_estimated
             log.write(f"{tstr}:     Position uncertainty estimated: {posunes}\n")
