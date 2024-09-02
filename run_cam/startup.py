@@ -12,7 +12,7 @@ from vnpy import *
 from gpiozero import Button, LED
 from datetime import datetime, timezone
 
-# green = LED(12)
+green = LED(12)
 
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
