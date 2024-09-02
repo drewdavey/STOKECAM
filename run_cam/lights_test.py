@@ -6,8 +6,8 @@ import subprocess
 from settings import *
 from datetime import datetime, timezone
 from time import sleep
-import os
-os.environ['GPIOZERO_PIN_FACTORY'] = os.environ.get('GPIOZERO_PIN_FACTORY', 'mock')
+# import os
+# os.environ['GPIOZERO_PIN_FACTORY'] = os.environ.get('GPIOZERO_PIN_FACTORY', 'mock')
 
 green = LED(12)
 
@@ -20,6 +20,9 @@ green = LED(12)
 #     green.on()
 # green.off()
 green.on()
+sleep(5)
+green.off()
+green.close()
 
 process = subprocess.Popen(['python3', 'sub_lights.py'])
     
