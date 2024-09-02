@@ -20,12 +20,12 @@ green = LED(12)
 #     green.on()
 # green.off()
 green.on()
-sleep(5)
-green.off()
-green.close()
+# sleep(5)
+# green.off()
+# green.close()
 
 process = subprocess.Popen(['python3', 'sub_lights.py'])
-    
+
 while not process.poll() is None:  # Check if standby.py is still running
     right_button = Button(18, hold_time=5) 
     left_button = Button(17, hold_time=5)
