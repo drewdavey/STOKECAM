@@ -8,7 +8,7 @@ from gpiozero import Button, LED
 from datetime import datetime, timezone
 from startup import setup_logging, read_inputs_yaml
 
-config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
+config = get_config() 
 
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)

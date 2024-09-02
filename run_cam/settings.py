@@ -2,8 +2,10 @@
 
 from picamera2 import Picamera2
 from libcamera import ColorSpace, Transform
+from startup import setup_logging, read_inputs_yaml
+from datetime import datetime, timezone
 
-def get_preview_configuration():
+def auto():
     cam = Picamera2()
     config = cam.create_preview_configuration()
     
@@ -16,7 +18,7 @@ def get_preview_configuration():
     cam.close()
     return config
 
-def get_still_configuration():
+def still():
     cam = Picamera2()
     config = cam.create_still_configuration()
 
@@ -28,3 +30,16 @@ def get_still_configuration():
 
     cam.close()
     return config
+
+def get_config():
+    fdir, fname = setup_logging()
+    inputs = read_inputs_yaml(fname)
+    mode = inputs['shooting_mode']
+    if mode == 'auto':
+        return auto()
+    elif mode == 'still':
+        return still()
+    else:
+        raise ValueError(f"Invalid mode: {mode}")
+
+

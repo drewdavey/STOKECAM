@@ -20,15 +20,13 @@ red = LED(26)
 right_button = Button(18, hold_time=3)  # 
 left_button = Button(17, hold_time=3)   # 
 
-config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
-
 # Connect to the cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
 busy = False
 
-def configure_cameras(fname_log):
+def configure_cameras(fname_log, config):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
     for idx, cam in enumerate([cam0, cam1]):
@@ -106,7 +104,8 @@ def standby(fdir, fname_log, dt, num_frames):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     Entering standby...\n\n")
     log.close()
-    configure_cameras(fname_log)
+    config = get_config()
+    configure_cameras(fname_log, config)
 
     while not (right_button.is_held and left_button.is_held):
 

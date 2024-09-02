@@ -12,7 +12,7 @@ from startup import setup_logging, read_inputs_yaml
 
 i = 0  # Global index variable
 
-config = get_still_configuration()
+config = get_config()
 
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)

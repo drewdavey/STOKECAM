@@ -6,9 +6,8 @@ from settings import *
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone
+from standby import configure_cameras
 from startup import setup_logging, read_inputs_yaml
-
-config = get_still_configuration() # get still config from settings.py. add statement here to choose mode
 
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
@@ -19,13 +18,13 @@ def run(fdir_out, fdir_cam0,fdir_cam1,fname_log,fname_imu,num_frames,dt):
 	log.write(f"{tstr}:     numFrames session (from numFrames.py): {fdir_out}\n")
 	log.close()
 	imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
-	log = open(fname_log, 'a')
-	for idx, cam in enumerate([cam0, cam1]):
-		cam.configure(config)
-		cam.start()  
-		log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
-		log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
-	log.close()
+	# log = open(fname_log, 'a')
+	# for idx, cam in enumerate([cam0, cam1]):
+	# 	cam.configure(config)
+	# 	cam.start()  
+	# 	log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
+	# 	log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+	# log.close()
 	for i in range(int(num_frames)):
 		tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
 		cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
@@ -54,5 +53,7 @@ fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 num_frames = inputs['num_frames']
 dt = inputs['dt']
+config = get_config() 
+configure_cameras(fname_log, config)
 fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
 run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, num_frames, dt)
