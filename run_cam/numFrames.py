@@ -1,7 +1,6 @@
 # Last updated: 2024-09-01
 import os
 import time
-import pprint
 import subprocess
 from settings import *
 from picamera2 import Picamera2
@@ -19,15 +18,13 @@ def run(fdir_out, fdir_cam0,fdir_cam1,fname_log,fname_imu,num_frames,dt):
 	log.write(f"{tstr}:     numFrames session (from numFrames.py): {fdir_out}\n")
 	log.close()
 	imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
-
+	log = open(fname_log, 'a')
 	for idx, cam in enumerate([cam0, cam1]):
 		cam.configure(config)
-		cam.start()
-		# format_config = pprint.pformat(cam.camera_configuration(), width=100, indent=2)
-		# format_meta = pprint.pformat(cam.capture_metadata(), width=100, indent=2)  
-		# log.write(f"cam{idx} configuration: {format_config}\n\n\n")
-		# log.write(f"cam{idx} metadata: {format_meta}\n\n\n")
-	
+		cam.start()  
+		log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
+		log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+	log.close()
 	for i in range(int(num_frames)):
 		tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
 		cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
