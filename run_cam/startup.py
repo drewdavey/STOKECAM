@@ -36,6 +36,8 @@ def setup_logging():
                                 ########################################################
 """.format(datetime.now(timezone.utc).strftime('%Y-%m-%d-%H-%M-%S'))
         with open(fname_log, 'w') as log:
+            tstr = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+            log.write(f"Startup complete - created log for {tstr}.\n\n")
             log.write(header_block)
             log.write("\n\n\n")
     return fdir, fname_log
@@ -98,10 +100,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
     s.disconnect()
 
 def enter_standby(fdir, fname_log, dt, num_frames):
-    tstr = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-    with open(fname_log, 'a') as log:
-        log.write(f"Startup complete - created log for {tstr}.\n\n")
-        log.close()
+ 
     process = subprocess.Popen(['python3', 'standby.py', fdir, fname_log, str(dt), str(num_frames)])
     
     while not process.poll() is None:  # Check if standby.py is still running
