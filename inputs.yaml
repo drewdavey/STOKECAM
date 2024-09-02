@@ -1,7 +1,7 @@
 
 
 launch_standby: true   # Launch into standby mode after startup?
-gps_wait_time: 30      # Time to wait for GPS lock in seconds (during startup)
+gps_wait_time: 3      # Time to wait for GPS lock in seconds (during startup)
 
 shooting_mode: 'bright'
 
