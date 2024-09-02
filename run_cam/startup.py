@@ -69,6 +69,7 @@ def sync_clock_and_imu(fname_log):
             num_sats = ez.current_data.num_sats
             log.write(f"Number of satellites: {num_sats}\n")
             time.sleep(1)
+        
         vn_pos = s.read_gps_solution_lla()
         vn_time = ez.current_data.time_utc
         log.write(f"Current position (LLA): ({vn_pos.lla.x}, {vn_pos.lla.y}, {vn_pos.lla.z})\n")
