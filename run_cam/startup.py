@@ -118,6 +118,7 @@ def enter_standby(fdir, fname_log, dt, num_frames):
 
 def startup():
     fdir, fname_log = setup_logging()               # Setup logging
+    
     inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
     num_frames = inputs['num_frames']
     dt = inputs['dt']
@@ -125,6 +126,7 @@ def startup():
     launch_standby = inputs['launch_standby']
     mode = inputs['shooting_mode']                   # pass or everybody check?
     gps_wait_time = inputs['gps_wait_time']
+    
     sync_clock_and_imu(fname_log, gps_wait_time)        # Connect to VecNav and sync clock
     if calib_on_boot:
         subprocess.Popen(['python3', 'calib.py']) 
