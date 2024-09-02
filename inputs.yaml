@@ -1,11 +1,12 @@
 
-num_frames: 10        # Number of frames to be captured by numFrames mode
-dt: 0                 # Time between frames in seconds (for numFrames and burst mode)
+num_frames: 10         # Number of frames to be captured by numFrames mode
+dt: 0                  # Time between frames in seconds (for numFrames and burst mode)
 imu_dt: 0              # Time between IMU readings in seconds
-burst_duration: 10    # Duration of burst mode in seconds (only when burst.py is run manually)
+burst_duration: 10     # Duration of burst mode in seconds (only when burst.py is run manually)
 calib_on_boot: false   # Ask to calibrate on boot?
 calib_frames: 10       # Number of frames to be captured by calib mode
-calib_dt: 1           # Time between frames in seconds (for calibration)
-launch_standby: true  # Launch into standby mode after startup?
+calib_dt: 1            # Time between frames in seconds (for calibration)
+launch_standby: true   # Launch into standby mode after startup?
+gps_wait_time: 5       # Time to wait for GPS lock in seconds (during startup)
 shooting_mode: 'bright'
 

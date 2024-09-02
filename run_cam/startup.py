@@ -51,7 +51,7 @@ def read_inputs_yaml(fname_log):
             log.write(f"Error parsing YAML file: {exc}")
             return None
     
-def sync_clock_and_imu(fname_log):
+def sync_clock_and_imu(fname_log, gps_wait_time):
     ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) # Create sensor object and connect to the VN-200 
     s = ez.sensor                                    # at the baud rate of 115200 (115,200 bytes/s) 
     # s = VnSensor()
@@ -68,13 +68,13 @@ def sync_clock_and_imu(fname_log):
             # log.write(f"Number of satellites: {num_sats}\n")
             time.sleep(1)
             i += 1
-            if i > 60:
+            if i > gps_wait_time:
                 log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
                 break
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         if ez.current_data.has_any_position:
-            pos = ez.current_data.any_position
-            log.write(f"{tstr}:     Position: ({pos.from_lla})\n")
+            pos = ez.current_data.position_gps_lla
+            log.write(f"{tstr}:     GPS Position (LLA): ({pos.x}, {pos.y}, {pos.z})\n")
             posun = ez.current_data.any_position_uncertainty
             log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
             posunes = ez.current_data.position_uncertainty_estimated
@@ -86,7 +86,9 @@ def sync_clock_and_imu(fname_log):
             num_sats = ez.current_data.num_sats
             log.write(f"{tstr}:     Number of satellites: {num_sats}\n")
         gps_sol = s.read_gps_solution_lla()
-        log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n\n")
+        log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n")
+        imu_out = s.read_imu_measurements() 
+        log.write(f"{tstr}:     Current Temperature: {imu_out.temp} and Pressure: {imu_out.pressure}\n\n")
     log.close()
     s.disconnect()
 
@@ -105,7 +107,8 @@ def startup():
     calib_on_boot = inputs['calib_on_boot']
     launch_standby = inputs['launch_standby']
     mode = inputs['shooting_mode']                   # pass to settings.py
-    sync_clock_and_imu(fname_log)                    # Connect to VecNav and sync clock
+    gps_wait_time = inputs['gps_wait_time']
+    sync_clock_and_imu(fname_log, gps_wait_time)                    # Connect to VecNav and sync clock
     if calib_on_boot:
         subprocess.Popen(['python3', 'calib.py', fdir, fname_log, num_frames, dt]) # path0,path1,fname_log,calib_frames,dt
     if launch_standby:
