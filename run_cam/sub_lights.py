@@ -1,0 +1,39 @@
+
+import os
+import sys
+import time
+from picamera2 import Picamera2
+from gpiozero import Button, LED
+from signal import pause
+import subprocess
+from settings import *
+from datetime import datetime, timezone
+
+# GPIO pin definitions
+yellow = LED(16)
+red = LED(26)
+right_button = Button(18, hold_time=3)  # 
+left_button = Button(17, hold_time=3)   # 
+
+def exit_standby():
+    red.close()
+    yellow.close() # Close the lights
+    right_button.close() 
+    left_button.close() # Close the buttons
+    sys.exit(0)
+
+def standby(fdir, fname_log, dt, num_frames):
+    yellow.on()
+
+    while not (right_button.is_held and left_button.is_held):
+
+        if right_button.is_pressed and not left_button.is_pressed and not busy:
+            red.on()
+        if left_button.is_pressed and not right_button.is_pressed and not busy:
+            red.on()
+        time.sleep(0.2)
+
+    exit_standby(fname_log)
+
+if __name__ == "__main__":
+    standby()
