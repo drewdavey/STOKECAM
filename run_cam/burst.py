@@ -23,6 +23,7 @@ def run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt):
 	log = open(fname_log, 'a')
 	tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
 	log.write(f"{tstr}:     burst session (from burst.py): {fdir_out}\n")
+	log.close()	
 	imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
 
 	for idx, cam in enumerate([cam0, cam1]):
@@ -47,7 +48,6 @@ def run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt):
 		cam1.stop()
 		cam0.close()
 		cam1.close()
-		log.close()	
 		exit()
 
 	# Set a timer to end the program after the specified duration
