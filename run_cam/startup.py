@@ -68,7 +68,7 @@ def sync_clock_and_imu(fname_log):
             # log.write(f"Number of satellites: {num_sats}\n")
             time.sleep(1)
             i += 1
-            if i > 5:
+            if i > 60:
                 log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
                 break
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
