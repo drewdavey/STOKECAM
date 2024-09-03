@@ -110,7 +110,7 @@ def startup():
     num_frames = inputs['num_frames']
     dt = inputs['dt']
     calib_on_boot = inputs['calib_on_boot']
-    launch_standby = inputs['launch_standby']
+    # launch_standby = inputs['launch_standby']
     mode = inputs['shooting_mode']                   # pass or everybody check?
     gps_wait_time = inputs['gps_wait_time']
     
