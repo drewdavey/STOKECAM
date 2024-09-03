@@ -144,6 +144,7 @@ while not (right_button.is_held and left_button.is_held):
         process = subprocess.Popen(['python3', 'calib.py'])
         process.wait()
         [led.off() for led in (red, green, yellow)]
+        monitor_gps()
         cam0 = Picamera2(0)
         cam1 = Picamera2(1)
     tnow = time.time()
