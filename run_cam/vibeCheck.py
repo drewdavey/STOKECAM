@@ -76,6 +76,24 @@ def numFrames(fdir, fname_log, dt, num_frames):
     busy = False
     log.close()
 
+def calib(fdir, fname_log, calib_dt, calib_frames):
+    global busy
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'calib')
+    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
+    log = open(fname_log, 'a')
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    log.write(f"{tstr}:     calibration session: {fdir_out}\n")
+    for i in range(int(calib_frames)):
+        red.on()
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
+        cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
+        cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+        red.off()
+        time.sleep(calib_dt)
+    imu_process.terminate()
+    busy = False
+    log.close()
+
 def monitor_gps():
     global busy
     if not busy:
@@ -96,8 +114,6 @@ def exit_standby(fname_log):
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
     log.close()
-    cam0.stop() # Stop the cameras
-    cam1.stop() 
     yellow.off() # Close the lights
     red.off()
     time.sleep(0.5)
@@ -110,7 +126,6 @@ def enter_standby(fdir, fname_log, dt, num_frames):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     Entering standby...\n\n")
     log.close()
-    configure_cameras(fname_log, config)
     while not (right_button.is_held and left_button.is_held):
         if right_button.is_pressed and not left_button.is_pressed and not busy:
             busy = True
@@ -125,9 +140,11 @@ fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 num_frames = inputs['num_frames']
 dt = inputs['dt']
+calib_frames = inputs['calib_frames']
+calib_dt = inputs['calib_dt']
 gps_wait_time = inputs['gps_wait_time']
-sync_clock_and_imu(fname_log, gps_wait_time)        # Connect to VecNav and sync clock
-
+sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock
+configure_cameras(fname_log, config)            # Configure the cameras 
 global standby
 standby = False
 tnow = time.time()
@@ -140,20 +157,17 @@ while not (right_button.is_held and left_button.is_held):
         standby = True
         enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
     if left_button.is_held and not standby and left_button.held_time > 5 and not right_button.is_pressed:
-        cam0.close()
-        cam1.close()
         [led.blink(0.5, 0.5) for led in (red, green, yellow)]
-        process = subprocess.Popen(['python3', 'calib.py'])
-        process.wait()
+        calib(fdir, fname_log, calib_dt, calib_frames)
         [led.off() for led in (red, green, yellow)]
         monitor_gps()
-        cam0 = Picamera2(0)
-        cam1 = Picamera2(1)
     tnow = time.time()
     time.sleep(0.2)
 ########################################################
 
 ##################### Cleanup ########################## 
+cam0.stop() # Stop the cameras
+cam1.stop() 
 cam0.close() # Close the cameras
 cam1.close()
 green.close()
