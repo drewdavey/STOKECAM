@@ -15,9 +15,10 @@ green = LED(12)
 green.on()
 
 green.close()
-
+sleep(1)
 AK = LED(12)
 AK.on()
+sleep(1)
 # while not process.poll() is None:  # Check if standby.py is still running
 #     right_button = Button(18, hold_time=5) 
 #     left_button = Button(17, hold_time=5)
