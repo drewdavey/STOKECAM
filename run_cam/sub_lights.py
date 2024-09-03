@@ -3,6 +3,7 @@ import sys
 import time
 from gpiozero import Button, LED
 
+sleep(1)
 yellow = LED(16)
 red = LED(26)
 right_button = Button(18, hold_time=3)  # 
