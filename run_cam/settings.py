@@ -29,7 +29,7 @@ def bright():
     config['main']['size'] = (1440, 1080)
     config['main']['format'] = 'RGB888'
     config['controls']['FrameDurationLimits'] = (33333, 33333)  
-    config['controls']['ExposureTime'] = 100000
+    config['controls']['ExposureTime'] = 5000
     cam.close()
     return config
 

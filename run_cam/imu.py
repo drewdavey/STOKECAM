@@ -15,8 +15,6 @@ imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperatur
 # Connect to the VN-200 
 ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
 s = ez.sensor
-# s = VnSensor()
-# s.connect('/dev/ttyUSB0', 115200)
 
 running = True
 
@@ -34,11 +32,11 @@ def imu_run(fname_imu,fname_log,imu_dt):
         ins = s.read_ins_solution_lla() # Read the INS solution
         imu_out = s.read_imu_measurements() # Read the IMU measurements
         cd = ez.current_data # Read current data as CompositeData class from EzAsyncData
-        # imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
-        imu.write(f"{tstr}, {ypr.x}, {ypr.y}, {ypr.z}" + '\n')
+        imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
+        # imu.write(f"{tstr}, {ypr.x}, {ypr.y}, {ypr.z}" + '\n')
         time.sleep(imu_dt)
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-    log.write(f"{tstr}:     IMU stopped.\n")
+    log.write(f"{tstr}:     IMU stopped.\n\n")
     log.close()
     imu.close()
     s.disconnect()
