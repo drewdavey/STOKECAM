@@ -19,7 +19,7 @@ def standard():
     config['main']['size'] = (1440, 1080)
     config['main']['format'] = 'RGB888'
     config['controls']['FrameDurationLimits'] = (33333, 33333)  
-    config['controls']['ExposureTime'] = 10000 
+    config['controls']['ExposureTime'] = 5000 
     cam.close()
     return config
 
@@ -43,6 +43,16 @@ def dark():
     cam.close()
     return config
 
+def fast():
+    cam = Picamera2()
+    config = cam.create_still_configuration()
+    config['main']['size'] = (1440, 1080)
+    config['main']['format'] = 'RGB888'
+    config['controls']['FrameDurationLimits'] = (33333, 33333)  
+    config['controls']['ExposureTime'] = 1000
+    cam.close()
+    return config
+
 def get_config():
     fdir, fname = setup_logging()
     inputs = read_inputs_yaml(fname)
@@ -55,6 +65,8 @@ def get_config():
         return bright()
     elif mode == 'dark':
         return dark()
+    elif mode == 'fast':
+        return fast()
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
