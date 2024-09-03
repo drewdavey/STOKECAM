@@ -1,9 +1,8 @@
-# Last updated: 2024-04-10
+# Last updated: 2024-09-02
 ##################################
-# This script is passed 5 arguments from run_numFrames.sh
-# Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames (5) dt
+# This script launches standby mode, which allows the user to choose between burst and numFrames shooting modes.
+# The user can also calibrate the cameras by holding the left button for more than 5 seconds.
 ##################################
-
 import sys
 import time
 import subprocess
@@ -82,14 +81,13 @@ def monitor_gps():
     if not busy:
         ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) 
         s = ez.sensor
-        # green.blink(0.5, 0.5)
         if ez.current_data.has_any_position:                              
             if ez.current_data.position_uncertainty_estimated > 10:
-                green.blink(0.5, 0.5)
+                green.blink(0.25, 0.25)
             elif ez.current_data.position_uncertainty_estimated <= 10:
                 green.on()
         else:
-            green.off() 
+            green.blink(0.5, 0.5) 
         s.disconnect()
 
 def exit_standby(fname_log):
@@ -125,19 +123,20 @@ def enter_standby(fdir, fname_log, dt, num_frames):
     exit_standby(fname_log)
 
 fdir, fname_log = setup_logging()               # Setup logging
-
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 num_frames = inputs['num_frames']
 dt = inputs['dt']
-
 gps_wait_time = inputs['gps_wait_time']
 sync_clock_and_imu(fname_log, gps_wait_time)        # Connect to VecNav and sync clock
 
 global standby
 standby = False
-
+tnow = time.time()
+monitor_gps()
+##################### Main loop #####################
 while not (right_button.is_held and left_button.is_held):
-    monitor_gps()
+    if time.time() - tnow > 60 and not standby:
+        monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
         enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
@@ -154,8 +153,9 @@ while not (right_button.is_held and left_button.is_held):
         yellow.off()
         cam0 = Picamera2(0)
         cam1 = Picamera2(1)
+    tnow = time.time()
     time.sleep(0.2)
-
+########################################################
 cam0.stop() 
 cam1.stop() # Close the cameras
 cam0.close()

@@ -1,12 +1,14 @@
-# Generate configuration settings
-
+# Last updated: 2024-04-10
+##################################
+# This file contains functions defining the camera settings for various shooting modes
+##################################
 from picamera2 import Picamera2
 from libcamera import ColorSpace, Transform
 from utils import *
 
 def auto():
     cam = Picamera2()
-    config = cam.create_preview_configuration()
+    config = cam.create_still_configuration()
     config['main']['size'] = (1440, 1080)
     cam.close()
     return config

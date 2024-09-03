@@ -1,3 +1,7 @@
+# Last updated: 2024-04-10
+##################################
+# Housekeeping funcs for the stereo camera system
+##################################
 
 import os
 import time

@@ -1,4 +1,8 @@
-# Last updated: 2024-09-01
+# Last updated: 2024-04-10
+##################################
+# This script captures [num_frames] images. 
+# It reads inputs from inputs.yaml and creates directories for the session.
+##################################
 import os
 import time
 import subprocess

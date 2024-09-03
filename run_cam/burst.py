@@ -1,8 +1,11 @@
-# Last updated: 2024-02-23
+# Last updated: 2024-04-10
+##################################
+# This script captures images continuosly at [dt] while right button is held. 
+# It reads inputs from inputs.yaml and creates directories for the session.
+##################################
 import os
 import time
 import subprocess
-from signal import pause
 from threading import Timer
 from settings import *
 from picamera2 import Picamera2

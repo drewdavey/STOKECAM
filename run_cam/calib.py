@@ -1,4 +1,8 @@
 # Last updated: 2024-04-10
+##################################
+# This script calibrates the cameras. 
+# It reads inputs from inputs.yaml and creates directories for the calibration session.
+##################################
 import os
 import time
 import subprocess
