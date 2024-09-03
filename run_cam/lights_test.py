@@ -15,7 +15,7 @@ green = LED(12)
 green.on()
 sleep(1)
 green.close()
-
+sleep(1)
 AK = LED(12)
 AK.on()
 sleep(1)
