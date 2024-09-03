@@ -92,6 +92,8 @@ def monitor_gps():
         s.disconnect()
 
 def exit_standby(fname_log):
+    global standby
+    standby = False
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
@@ -100,9 +102,9 @@ def exit_standby(fname_log):
     cam1.stop() # Close the cameras
     yellow.close() # Close the lights
     red.close()
-    right_button.close() 
-    left_button.close() # Close the buttons
-    sys.exit(0)
+    # right_button.close() 
+    # left_button.close() # Close the buttons
+    # sys.exit(0)
 
 def enter_standby(fdir, fname_log, dt, num_frames):
     yellow.on()
@@ -135,9 +137,20 @@ gps_wait_time = inputs['gps_wait_time']
 
 sync_clock_and_imu(fname_log, gps_wait_time)        # Connect to VecNav and sync clock
 
-monitor_gps()
+global standby
+standby = False
 
-right_button.when_held = enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
-# left_button.when_held = subprocess.Popen(['python3', 'calib.py'])
+while not (right_button.is_held and left_button.is_held):
+        monitor_gps()
+        if right_button.is_held and not standby:
+            standby = True
+            enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
+        # if left_button.is_held:
+        #     process = subprocess.Popen(['python3', 'calib.py'])
+        #     process.wait()
+        time.sleep(0.2)
 
-pause()
+green.close()
+right_button.close() 
+left_button.close() # Close the buttons
+sys.exit(0)
