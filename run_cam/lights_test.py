@@ -31,11 +31,11 @@ green.on()
 
 while True:
     if (right_button.is_held and left_button.is_held): 
-        # green.close()
-        # right_button.close()
-        # left_button.close() 
+        green.close()
+        right_button.close()
+        left_button.close() 
         # GPIO.cleanup()
-        # time.sleep(1)
+        time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         # time.sleep(1)
         process.wait()
