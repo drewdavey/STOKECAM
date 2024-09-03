@@ -53,6 +53,16 @@ def fast():
     cam.close()
     return config
 
+def max():
+    cam = Picamera2()
+    config = cam.create_still_configuration()
+    config['main']['size'] = (1440, 1080)
+    config['main']['format'] = 'RGB888'
+    config['controls']['FrameDurationLimits'] = (100, 100)  
+    config['controls']['ExposureTime'] = 50
+    cam.close()
+    return config
+
 def get_config():
     fdir, fname = setup_logging()
     inputs = read_inputs_yaml(fname)
@@ -67,6 +77,8 @@ def get_config():
         return dark()
     elif mode == 'fast':
         return fast()
+    elif mode == 'max':
+        return max()
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
