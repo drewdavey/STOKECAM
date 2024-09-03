@@ -122,7 +122,7 @@ def exit_standby(fname_log):
     log.close()
     yellow.off() # Close the lights
     red.off()
-    time.sleep(0.5)
+    time.sleep(2)
     standby = False
 
 def enter_standby(fdir, fname_log, dt, num_frames):
