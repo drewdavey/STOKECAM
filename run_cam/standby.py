@@ -4,17 +4,18 @@
 # Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames (5) dt
 ##################################
 
-import os
 import sys
 import time
+import subprocess
+from utils import *
+from settings import *
+from signal import pause
 from picamera2 import Picamera2
 from gpiozero import Button, LED
-from signal import pause
-import subprocess
-from settings import *
 from datetime import datetime, timezone
 
 # GPIO pin definitions
+green = LED(12)
 yellow = LED(16)
 red = LED(26)
 right_button = Button(18, hold_time=3)  # 
@@ -76,30 +77,33 @@ def numFrames(fdir, fname_log, dt, num_frames):
     busy = False
     log.close()
 
-def create_dirs(fdir, mode):
-    session = datetime.now(timezone.utc).strftime('%H%M%S_' + mode)
-    fdir_out = os.path.join(fdir, session + '/')
-    fdir_cam0 = os.path.join(fdir_out, 'cam0/')
-    fdir_cam1 = os.path.join(fdir_out, 'cam1/')
-    os.makedirs(fdir_cam0, exist_ok=True)
-    os.makedirs(fdir_cam1, exist_ok=True)
-    fname_imu = f'{fdir_out}IMU_{session}.txt'
-    return fdir_out, fdir_cam0, fdir_cam1, fname_imu
+def monitor_gps():
+    global busy
+    if not busy:
+        ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) 
+        s = ez.sensor
+        green.blink(0.5, 0.5)
+        # if ez.current_data.has_any_position:                              
+        #     if ez.current_data.position_uncertainty_estimated > 10:
+        #         green.blink(0.5, 0.5)
+        #     elif ez.current_data.position_uncertainty_estimated <= 10:
+        #         green.on()
+        # else:
+        #     green.off() 
+        s.disconnect()
 
 def exit_standby(fname_log):
+    global standby
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
     log.close()
-    cam0.stop() 
-    cam1.stop() # Close the cameras
-    red.close()
-    yellow.close() # Close the lights
-    right_button.close() 
-    left_button.close() # Close the buttons
-    sys.exit(0)
+    yellow.off() # Close the lights
+    red.off()
+    time.sleep(0.5)
+    standby = False
 
-def standby(fdir, fname_log, dt, num_frames):
+def enter_standby(fdir, fname_log, dt, num_frames):
     yellow.on()
     global busy
     log = open(fname_log, 'a')
@@ -120,5 +124,39 @@ def standby(fdir, fname_log, dt, num_frames):
 
     exit_standby(fname_log)
 
-if __name__ == "__main__":
-    standby(sys.argv[1], sys.argv[2], float(sys.argv[3]), int(sys.argv[4]))
+fdir, fname_log = setup_logging()               # Setup logging
+
+inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
+num_frames = inputs['num_frames']
+dt = inputs['dt']
+
+gps_wait_time = inputs['gps_wait_time']
+sync_clock_and_imu(fname_log, gps_wait_time)        # Connect to VecNav and sync clock
+
+global standby
+standby = False
+
+while not (right_button.is_held and left_button.is_held):
+    monitor_gps()
+    if right_button.is_held and not standby:
+        standby = True
+        enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
+    if left_button.is_held and not standby:
+        cam0.close()
+        cam1.close()
+        process = subprocess.Popen(['python3', 'calib.py'])
+        process.wait()
+        cam0 = Picamera2(0)
+        cam1 = Picamera2(1)
+    time.sleep(0.2)
+
+cam0.stop() 
+cam1.stop() # Close the cameras
+cam0.close()
+cam1.close()
+green.close()
+yellow.close()
+red.close() 
+right_button.close() 
+left_button.close() # Close the buttons
+sys.exit(0)
