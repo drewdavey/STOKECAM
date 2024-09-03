@@ -1,7 +1,7 @@
 
 from gpiozero import Button, LED
 import subprocess
-from time import sleep
+import time
 from subprocess import Popen
 from signal import SIGINT
 
@@ -23,11 +23,12 @@ while True:
         right_button.close()
         left_button.close()
         green.close() 
+        time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         process.wait()
         right_button = Button(18, hold_time=3)  
         left_button = Button(17, hold_time=3)
-        sleep(1)
+        time.sleep(1)
 
 
 # if (right_button.is_held and left_button.is_held): 

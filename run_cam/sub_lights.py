@@ -3,6 +3,7 @@ import sys
 import time
 from gpiozero import Button, LED
 
+time.sleep(1)
 green = LED(12)
 yellow = LED(16)
 red = LED(26)
