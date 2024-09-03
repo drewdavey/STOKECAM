@@ -5,8 +5,8 @@ from time import sleep
 
 right_button = Button(18, hold_time=3)  
 left_button = Button(17, hold_time=3)
-right_button.close()
-left_button.close()
+# right_button.close()
+# left_button.close()
 right_button = Button(18, hold_time=3)  
 left_button = Button(17, hold_time=3)
 
