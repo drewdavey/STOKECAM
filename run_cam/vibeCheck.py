@@ -20,24 +20,25 @@ red = LED(26)
 right_button = Button(18, hold_time=3)  # 
 left_button = Button(17, hold_time=3)   # 
 
-# Connect to the cameras
-cam0 = Picamera2(0)
-cam1 = Picamera2(1)
+# # Connect to the cameras
+# cam0 = Picamera2(0)
+# cam1 = Picamera2(1)
 
 busy = False
 
 def configure_cameras(fname_log, config):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
-    # # Connect to the cameras
-    # cam0 = Picamera2(0)
-    # cam1 = Picamera2(1)
+    # Connect to the cameras
+    cam0 = Picamera2(0)
+    cam1 = Picamera2(1)
     for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
         log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.close()
+    return cam0, cam1
 
 # def burst(fdir, fname_log, dt): 
 #     global busy
@@ -85,7 +86,7 @@ def shoot_mode0(fdir, fname_log, dt, mode0):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     {mode0} session: {fdir_out}\n")
     config = get_config(mode0)
-    configure_cameras(fname_log, config)            # Configure the cameras
+    cam0, cam1 = configure_cameras(fname_log, config)            # Configure the cameras
     while right_button.is_pressed:
         red.on()
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
@@ -95,8 +96,8 @@ def shoot_mode0(fdir, fname_log, dt, mode0):
         red.off()
         time.sleep(dt)
     imu_process.terminate()
-    cam0.stop() # Stop the cameras
-    cam1.stop() 
+    cam0.close() # Stop the cameras
+    cam1.close() 
     busy = False
     log.close()
 
@@ -109,7 +110,7 @@ def shoot_mode1(fdir, fname_log, dt, mode1):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     {mode1} session: {fdir_out}\n")
     config = get_config(mode1)
-    configure_cameras(fname_log, config)            # Configure the cameras
+    cam0, cam1 = configure_cameras(fname_log, config)            # Configure the cameras
     while right_button.is_pressed:
         red.on()
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
@@ -119,8 +120,8 @@ def shoot_mode1(fdir, fname_log, dt, mode1):
         red.off()
         time.sleep(dt)
     imu_process.terminate()
-    cam0.stop() # Stop the cameras
-    cam1.stop() 
+    cam0.close() # Stop the cameras
+    cam1.close() 
     busy = False
     log.close()
 
@@ -135,7 +136,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, calib_mode):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     calibration session: {fdir_out}\n")
     config = get_config(calib_mode)
-    configure_cameras(fname_log, config)            # Configure the cameras
+    cam0, cam1 = configure_cameras(fname_log, config)            # Configure the cameras
     for i in range(int(calib_frames)):
         green.on(), time.sleep(0.5)
         yellow.on(), time.sleep(0.5)
@@ -148,8 +149,8 @@ def calib(fdir, fname_log, calib_dt, calib_frames, calib_mode):
         [led.off() for led in (red, green, yellow)]
         time.sleep(calib_dt)
     imu_process.terminate()
-    cam0.stop() # Stop the cameras
-    cam1.stop() 
+    cam0.close() # Stop the cameras
+    cam1.close() 
     busy = False
     log.close()
 
@@ -226,8 +227,8 @@ while not (right_button.is_held and left_button.is_held):
 ########################################################
 
 ##################### Cleanup ########################## 
-cam0.close() # Close the cameras
-cam1.close()
+# cam0.close() # Close the cameras
+# cam1.close()
 green.close()
 yellow.close() # Close the LEDs
 red.close() 
