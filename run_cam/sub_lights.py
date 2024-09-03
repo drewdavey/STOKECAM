@@ -7,7 +7,7 @@ from signal import pause
 import RPi.GPIO as GPIO
 
 # GPIO pin definitions
-# GPIO.cleanup()
+GPIO.cleanup()
 yellow = LED(16)
 red = LED(26)
 right_button = Button(18, hold_time=3)  # 
