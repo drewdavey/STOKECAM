@@ -10,8 +10,8 @@ import RPi.GPIO as GPIO
 # GPIO.cleanup()
 yellow = LED(16)
 red = LED(26)
-# right_button = Button(18, hold_time=3)  # 
-# left_button = Button(17, hold_time=3)   # 
+right_button = Button(18, hold_time=3)  # 
+left_button = Button(17, hold_time=3)   # 
 
 
 def exit_standby():
