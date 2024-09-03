@@ -8,7 +8,8 @@ from datetime import datetime, timezone
 from time import sleep
 import RPi.GPIO as GPIO
 
-
+right_button = Button(18, hold_time=3)  
+left_button = Button(17, hold_time=3)
 
 green = LED(12)
 
@@ -29,8 +30,6 @@ green.on()
 #     return process
 
 while True:
-    right_button = Button(18, hold_time=3)  
-    left_button = Button(17, hold_time=3)
     if (right_button.is_held and left_button.is_held): 
         green.close()
         right_button.close()
