@@ -4,9 +4,10 @@ import time
 from picamera2 import Picamera2
 from gpiozero import Factory, Button, LED
 from signal import pause
+import RPi.GPIO as GPIO
 
 # GPIO pin definitions
-# Factory.release_all()
+GPIO.cleanup()
 yellow = LED(16)
 red = LED(26)
 right_button = Button(18, hold_time=3)  # 
@@ -14,10 +15,11 @@ left_button = Button(17, hold_time=3)   #
 
 
 def exit_standby():
-    red.close()
-    yellow.close() # Close the lights
-    right_button.close() 
-    left_button.close() # Close the buttons
+    # red.close()
+    # yellow.close() # Close the lights
+    # right_button.close() 
+    # left_button.close() # Close the buttons
+    GPIO.cleanup()
     sys.exit(0)
 
 def standby():

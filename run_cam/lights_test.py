@@ -6,6 +6,7 @@ import subprocess
 from settings import *
 from datetime import datetime, timezone
 from time import sleep
+import RPi.GPIO as GPIO
 
 right_button = Button(18, hold_time=3)  
 left_button = Button(17, hold_time=3)
@@ -30,14 +31,15 @@ green.on()
 
 while True:
     if (right_button.is_held and left_button.is_held): 
-        green.close()
-        right_button.close()
-        left_button.close() 
-        # Factory.close()
-        time.sleep(1)
+        # green.close()
+        # right_button.close()
+        # left_button.close() 
+        GPIO.cleanup()
+        # time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
-        time.sleep(1)
+        # time.sleep(1)
         process.wait()
+        GPIO.cleanup()
         right_button = Button(18, hold_time=3)  
         left_button = Button(17, hold_time=3)
         time.sleep(1)
