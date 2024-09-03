@@ -12,4 +12,4 @@ imu_dt: 0              # Time between IMU readings in seconds
 burst_duration: 10     # Duration of burst mode in seconds (only when burst.py is run manually)
 
 calib_frames: 10       # Number of frames to be captured by calib mode
-calib_dt: 1            # Time between frames in seconds (for calibration)
+calib_dt: 3            # Time between frames in seconds (for calibration)

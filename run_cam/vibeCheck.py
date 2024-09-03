@@ -78,17 +78,23 @@ def numFrames(fdir, fname_log, dt, num_frames):
 
 def calib(fdir, fname_log, calib_dt, calib_frames):
     global busy
+    [led.on() for led in (red, green, yellow)]
+    time.sleep(5)
+    [led.off() for led in (red, green, yellow)]
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'calib')
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     calibration session: {fdir_out}\n")
     for i in range(int(calib_frames)):
-        red.on()
+        [led.blink(0.5,0.5) for led in (red, green, yellow)]
+        time.sleep(3)
+        [led.on() for led in (red, green, yellow)]
+        time.sleep(1)
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
-        red.off()
+        [led.off() for led in (red, green, yellow)]
         time.sleep(calib_dt)
     imu_process.terminate()
     busy = False
@@ -157,9 +163,7 @@ while not (right_button.is_held and left_button.is_held):
         standby = True
         enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
     if left_button.is_held and not standby and left_button.held_time > 5 and not right_button.is_pressed:
-        [led.blink(0.5, 0.5) for led in (red, green, yellow)]
         calib(fdir, fname_log, calib_dt, calib_frames)
-        [led.off() for led in (red, green, yellow)]
         monitor_gps()
     tnow = time.time()
     time.sleep(0.2)
