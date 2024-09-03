@@ -1,4 +1,4 @@
-
+import gpiozero
 from gpiozero import Button, LED
 import subprocess
 import time
@@ -14,15 +14,16 @@ left_button = Button(17, hold_time=3)
 # right_button = Button(18, hold_time=3)  
 # left_button = Button(17, hold_time=3)
 
-# green = LED(12)
+green = LED(12)
 
-LED(12).on()
+green.on()
 
 while True:
     if (right_button.is_held and left_button.is_held): 
-        right_button.close()
-        left_button.close()
-        LED(12).close() 
+        # right_button.close()
+        # left_button.close()
+        # green.close() 
+        gpiozero.reset_devices()
         time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         process.wait()
