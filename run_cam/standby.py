@@ -96,6 +96,8 @@ def exit_standby(fname_log):
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
     log.close()
+    cam0.stop() # Stop the cameras
+    cam1.stop() 
     yellow.off() # Close the lights
     red.off()
     time.sleep(0.5)
@@ -151,10 +153,8 @@ while not (right_button.is_held and left_button.is_held):
     time.sleep(0.2)
 ########################################################
 
-##################### Cleanup ##########################
-cam0.stop() 
-cam1.stop() # Close the cameras
-cam0.close()
+##################### Cleanup ########################## 
+cam0.close() # Close the cameras
 cam1.close()
 green.close()
 yellow.close() # Close the LEDs
