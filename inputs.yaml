@@ -4,12 +4,14 @@
 ##################################
 gps_wait_time: 5      # Time to wait for GPS lock in seconds (during startup)
 
-shooting_mode: 'fast' # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
+shooting_mode0: 'auto' # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
+shooting_mode1: 'max'  # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
+calib_mode: 'auto'     # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
+
+calib_frames: 10       # Number of frames to be captured by calib mode
+calib_dt: 3            # Time between frames in seconds (for calibration)
 
 num_frames: 10         # Number of frames to be captured by numFrames mode
 dt: 0                  # Time between frames in seconds (for numFrames and burst mode)
 imu_dt: 0              # Time between IMU readings in seconds
 burst_duration: 10     # Duration of burst mode in seconds (only when burst.py is run manually)
-
-calib_frames: 10       # Number of frames to be captured by calib mode
-calib_dt: 3            # Time between frames in seconds (for calibration)
