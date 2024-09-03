@@ -14,9 +14,9 @@ left_button = Button(17, hold_time=3)
 # right_button = Button(18, hold_time=3)  
 # left_button = Button(17, hold_time=3)
 
-green = LED(12)
+# green = LED(12)
 
-green.on()
+LED(12).on()
 
 while True:
     if (right_button.is_held and left_button.is_held): 
