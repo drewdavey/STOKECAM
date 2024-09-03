@@ -4,6 +4,7 @@ import subprocess
 import time
 from subprocess import Popen
 from signal import SIGINT
+import RPi.GPIO as pins
 
 
 
@@ -23,7 +24,7 @@ while True:
         # right_button.close()
         # left_button.close()
         # green.close() 
-        gpiozero.reset_devices()
+        pins.cleanup()
         time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         process.wait()
