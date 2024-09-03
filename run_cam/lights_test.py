@@ -1,12 +1,11 @@
 import gpiozero
-from gpiozero import Button, LED
+from gpiozero import Button, LED, Factory
 import subprocess
 import time
 from subprocess import Popen
 from signal import SIGINT
 import RPi.GPIO as pins
 
-gpiozero.Factory.release_pins()
 
 right_button = Button(18, hold_time=3)  
 left_button = Button(17, hold_time=3)
