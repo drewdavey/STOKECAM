@@ -10,9 +10,7 @@ from time import sleep
 
 green = LED(12)
 
-
 green.on()
-
 
 process = subprocess.Popen(['python3', 'sub_lights.py'])
 

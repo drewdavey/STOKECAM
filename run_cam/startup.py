@@ -100,21 +100,8 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
     s.disconnect()
 
 def enter_standby(fdir, fname_log, dt, num_frames):
- 
     process = subprocess.Popen(['python3', 'standby.py', fdir, fname_log, str(dt), str(num_frames)])
-    
-    while not process.poll() is None:  # Check if standby.py is still running
-        right_button = Button(18, hold_time=5) 
-        left_button = Button(17, hold_time=5)
-        if (right_button.is_held and left_button.is_held):
-            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-            log = open(fname_log, 'a')
-            log.write(f"{tstr}:     Exiting startup.\n")
-            green.close()
-            right_button.close()
-            left_button.close()
-            log.close()
-            exit()
+    return process
 
 def startup():
     fdir, fname_log = setup_logging()               # Setup logging
@@ -128,10 +115,22 @@ def startup():
     gps_wait_time = inputs['gps_wait_time']
     
     sync_clock_and_imu(fname_log, gps_wait_time)        # Connect to VecNav and sync clock
+    
     if calib_on_boot:
         subprocess.Popen(['python3', 'calib.py']) 
-    if launch_standby:
-        enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
+
+    right_button = Button(18, hold_time=3)  
+    left_button = Button(17, hold_time=3)
+
+    while True:
+        if (right_button.is_held and left_button.is_held): 
+            right_button.close()
+            left_button.close() 
+            process = enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
+            process.wait()
+            right_button = Button(18, hold_time=3)  
+            left_button = Button(17, hold_time=3)
+            time.sleep(0.2)
 
 if __name__ == "__main__":
     startup()
