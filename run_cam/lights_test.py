@@ -34,7 +34,7 @@ while True:
         green.close()
         right_button.close()
         left_button.close() 
-        # GPIO.cleanup()
+        GPIO.cleanup()
         time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         # time.sleep(1)
