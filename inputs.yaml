@@ -4,7 +4,7 @@
 ##################################
 gps_wait_time: 5      # Time to wait for GPS lock in seconds (during startup)
 
-shooting_mode: 'max' # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
+shooting_mode: 'fast' # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
 
 num_frames: 10         # Number of frames to be captured by numFrames mode
 dt: 0                  # Time between frames in seconds (for numFrames and burst mode)
