@@ -10,6 +10,7 @@ red = LED(26)
 
 yellow.on()
 red.on()    
+time.sleep(5)
 # def exit_standby():
 #     red.close()
 #     yellow.close() # Close the lights
