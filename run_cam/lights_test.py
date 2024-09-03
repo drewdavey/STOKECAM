@@ -1,6 +1,6 @@
 import time
 from picamera2 import Picamera2
-from gpiozero import Button, LED
+from gpiozero import Factory, Button, LED
 from signal import pause
 import subprocess
 from settings import *
@@ -30,6 +30,7 @@ while True:
         green.close()
         right_button.close()
         left_button.close() 
+        Factory.release_all()
         time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         time.sleep(1)

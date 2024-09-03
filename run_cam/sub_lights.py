@@ -17,7 +17,7 @@ def exit_standby(red, yellow, right_button, left_button):
 
 def standby():
     # GPIO pin definitions
-    Factory.close()
+    # Factory.release_all()
     yellow = LED(16)
     red = LED(26)
     right_button = Button(18, hold_time=3)  # 
