@@ -109,9 +109,7 @@ def enter_standby(fdir, fname_log, dt, num_frames):
     log.write(f"{tstr}:     Entering standby...\n\n")
     log.close()
     configure_cameras(fname_log, config)
-
     while not (right_button.is_held and left_button.is_held):
-
         if right_button.is_pressed and not left_button.is_pressed and not busy:
             busy = True
             burst(fdir, fname_log, dt)
@@ -119,7 +117,6 @@ def enter_standby(fdir, fname_log, dt, num_frames):
             busy = True
             numFrames(fdir, fname_log, dt, num_frames)
         time.sleep(0.2)
-
     exit_standby(fname_log)
 
 fdir, fname_log = setup_logging()               # Setup logging
@@ -143,26 +140,25 @@ while not (right_button.is_held and left_button.is_held):
     if left_button.is_held and not standby and left_button.held_time > 5 and not right_button.is_pressed:
         cam0.close()
         cam1.close()
-        red.blink(0.5, 0.5)
-        green.blink(0.5, 0.5)
-        yellow.blink(0.5, 0.5)
+        [led.blink(0.5, 0.5) for led in (red, green, yellow)]
         process = subprocess.Popen(['python3', 'calib.py'])
         process.wait()
-        red.off()
-        green.off()
-        yellow.off()
+        [led.off() for led in (red, green, yellow)]
         cam0 = Picamera2(0)
         cam1 = Picamera2(1)
     tnow = time.time()
     time.sleep(0.2)
 ########################################################
+
+##################### Cleanup ##########################
 cam0.stop() 
 cam1.stop() # Close the cameras
 cam0.close()
 cam1.close()
 green.close()
-yellow.close()
+yellow.close() # Close the LEDs
 red.close() 
 right_button.close() 
 left_button.close() # Close the buttons
 sys.exit(0)
+########################################################
