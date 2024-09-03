@@ -87,10 +87,11 @@ def calib(fdir, fname_log, calib_dt, calib_frames):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     calibration session: {fdir_out}\n")
     for i in range(int(calib_frames)):
-        [led.blink(0.5,0.5) for led in (red, green, yellow)]
-        time.sleep(3)
-        [led.on() for led in (red, green, yellow)]
-        time.sleep(1)
+        green.on(), time.sleep(0.5)
+        yellow.on(), time.sleep(0.5)
+        red.on(), time.sleep(0.5)
+        [led.blink(0.5,0.5) for led in (red, green, yellow)], time.sleep(3)
+        [led.on() for led in (red, green, yellow)],time.sleep(1.5)
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
