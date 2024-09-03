@@ -13,9 +13,9 @@ left_button = Button(17, hold_time=3)
 green = LED(12)
 
 green.on()
-
-green.close()
 sleep(1)
+green.close()
+
 AK = LED(12)
 AK.on()
 sleep(1)
