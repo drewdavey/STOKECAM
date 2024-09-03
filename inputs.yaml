@@ -2,9 +2,9 @@
 ##################################
 # Inputs for STOKE
 ##################################
-gps_wait_time: 10      # Time to wait for GPS lock in seconds (during startup)
+gps_wait_time: 5      # Time to wait for GPS lock in seconds (during startup)
 
-shooting_mode: 'still' # Shooting mode: 'still', 'auto'
+shooting_mode: 'dark' # Shooting mode: 'standard', 'auto', 'bright', 'dark'
 
 num_frames: 10         # Number of frames to be captured by numFrames mode
 dt: 0                  # Time between frames in seconds (for numFrames and burst mode)
