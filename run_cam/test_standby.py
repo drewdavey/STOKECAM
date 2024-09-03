@@ -98,8 +98,6 @@ def exit_standby(fname_log):
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
     log.close()
-    cam0.stop() 
-    cam1.stop() # Close the cameras
     yellow.off() # Close the lights
     red.off()
     # right_button.close() 
@@ -146,10 +144,19 @@ while not (right_button.is_held and left_button.is_held):
             standby = True
             enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
         if left_button.is_held:
+            cam0.close()
+            cam1.close()
             process = subprocess.Popen(['python3', 'calib.py'])
             process.wait()
+            cam0 = Picamera2(0)
+            cam1 = Picamera2(1)
         time.sleep(0.2)
 
+
+cam0.stop() 
+cam1.stop() # Close the cameras
+cam0.close()
+cam1.close()
 green.close()
 yellow.close()
 red.close() 
