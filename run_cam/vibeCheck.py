@@ -128,6 +128,7 @@ def exit_standby(fname_log):
 
 def enter_standby(fdir, fname_log, dt, num_frames):
     yellow.on()
+    time.sleep(1)
     global busy
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
