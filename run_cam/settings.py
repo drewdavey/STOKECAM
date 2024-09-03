@@ -49,8 +49,12 @@ def get_config():
     mode = inputs['shooting_mode']
     if mode == 'auto':
         return auto()
-    elif mode == 'still':
-        return still()
+    elif mode == 'standard':
+        return standard()
+    elif mode == 'bright':
+        return bright()
+    elif mode == 'dark':
+        return dark()
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
