@@ -38,15 +38,16 @@ green = LED(12)
 #     left_button = Button(17, hold_time=3)
 #     sleep(1)
 
+standby = None
 def start_subprocess():
-    global child_process, left_button, right_button
-    if child_process is None:
+    global standby, left_button, right_button
+    if standby is None:
         # Close buttons to free up GPIO pins
         left_button.close()
         right_button.close()
         
         # Start child process
-        child_process = Popen(['python', 'sub_lights.py'])
+        standby = Popen(['python', 'sub_lights.py'])
         sleep(0.5)  # Debounce delay
 
         # Reinitialize buttons after subprocess starts
@@ -56,10 +57,10 @@ def start_subprocess():
         right_button.when_pressed = start_subprocess
 
 def stop_subprocess():
-    global child_process, left_button, right_button
-    if child_process is not None:
-        child_process.send_signal(SIGINT)
-        child_process.wait()
+    global standby, left_button, right_button
+    if standby is not None:
+        standby.send_signal(SIGINT)
+        standby.wait()
 
         # Close and reinitialize buttons after subprocess ends
         left_button.close()
@@ -69,7 +70,7 @@ def stop_subprocess():
         left_button.when_pressed = stop_subprocess
         right_button.when_pressed = start_subprocess
         
-        child_process = None
+        standby = None
         sleep(0.5)  # Debounce delay
 
 left_button.when_held = start_subprocess
