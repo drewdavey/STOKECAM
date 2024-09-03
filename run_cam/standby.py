@@ -82,14 +82,14 @@ def monitor_gps():
     if not busy:
         ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) 
         s = ez.sensor
-        green.blink(0.5, 0.5)
-        # if ez.current_data.has_any_position:                              
-        #     if ez.current_data.position_uncertainty_estimated > 10:
-        #         green.blink(0.5, 0.5)
-        #     elif ez.current_data.position_uncertainty_estimated <= 10:
-        #         green.on()
-        # else:
-        #     green.off() 
+        # green.blink(0.5, 0.5)
+        if ez.current_data.has_any_position:                              
+            if ez.current_data.position_uncertainty_estimated > 10:
+                green.blink(0.5, 0.5)
+            elif ez.current_data.position_uncertainty_estimated <= 10:
+                green.on()
+        else:
+            green.off() 
         s.disconnect()
 
 def exit_standby(fname_log):
@@ -138,10 +138,10 @@ standby = False
 
 while not (right_button.is_held and left_button.is_held):
     monitor_gps()
-    if right_button.is_held and not standby:
+    if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
         enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
-    if left_button.is_held and not standby:
+    if left_button.is_held and not standby and left_button.held_time > 5 and not right_button.is_pressed:
         cam0.close()
         cam1.close()
         process = subprocess.Popen(['python3', 'calib.py'])
