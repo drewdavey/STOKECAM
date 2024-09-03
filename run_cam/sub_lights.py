@@ -19,6 +19,8 @@ def standby():
     # GPIO pin definitions
     yellow = LED(16)
     red = LED(26)
+    right_button.close() 
+    left_button.close() # Close the buttons
     right_button = Button(18, hold_time=3)  # 
     left_button = Button(17, hold_time=3)   # 
     yellow.on()
