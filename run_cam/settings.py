@@ -2,9 +2,9 @@
 ##################################
 # This file contains functions defining the camera settings for various shooting modes
 ##################################
+from utils import *
 from picamera2 import Picamera2
 from libcamera import ColorSpace, Transform
-from utils import *
 
 def auto():
     cam = Picamera2()

@@ -6,19 +6,19 @@
 import os
 import time
 import subprocess
-from threading import Timer
+from utils import *
 from settings import *
+from threading import Timer
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone
-from utils import *
-
-i = 0  # Global index variable
 
 config = get_config()
 
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
+
+i = 0  # Global index variable
 
 def run(fdir_out, fdir_cam0, fdir_cam1, fname_log, fname_imu, duration, dt):
 	button = Button(18)
