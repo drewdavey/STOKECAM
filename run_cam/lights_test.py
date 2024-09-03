@@ -24,7 +24,7 @@ while True:
         # right_button.close()
         # left_button.close()
         # green.close() 
-        gpiozero.Factory.release_pins()
+        gpiozero.Factory.close()
         time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         process.wait()
