@@ -4,7 +4,6 @@
 # Args: (1) Cam0 path (2) Cam1 path (3) Log path (4) Number of frames (5) dt
 ##################################
 
-import os
 import sys
 import time
 import subprocess
@@ -140,3 +139,5 @@ monitor_gps()
 
 right_button.when_held = enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
 # left_button.when_held = subprocess.Popen(['python3', 'calib.py'])
+
+pause()
