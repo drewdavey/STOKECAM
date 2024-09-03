@@ -100,8 +100,8 @@ def exit_standby(fname_log):
     log.close()
     cam0.stop() 
     cam1.stop() # Close the cameras
-    yellow.close() # Close the lights
-    red.close()
+    yellow.off() # Close the lights
+    red.off()
     # right_button.close() 
     # left_button.close() # Close the buttons
     # sys.exit(0)
@@ -145,12 +145,14 @@ while not (right_button.is_held and left_button.is_held):
         if right_button.is_held and not standby:
             standby = True
             enter_standby(fdir, fname_log, dt, num_frames)    # Enter standby mode
-        # if left_button.is_held:
-        #     process = subprocess.Popen(['python3', 'calib.py'])
-        #     process.wait()
+        if left_button.is_held:
+            process = subprocess.Popen(['python3', 'calib.py'])
+            process.wait()
         time.sleep(0.2)
 
 green.close()
+yellow.close()
+red.close() 
 right_button.close() 
 left_button.close() # Close the buttons
 sys.exit(0)
