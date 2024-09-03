@@ -2,7 +2,7 @@
 
 from picamera2 import Picamera2
 from libcamera import ColorSpace, Transform
-from startup import setup_logging, read_inputs_yaml
+from utils import *
 
 def auto():
     cam = Picamera2()

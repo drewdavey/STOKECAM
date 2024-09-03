@@ -4,7 +4,7 @@ import time
 import signal
 from vnpy import *
 from datetime import datetime, timezone
-from startup import setup_logging, read_inputs_yaml
+from utils import *
 
 imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n"
 
