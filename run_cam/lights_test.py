@@ -22,7 +22,7 @@ while True:
     if (right_button.is_held and left_button.is_held): 
         right_button.close()
         left_button.close()
-        green.close() 
+        LED(12).close() 
         time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         process.wait()
