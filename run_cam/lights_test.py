@@ -6,7 +6,7 @@ from subprocess import Popen
 from signal import SIGINT
 import RPi.GPIO as pins
 
-
+gpiozero.Factory.release_pins()
 
 right_button = Button(18, hold_time=3)  
 left_button = Button(17, hold_time=3)
@@ -24,7 +24,7 @@ while True:
         # right_button.close()
         # left_button.close()
         # green.close() 
-        pins.cleanup()
+        gpiozero.Factory.release_pins()
         time.sleep(1)
         process = subprocess.Popen(['python3', 'sub_lights.py'])
         process.wait()
