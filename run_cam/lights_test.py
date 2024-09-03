@@ -6,7 +6,6 @@ import subprocess
 from settings import *
 from datetime import datetime, timezone
 from time import sleep
-import RPi.GPIO as GPIO
 
 right_button = Button(18, hold_time=3)  
 left_button = Button(17, hold_time=3)
@@ -15,7 +14,10 @@ green = LED(12)
 
 green.on()
 
+green.close()
 
+AK = LED(12)
+AK.on()
 # while not process.poll() is None:  # Check if standby.py is still running
 #     right_button = Button(18, hold_time=5) 
 #     left_button = Button(17, hold_time=5)
@@ -29,17 +31,16 @@ green.on()
 #     process = subprocess.Popen(['python3', 'standby.py', fdir, fname_log, str(dt), str(num_frames)])
 #     return process
 
-while True:
-    if (right_button.is_held and left_button.is_held): 
-        green.close()
-        right_button.close()
-        left_button.close() 
-        GPIO.cleanup()
-        time.sleep(1)
-        process = subprocess.Popen(['python3', 'sub_lights.py'])
-        # time.sleep(1)
-        process.wait()
-        # GPIO.cleanup()
-        # right_button = Button(18, hold_time=3)  
-        # left_button = Button(17, hold_time=3)
-        time.sleep(1)
+# while True:
+#     if (right_button.is_held and left_button.is_held): 
+#         green.close()
+#         right_button.close()
+#         left_button.close() 
+#         time.sleep(1)
+#         process = subprocess.Popen(['python3', 'sub_lights.py'])
+#         # time.sleep(1)
+#         process.wait()
+#         # GPIO.cleanup()
+#         # right_button = Button(18, hold_time=3)  
+#         # left_button = Button(17, hold_time=3)
+#         time.sleep(1)
