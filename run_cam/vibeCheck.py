@@ -170,7 +170,7 @@ standby = False
 tnow = time.time()
 monitor_gps()
 ##################### Main loop #####################
-while not right_button.active_time > 10 and not left_button.active_time > 10:
+while True:
     if time.time() - tnow > 10 and not standby:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
@@ -181,11 +181,15 @@ while not right_button.active_time > 10 and not left_button.active_time > 10:
         monitor_gps()
     if (right_button.is_held and left_button.is_held) and not standby:
         [led.on() for led in (red, green, yellow)]
-        left_button.wait_for_release(), right_button.wait_for_release()
-        [led.blink(0.1, 0.1) for led in (red, green, yellow)]
-        time.sleep(3)
-        mode = toggle_modes(mode)
-        [led.off() for led in (red, green, yellow)]
+        # time.sleep(3)
+        if left_button.held_time < 10 and right_button.held_time < 10:
+            left_button.wait_for_release(), right_button.wait_for_release()
+            [led.blink(0.1, 0.1) for led in (red, green, yellow)]
+            time.sleep(3)
+            mode = toggle_modes(mode)
+            [led.off() for led in (red, green, yellow)]
+        else:
+            break
 
     tnow = time.time()
     time.sleep(0.2)
