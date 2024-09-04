@@ -191,7 +191,7 @@ while True:
         else:
             [led.blink(0.1, 0.1) for led in (red, green, yellow)]
             time.sleep(3)
-            mode = toggle_modes()
+            toggle_modes()
             [led.off() for led in (red, green, yellow)]
     tnow = time.time()
     time.sleep(0.2)
