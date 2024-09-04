@@ -72,6 +72,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n")
+    log.close()
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     for i in range(int(calib_frames)):
         green.on(), time.sleep(0.5)
@@ -85,9 +86,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
         [led.off() for led in (red, green, yellow)]
         time.sleep(calib_dt)
     imu_process.terminate()
-    time.sleep(1)
     busy = False
-    log.close()
 
 def monitor_gps():
     global busy
@@ -122,11 +121,11 @@ def toggle_modes():
             red.on(), green.off(), yellow.off()
         time.sleep(0.2)
     [led.off() for led in (red, green, yellow)]
-    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0       
     cam1 = Picamera2(1)                             # Initialize cam1
     configure_cameras(fname_log, mode)              # Configure the cameras
+    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
