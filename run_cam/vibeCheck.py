@@ -13,15 +13,16 @@ from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone
 
-def configure_cameras(fname_log):
+def configure_cameras(fname_log, mode):
     global cam0, cam1, config 
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
+    log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
     for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
-        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n\n")
     log.close()
 
 def burst(fdir, fname_log, dt, mode): 
@@ -119,12 +120,13 @@ def toggle_modes():
         elif mode == shooting_modes[2]:
             red.on(), green.off(), yellow.off()
         time.sleep(0.2)
+    [led.off() for led in (red, green, yellow)]
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     time.sleep(3)
     config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0       
     cam1 = Picamera2(1)                             # Initialize cam1
-    configure_cameras(fname_log)                    # Configure the cameras
+    configure_cameras(fname_log, mode)              # Configure the cameras
     [led.off() for led in (red, green, yellow)]
 
 def exit_standby(fname_log):
@@ -171,16 +173,16 @@ calib_frames = inputs['calib_frames']
 calib_dt = inputs['calib_dt']
 gps_wait_time = inputs['gps_wait_time']
 
-global cam0, cam1, config, mode, shooting_modes
+sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
+
+global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
 mode = shooting_modes[0]                        # Default to 'auto'
 config = get_config(mode)                       # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 cam1 = Picamera2(1)                             # Initialize cam1
-configure_cameras(fname_log)                    # Configure the cameras
+configure_cameras(fname_log, mode)                    # Configure the cameras
 
-sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
-global standby
 standby = False
 busy = False
 tnow = time.time()
