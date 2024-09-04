@@ -23,6 +23,7 @@ left_button = Button(17, hold_time=3)   #
 busy = False
 
 def configure_cameras(fname_log, config):
+    global cam0, cam1
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
     for idx, cam in enumerate([cam0, cam1]):
@@ -110,6 +111,7 @@ def monitor_gps():
         s.disconnect()
 
 def toggle_modes(mode):
+    global cam0, cam1, config
     mode = mode1                                    # switch mode
     config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0       
@@ -158,6 +160,7 @@ mode1 = inputs['shooting_mode1']
 mode2 = inputs['shooting_mode2']
 
 mode = mode0                # default mode
+global cam0, cam1, config
 config = get_config(mode)   # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 cam1 = Picamera2(1)                             # Initialize cam1
