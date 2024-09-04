@@ -123,11 +123,11 @@ def toggle_modes():
         time.sleep(0.2)
     [led.off() for led in (red, green, yellow)]
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
-    time.sleep(3)
     config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0       
     cam1 = Picamera2(1)                             # Initialize cam1
     configure_cameras(fname_log, mode)              # Configure the cameras
+    time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
 def exit_standby(fname_log):
