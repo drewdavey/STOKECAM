@@ -161,7 +161,7 @@ standby = False
 tnow = time.time()
 monitor_gps()
 ##################### Main loop #####################
-while not (right_button.held_time > 10 and left_button.held_time > 10):
+while not (right_button.hold_time > 10 and left_button.hold_time > 10):
     if time.time() - tnow > 10 and not standby:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
