@@ -85,6 +85,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
         [led.off() for led in (red, green, yellow)]
         time.sleep(calib_dt)
     imu_process.terminate()
+    time.sleep(1)
     busy = False
     log.close()
 
