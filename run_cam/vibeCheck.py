@@ -13,15 +13,6 @@ from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone
 
-# GPIO pin definitions
-green = LED(12)
-yellow = LED(16)
-red = LED(26)
-right_button = Button(18, hold_time=3)  # 
-left_button = Button(17, hold_time=3)   # 
-
-busy = False
-
 def configure_cameras(fname_log):
     global cam0, cam1, config 
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
@@ -112,12 +103,27 @@ def monitor_gps():
 
 def toggle_modes():
     global cam0, cam1, config, mode
+    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
+    time.sleep(3)
+    [led.off() for led in (red, green, yellow)]
     cam0.close(), cam1.close()                      # Close the cameras
-    mode = mode1                                    # switch mode
+    idx = shooting_modes.index(mode)                # Get the index of the current mode
+    while not (right_button.is_held and left_button.is_held):
+        if right_button.is_pressed and not left_button.is_pressed:
+            idx = (idx + 1) % len(shooting_modes)
+            mode = shooting_modes[idx]
+        if mode == shooting_modes[0]:
+            green.on(), yellow.off(), red.off()
+        elif mode == shooting_modes[1]:
+            yellow.on(), green.off(), red.off()
+        elif mode == shooting_modes[2]:
+            red.on(), green.off(), yellow.off()
+        time.sleep(0.2)
     config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0       
     cam1 = Picamera2(1)                             # Initialize cam1
-    configure_cameras(fname_log)            # Configure the cameras
+    configure_cameras(fname_log)                    # Configure the cameras
+    [led.off() for led in (red, green, yellow)]
 
 def exit_standby(fname_log):
     global standby
@@ -134,6 +140,7 @@ def enter_standby(fdir, fname_log, dt, num_frames, mode):
     yellow.on()
     time.sleep(1)
     global busy
+    busy = False
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     Entering standby...\n\n")
@@ -148,6 +155,13 @@ def enter_standby(fdir, fname_log, dt, num_frames, mode):
         time.sleep(0.2)
     exit_standby(fname_log)
 
+############################ Initialization ############################
+green = LED(12)                         # Green LED
+yellow = LED(16)                        # Yellow LED
+red = LED(26)                           # Red LED
+right_button = Button(18, hold_time=3)  # Right button
+left_button = Button(17, hold_time=3)   # Left button
+
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 num_frames = inputs['num_frames']
@@ -155,25 +169,24 @@ dt = inputs['dt']
 calib_frames = inputs['calib_frames']
 calib_dt = inputs['calib_dt']
 gps_wait_time = inputs['gps_wait_time']
-mode0 = inputs['shooting_mode0']
-mode1 = inputs['shooting_mode1']
-mode2 = inputs['shooting_mode2']
 
-global cam0, cam1, config, mode
-mode = mode0                # default mode
-config = get_config(mode)   # Get the configuration for the cameras
+global cam0, cam1, config, mode, shooting_modes
+shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
+mode = shooting_modes[0]                        # default mode
+config = get_config(mode)                       # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 cam1 = Picamera2(1)                             # Initialize cam1
-configure_cameras(fname_log)            # Configure the cameras
+configure_cameras(fname_log)                    # Configure the cameras
 
 sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
 global standby
 standby = False
 tnow = time.time()
 monitor_gps()
+#######################################################################
 
-##################### Main loop #####################
-while True:
+############################# Main loop ###############################
+while True: 
     if time.time() - tnow > 10 and not standby:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
@@ -185,19 +198,17 @@ while True:
     if (right_button.is_held and left_button.is_held) and not standby:
         [led.on() for led in (red, green, yellow)]
         left_button.wait_for_release()
-        time.sleep(2)
+        time.sleep(1)
         if right_button.is_held:
             break
         else:
-            [led.blink(0.1, 0.1) for led in (red, green, yellow)]
-            time.sleep(3)
             toggle_modes()
-            [led.off() for led in (red, green, yellow)]
+            monitor_gps()
     tnow = time.time()
     time.sleep(0.2)
-########################################################
+#######################################################################
 
-##################### Cleanup ########################## 
+############################## Cleanup ###############################
 cam0.stop() # Stop the cameras
 cam1.stop()
 cam0.close() # Close the cameras
@@ -208,4 +219,4 @@ red.close()
 right_button.close() 
 left_button.close() # Close the buttons
 sys.exit(0)
-########################################################
+#######################################################################
