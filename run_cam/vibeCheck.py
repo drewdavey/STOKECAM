@@ -110,7 +110,6 @@ def monitor_gps():
         s.disconnect()
 
 def toggle_modes(mode):
-    cam0.close(), cam1.close()                      # Close the cameras
     mode = mode1                                    # switch mode
     config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0       
@@ -186,6 +185,7 @@ while True:
             left_button.wait_for_release(), right_button.wait_for_release()
             [led.blink(0.1, 0.1) for led in (red, green, yellow)]
             time.sleep(3)
+            cam0.close(), cam1.close()                      # Close the cameras
             mode = toggle_modes(mode)
             [led.off() for led in (red, green, yellow)]
         else:
