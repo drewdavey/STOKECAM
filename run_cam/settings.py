@@ -2,7 +2,6 @@
 ##################################
 # This file contains functions defining the camera settings for various shooting modes
 ##################################
-# from utils import *
 from picamera2 import Picamera2
 from libcamera import ColorSpace, Transform
 
@@ -64,8 +63,6 @@ def max():
     return config
 
 def get_config(mode):
-    # fdir, fname = setup_logging()
-    # inputs = read_inputs_yaml(fname)
     if mode == 'auto':
         return auto()
     elif mode == 'standard':

@@ -101,4 +101,3 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
         log.write(f"{tstr}:     Current Temperature: {imu_out.temp} and Pressure: {imu_out.pressure}\n\n")
     log.close()
     s.disconnect()
-
