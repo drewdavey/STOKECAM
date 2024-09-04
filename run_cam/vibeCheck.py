@@ -1,4 +1,4 @@
-# Last updated: 2024-09-02
+# Last updated: 2024-09-03
 ##################################
 # This script launches standby mode, which allows the user to choose between burst and numFrames shooting modes.
 # The user can also calibrate the cameras by holding the left button for more than 5 seconds.
@@ -149,12 +149,12 @@ def enter_standby(fdir, fname_log, dt, num_frames, mode):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     Entering standby...\n\n")
     log.close()
-    while not (right_button.is_held and left_button.is_held):
+    while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed and not busy:
-            busy = True
+            busy = True # Hold right button ONLY for burst   
             burst(fdir, fname_log, dt, mode)
         if left_button.is_pressed and not right_button.is_pressed and not busy:
-            busy = True
+            busy = True # Press left button ONLY for 3 numFrames
             numFrames(fdir, fname_log, dt, num_frames, mode)
         time.sleep(0.2)
     exit_standby(fname_log)
@@ -182,7 +182,7 @@ mode = shooting_modes[0]                        # Default to 'auto'
 config = get_config(mode)                       # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 cam1 = Picamera2(1)                             # Initialize cam1
-configure_cameras(fname_log, mode)                    # Configure the cameras
+configure_cameras(fname_log, mode)              # Configure the cameras
 
 standby = False
 busy = False
@@ -190,14 +190,21 @@ tnow = time.time()
 monitor_gps()
 #######################################################################
 
+
 ############################# Main loop ###############################
+# Hold both buttons for 3 seconds to toggle modes, then:
+#                         - release both to toggle modes
+#                         - release left ONLY to exit script
+# Hold right button ONLY for 3 seconds to enter standby mode    
+# Hold left button ONLY for 3 seconds to calibrate the cameras
+                                 
 while True: 
     if time.time() - tnow > 10 and not standby:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
-        enter_standby(fdir, fname_log, dt, num_frames, mode)    # Enter standby mode
-    if left_button.is_held and not standby and left_button.held_time > 5 and not right_button.is_pressed:
+        enter_standby(fdir, fname_log, dt, num_frames, mode)    
+    if left_button.is_held and not standby and not right_button.is_pressed:
         calib(fdir, fname_log, calib_dt, calib_frames, mode)
         monitor_gps()
     if (right_button.is_held and left_button.is_held) and not standby:
