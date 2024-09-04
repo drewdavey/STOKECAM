@@ -183,9 +183,9 @@ while True:
         monitor_gps()
     if (right_button.is_held and left_button.is_held) and not standby:
         [led.on() for led in (red, green, yellow)]
-        time.sleep(3)
-        # left_button.wait_for_release()
-        if right_button.held_time > 5 and left_button.held_time > 5:
+        left_button.wait_for_release()
+        time.sleep(1)
+        if right_button.is_held:
             break
         else:
             [led.blink(0.1, 0.1) for led in (red, green, yellow)]
