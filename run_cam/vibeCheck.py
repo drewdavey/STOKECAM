@@ -185,7 +185,7 @@ while True:
         [led.on() for led in (red, green, yellow)]
         time.sleep(3)
         # left_button.wait_for_release()
-        if right_button.held_time > 6 and left_button.held_time > 6:
+        if right_button.held_time > 5 and left_button.held_time > 5:
             break
         else:
             [led.blink(0.1, 0.1) for led in (red, green, yellow)]
