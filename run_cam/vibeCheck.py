@@ -140,7 +140,6 @@ def enter_standby(fdir, fname_log, dt, num_frames, mode):
     yellow.on()
     time.sleep(1)
     global busy
-    busy = False
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     Entering standby...\n\n")
@@ -181,6 +180,7 @@ configure_cameras(fname_log)                    # Configure the cameras
 sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
 global standby
 standby = False
+busy = False
 tnow = time.time()
 monitor_gps()
 #######################################################################
