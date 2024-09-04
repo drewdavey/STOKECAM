@@ -69,10 +69,10 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     time.sleep(5)
     [led.off() for led in (red, green, yellow)]
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"calib_{mode}")
-    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n")
+    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     for i in range(int(calib_frames)):
         green.on(), time.sleep(0.5)
         yellow.on(), time.sleep(0.5)
