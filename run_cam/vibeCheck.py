@@ -22,8 +22,8 @@ left_button = Button(17, hold_time=3)   #
 
 busy = False
 
-def configure_cameras(fname_log, config):
-    global cam0, cam1
+def configure_cameras(fname_log):
+    global cam0, cam1, config 
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
     for idx, cam in enumerate([cam0, cam1]):
@@ -110,14 +110,14 @@ def monitor_gps():
             green.blink(0.5, 0.5) 
         s.disconnect()
 
-def toggle_modes(mode):
-    global cam0, cam1, config
+def toggle_modes():
+    global cam0, cam1, config, mode
+    cam0.close(), cam1.close()                      # Close the cameras
     mode = mode1                                    # switch mode
     config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0       
     cam1 = Picamera2(1)                             # Initialize cam1
-    configure_cameras(fname_log, config)            # Configure the cameras
-    return mode
+    configure_cameras(fname_log)            # Configure the cameras
 
 def exit_standby(fname_log):
     global standby
@@ -159,18 +159,19 @@ mode0 = inputs['shooting_mode0']
 mode1 = inputs['shooting_mode1']
 mode2 = inputs['shooting_mode2']
 
+global cam0, cam1, config, mode
 mode = mode0                # default mode
-global cam0, cam1, config
 config = get_config(mode)   # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 cam1 = Picamera2(1)                             # Initialize cam1
-configure_cameras(fname_log, config)            # Configure the cameras
+configure_cameras(fname_log)            # Configure the cameras
 
 sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
 global standby
 standby = False
 tnow = time.time()
 monitor_gps()
+
 ##################### Main loop #####################
 while True:
     if time.time() - tnow > 10 and not standby:
@@ -184,16 +185,14 @@ while True:
     if (right_button.is_held and left_button.is_held) and not standby:
         [led.on() for led in (red, green, yellow)]
         left_button.wait_for_release()
-        time.sleep(1)
+        time.sleep(2)
         if right_button.is_held:
             break
         else:
             [led.blink(0.1, 0.1) for led in (red, green, yellow)]
             time.sleep(3)
-            cam0.close(), cam1.close()                      # Close the cameras
-            mode = toggle_modes(mode)
+            mode = toggle_modes()
             [led.off() for led in (red, green, yellow)]
-
     tnow = time.time()
     time.sleep(0.2)
 ########################################################
