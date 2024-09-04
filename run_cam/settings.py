@@ -65,16 +65,16 @@ def dark():
 def get_config(mode):
     if mode == 'auto':
         return auto()
+    elif mode == 'fast':
+        return fast()
+    elif mode == 'max':
+        return max()
     elif mode == 'standard':
         return standard()
     elif mode == 'bright':
         return bright()
     elif mode == 'dark':
         return dark()
-    elif mode == 'fast':
-        return fast()
-    elif mode == 'max':
-        return max()
     else:
         raise ValueError(f"Invalid mode: {mode}")
 
