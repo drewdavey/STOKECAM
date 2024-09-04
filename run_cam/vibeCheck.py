@@ -109,6 +109,15 @@ def monitor_gps():
             green.blink(0.5, 0.5) 
         s.disconnect()
 
+def toggle_modes(mode):
+    cam0.close(), cam1.close()                      # Close the cameras
+    mode = mode1                                    # switch mode
+    config = get_config(mode)                       # Get the configuration for the cameras
+    cam0 = Picamera2(0)                             # Initialize cam0       
+    cam1 = Picamera2(1)                             # Initialize cam1
+    configure_cameras(fname_log, config)            # Configure the cameras
+    return mode
+
 def exit_standby(fname_log):
     global standby
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
@@ -161,7 +170,7 @@ standby = False
 tnow = time.time()
 monitor_gps()
 ##################### Main loop #####################
-while not (right_button.hold_time > 10 and left_button.hold_time > 10):
+while not (right_button.active_time > 10 and left_button.active_time > 10):
     if time.time() - tnow > 10 and not standby:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
@@ -173,20 +182,18 @@ while not (right_button.hold_time > 10 and left_button.hold_time > 10):
     if (right_button.is_held and left_button.is_held) and not standby:
         [led.on() for led in (red, green, yellow)]
         left_button.wait_for_release(), right_button.wait_for_release()
-        time.sleep(5)
         [led.blink(0.1, 0.1) for led in (red, green, yellow)]
-        cam0.close(), cam1.close()                      # Close the cameras
-        mode = mode1                                    # switch mode
-        config = get_config(mode)                       # Get the configuration for the cameras
-        cam0 = Picamera2(0)                             # Initialize cam0       
-        cam1 = Picamera2(1)                             # Initialize cam1
-        configure_cameras(fname_log, config)            # Configure the cameras
+        time.sleep(3)
+        mode = toggle_modes(mode)
+        [led.off() for led in (red, green, yellow)]
 
     tnow = time.time()
     time.sleep(0.2)
 ########################################################
 
 ##################### Cleanup ########################## 
+cam0.stop() # Stop the cameras
+cam1.stop()
 cam0.close() # Close the cameras
 cam1.close()
 green.close()
