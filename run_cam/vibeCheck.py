@@ -183,16 +183,16 @@ while True:
         monitor_gps()
     if (right_button.is_held and left_button.is_held) and not standby:
         [led.on() for led in (red, green, yellow)]
-        # time.sleep(3)
-        if left_button.held_time < 10 and right_button.held_time < 10:
-            left_button.wait_for_release(), right_button.wait_for_release()
+        time.sleep(3)
+        # left_button.wait_for_release()
+        if right_button.held_time > 6 and left_button.held_time > 6:
+            break
+        else:
             [led.blink(0.1, 0.1) for led in (red, green, yellow)]
             time.sleep(3)
             cam0.close(), cam1.close()                      # Close the cameras
             mode = toggle_modes(mode)
             [led.off() for led in (red, green, yellow)]
-        else:
-            break
 
     tnow = time.time()
     time.sleep(0.2)
