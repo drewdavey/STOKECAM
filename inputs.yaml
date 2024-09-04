@@ -5,8 +5,8 @@
 gps_wait_time: 5      # Time to wait for GPS lock in seconds (during startup)
 
 shooting_mode0: 'auto' # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
-shooting_mode1: 'max'  # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
-shooting_mode2: 'fast' # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
+shooting_mode1: 'fast'  # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
+shooting_mode2: 'max' # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
 
 calib_frames: 10       # Number of frames to be captured by calib mode
 calib_dt: 1            # Time between frames in seconds (for calibration)
