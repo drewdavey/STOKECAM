@@ -32,14 +32,14 @@ def configure_cameras(fname_log, config):
         log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.close()
 
-def burst(fdir, fname_log, dt): 
+def burst(fdir, fname_log, dt, mode): 
     global busy
     i = 0
-    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'burst')
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"burst_{mode}")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-    log.write(f"{tstr}:     burst session: {fdir_out}\n")
+    log.write(f"{tstr}:     burst_{mode} session: {fdir_out}\n")
     while right_button.is_pressed:
         red.on()
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
@@ -52,13 +52,13 @@ def burst(fdir, fname_log, dt):
     busy = False
     log.close()
 
-def numFrames(fdir, fname_log, dt, num_frames):
+def numFrames(fdir, fname_log, dt, num_frames, mode):
     global busy
-    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'numFrames')
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"numFrames_{mode}")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-    log.write(f"{tstr}:     numFrames session: {fdir_out}\n")
+    log.write(f"{tstr}:     numFrames_{mode} session: {fdir_out}\n")
     for i in range(int(num_frames)):
         red.on()
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
@@ -70,16 +70,16 @@ def numFrames(fdir, fname_log, dt, num_frames):
     busy = False
     log.close()
 
-def calib(fdir, fname_log, calib_dt, calib_frames):
+def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     global busy
     [led.on() for led in (red, green, yellow)]
     time.sleep(5)
     [led.off() for led in (red, green, yellow)]
-    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, 'calib')
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"calib_{mode}")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-    log.write(f"{tstr}:     calibration session: {fdir_out}\n")
+    log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n")
     for i in range(int(calib_frames)):
         green.on(), time.sleep(0.5)
         yellow.on(), time.sleep(0.5)
