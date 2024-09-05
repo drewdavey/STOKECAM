@@ -51,10 +51,10 @@ for i = 1:length(imageFileNames1)
     %%%%%%%%%%%%%%%%%%%%%%%
 
     %%% Compute Disparity Map %%%
-%     disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
+    disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
 % disparityMap = disparityBM(J1,J2,'DisparityRange',disparityRange,'UniquenessThreshold',20);
                        % use J1 and J2?
-    disparityMap = disparitySGM(frameLeftGray, frameRightGray); % semi-global matching
+%     disparityMap = disparitySGM(frameLeftGray, frameRightGray); % semi-global matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Plotting
