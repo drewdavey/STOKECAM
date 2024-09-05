@@ -44,17 +44,17 @@ for i = 1:length(imageFileNames1)
     I2 = imread(imageFileNames2{i});
     
     %%% Rectify Images %%%
-%     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='valid'); 
-    [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='full'); 
+    [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='valid'); 
+%     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='full'); 
     frameLeftGray  = im2gray(J1);
     frameRightGray = im2gray(J2);
     %%%%%%%%%%%%%%%%%%%%%%%
 
     %%% Compute Disparity Map %%%
-    disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
+%     disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
 % disparityMap = disparityBM(J1,J2,'DisparityRange',disparityRange,'UniquenessThreshold',20);
                        % use J1 and J2?
-%     disparityMap = disparitySGM(frameLeftGray, frameRightGray); % semi-global matching
+    disparityMap = disparitySGM(frameLeftGray, frameRightGray); % semi-global matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Plotting
