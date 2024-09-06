@@ -52,7 +52,7 @@ for i = 1:length(imageFileNames1)
 
     %%% Compute Disparity Map %%%
 %     disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
-% disparityMap = disparityBM(J1,J2,'DisparityRange',disparityRange,'UniquenessThreshold',20);
+%         disparityMap = disparityBM(J1,J2,'DisparityRange',disparityRange,'UniquenessThreshold',20);
                        % use J1 and J2?
     disparityMap = disparitySGM(frameLeftGray, frameRightGray); % semi-global matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,7 +63,7 @@ for i = 1:length(imageFileNames1)
     filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
-    f2 = figure(2);
+    f2 = figure(2); 
     imshow(disparityMap, [0, 64]); % Display disparity map
     colormap jet; colorbar;
     filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
@@ -73,7 +73,7 @@ for i = 1:length(imageFileNames1)
     % Save .mat
     filename = imageFileNames1{i}(end-18:end-4);
     fullFilePath = fullfile(matDir, filename);
-    save(fullFilePath,'I1','I2','J1','J2','reprojectionMatrix','disparityMap','calib_path');
+    save(fullFilePath,'I1','I2','J1','J2','frameLeftGray', 'frameRightGray','reprojectionMatrix','disparityMap','calib_path');
     
 end
 

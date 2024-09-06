@@ -162,7 +162,7 @@ def enter_standby(fdir, fname_log, dt, num_frames, mode):
 ############################ Initialization ############################
 green = LED(12)                         # Green LED
 yellow = LED(16)                        # Yellow LED
-red = LED(26)                           # Red LED
+red = LED(24)                           # Red LED
 right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
 
