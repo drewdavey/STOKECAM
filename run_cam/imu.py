@@ -10,7 +10,8 @@ from vnpy import *
 from utils import *
 from datetime import datetime, timezone
 
-imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n"
+imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA\n"
+# imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n"
 
 # Connect to the VN-200 
 ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
@@ -29,10 +30,11 @@ def imu_run(fname_imu,fname_log,imu_dt):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
         gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
-        ins = s.read_ins_solution_lla() # Read the INS solution
+        # ins = s.read_ins_solution_lla() # Read the INS solution
         imu_out = s.read_imu_measurements() # Read the IMU measurements
         cd = ez.current_data # Read current data as CompositeData class from EzAsyncData
-        imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
+        imu.write(f"{tstr}, {cd.time_utc}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
+        # imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
         # imu.write(f"{tstr}, {ypr.x}, {ypr.y}, {ypr.z}" + '\n')
         time.sleep(imu_dt)
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]

@@ -20,8 +20,8 @@ if ~exist(rectifiedImagesDir, 'dir')
     mkdir(rectifiedImagesDir); % mkdir for rectified images
 end
 
-dir1 = dir([path '/cam0/*.jpg']);
-dir2 = dir([path '/cam1/*.jpg']);
+dir1 = dir([path '/cam1/*.jpg']);
+dir2 = dir([path '/cam0/*.jpg']);
 
 %% Parse data
 
@@ -43,6 +43,13 @@ for i = 1:length(imageFileNames1)
     I1 = imread(imageFileNames1{i});
     I2 = imread(imageFileNames2{i});
     
+
+
+%     I1 = im2gray(I1);
+%     I2 = im2gray(I2);
+
+
+
     %%% Rectify Images %%%
     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='valid'); 
 %     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='full'); 

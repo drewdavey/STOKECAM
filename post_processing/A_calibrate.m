@@ -10,8 +10,8 @@ squareSize = 45;  % in units of 'millimeters'
 
 calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
 
-dir1 = dir([calib_path '/cam0/*.jpg']);
-dir2 = dir([calib_path '/cam1/*.jpg']);
+dir1 = dir([calib_path '/cam1/*.jpg']);
+dir2 = dir([calib_path '/cam0/*.jpg']);
 
 % Check the number of files in each directory
 numFiles = min(length(dir1), length(dir2));
