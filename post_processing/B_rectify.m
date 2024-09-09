@@ -24,7 +24,7 @@ dir1 = dir([path '/cam1/*.jpg']);
 dir2 = dir([path '/cam0/*.jpg']);
 
 %% Parse data
-
+ 
 % Check the number of files in each directory
 numFiles = min(length(dir1), length(dir2));
 
