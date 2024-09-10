@@ -43,12 +43,8 @@ for i = 1:length(imageFileNames1)
     I1 = imread(imageFileNames1{i});
     I2 = imread(imageFileNames2{i});
     
-
-
 %     I1 = im2gray(I1);
 %     I2 = im2gray(I2);
-
-
 
     %%% Rectify Images %%%
     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='valid'); 
@@ -58,10 +54,24 @@ for i = 1:length(imageFileNames1)
     %%%%%%%%%%%%%%%%%%%%%%%
 
     %%% Compute Disparity Map %%%
+    DisparityRange = [0 64];
+    BlockSize = 11;
+    ContrastThreshold = 0.7;
+    UniquenessThreshold = 10;
+    DistanceThreshold = 0;
+    TextureThreshold = 0;
+
 %     disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
-%         disparityMap = disparityBM(J1,J2,'DisparityRange',disparityRange,'UniquenessThreshold',20);
+%     disparityMap = disparityBM(frameLeftGray, frameRightGray,'DisparityRange',DisparityRange,...
+%         'UniquenessThreshold',UniquenessThreshold,...
+%         'ContrastThreshold', ContrastThreshold,...
+%         'BlockSize',BlockSize,...
+%         'DistanceThreshold',DistanceThreshold,...
+%         'TextureThreshold',TextureThreshold);
                        % use J1 and J2?
-    disparityMap = disparitySGM(frameLeftGray, frameRightGray); % semi-global matching
+
+    disparityMap = disparitySGM(frameLeftGray, frameRightGray);
+%     disparityMap = disparitySGM(frameLeftGray, frameRightGray,'UniquenessThreshold',UniquenessThreshold); % semi-global matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Plotting
@@ -85,26 +95,26 @@ for i = 1:length(imageFileNames1)
 end
 
 %% Write rectified images as a movie
-outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'rectified_movie'));
-outputVideo.FrameRate = 5;
-open(outputVideo);
-for i = 1:length(imageFileNames1)
-    filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
-    fullFilePath = fullfile(rectifiedImagesDir, filename);
-    img = imread(fullFilePath);
-    writeVideo(outputVideo, img);
-end
-close(outputVideo);
-
-%% Write disparity images as a movie
-outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'disparity_movie'));
-outputVideo.FrameRate = 5;
-open(outputVideo);
-for i = 1:length(imageFileNames1)
-    filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
-    fullFilePath = fullfile(rectifiedImagesDir, filename);
-    img = imread(fullFilePath);
-    writeVideo(outputVideo, img);
-end
-close(outputVideo);
+% outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'rectified_movie'));
+% outputVideo.FrameRate = 5;
+% open(outputVideo);
+% for i = 1:length(imageFileNames1)
+%     filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
+%     fullFilePath = fullfile(rectifiedImagesDir, filename);
+%     img = imread(fullFilePath);
+%     writeVideo(outputVideo, img);
+% end
+% close(outputVideo);
+% 
+% %% Write disparity images as a movie
+% outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'disparity_movie'));
+% outputVideo.FrameRate = 5;
+% open(outputVideo);
+% for i = 1:length(imageFileNames1)
+%     filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
+%     fullFilePath = fullfile(rectifiedImagesDir, filename);
+%     img = imread(fullFilePath);
+%     writeVideo(outputVideo, img);
+% end
+% close(outputVideo);
 
