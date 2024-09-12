@@ -192,11 +192,11 @@ monitor_gps()
 
 
 ############################# Main loop ###############################
+# Hold right button ONLY for 3 seconds to enter standby mode    
+# Hold left button ONLY for 3 seconds to calibrate the cameras
 # Hold both buttons for 3 seconds to toggle modes, then:
 #                         - release both to toggle modes
 #                         - release left ONLY to exit script
-# Hold right button ONLY for 3 seconds to enter standby mode    
-# Hold left button ONLY for 3 seconds to calibrate the cameras
                                  
 while True: 
     if time.time() - tnow > 10 and not standby:
