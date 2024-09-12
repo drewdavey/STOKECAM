@@ -11,10 +11,10 @@ matDir = [path '/mats'];
 
 viewFlag = 1;
 
-depth = 25;
+depth = [0, 30];
 
-xbounds = 5;
-ybounds = 5;
+xbounds = [-5, 5];
+ybounds = [-5, 5];
 
 %% View point clouds
 
@@ -25,7 +25,7 @@ while viewFlag
     % Load mat
     load([matDir '/' file '.mat']);
     % Create a streaming point cloud viewer
-    player3D = pcplayer([-xbounds, xbounds], [-ybounds, ybounds], [0, depth], VerticalAxis="y", ...
+    player3D = pcplayer(xbounds, ybounds, depth, VerticalAxis="y", ...
         VerticalAxisDir="down");
     % Visualize the point cloud
     view(player3D, ptCloud);
