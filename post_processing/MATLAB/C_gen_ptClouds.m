@@ -43,7 +43,7 @@ for i = 1:length(matFileNames)
     ptCloud = pointCloud(points3D, Color=J1);
 
     % Append ptCloud to mat
-    save(matFileNames{i},'ptCloud','-append');
+    save(matFileNames{i},'ptCloud','points3D','-append');
 
     % Save ptCloud as .ply
     filename = matFileNames{i}(end-18:end-4);

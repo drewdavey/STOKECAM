@@ -11,7 +11,7 @@ if ~exist(matDir, 'dir')
     mkdir(matDir); % mkdir for .mats
 end
 
-rectifiedImagesDir = [path '/Rectified_Images']; 
+rectifiedImagesDir = [path '/Unrectified_Images']; 
 if ~exist(rectifiedImagesDir, 'dir')
     mkdir(rectifiedImagesDir); % mkdir for rectified images
 end
@@ -42,25 +42,23 @@ for i = 1:length(imageFileNames1)
     I1gray = im2gray(I1);
     I2gray = im2gray(I2);
 
-    figure
+    f1 = figure(1);
     imshowpair(I1,I2,"montage")
     title("I1 (left); I2 (right)")
 
-    figure 
+    f2 = figure(2);
     imshow(stereoAnaglyph(I1,I2))
     title("Composite Image (Red - Left Image, Cyan - Right Image)")
-
-
     blobs1 = detectSURFFeatures(I1gray,MetricThreshold=2000);
     blobs2 = detectSURFFeatures(I2gray,MetricThreshold=2000);
 
-    figure 
+    f3 = figure(3);
     imshow(I1)
     hold on
     plot(selectStrongest(blobs1,30))
     title("Thirty Strongest SURF Features In I1")
 
-    figure
+    f4 = figure(4);
     imshow(I2)
     hold on
     plot(selectStrongest(blobs2,30))
@@ -68,16 +66,14 @@ for i = 1:length(imageFileNames1)
 
     [features1,validBlobs1] = extractFeatures(I1gray,blobs1);
     [features2,validBlobs2] = extractFeatures(I2gray,blobs2);
-
     indexPairs = matchFeatures(features1,features2,Metric="SSD", ...
       MatchThreshold=10, Method='Approximate');
-
     matchedPoints1 = validBlobs1(indexPairs(:,1),:);
     matchedPoints2 = validBlobs2(indexPairs(:,2),:);
 
-    figure 
+    f5 = figure(5);
     showMatchedFeatures(I1, I2, matchedPoints1, matchedPoints2)
-    legend("Putatively Matched Points In I1","Putatively Matched Points In I2")
+    legend("Matched Points In I1","Matched Points In I2")
 
     [fMatrix, epipolarInliers, status] = estimateFundamentalMatrix(...
       matchedPoints1,matchedPoints2,Method="MSAC", ...
@@ -94,7 +90,7 @@ for i = 1:length(imageFileNames1)
     inlierPoints1 = matchedPoints1(epipolarInliers, :);
     inlierPoints2 = matchedPoints2(epipolarInliers, :);
     
-    figure
+    f6 = figure(6);
     showMatchedFeatures(I1, I2, inlierPoints1, inlierPoints2)
     legend("Inlier Points In I1","Inlier Points In I2")
 
@@ -107,7 +103,7 @@ for i = 1:length(imageFileNames1)
     frameLeftGray  = im2gray(J1);
     frameRightGray = im2gray(J2);
     
-    figure
+    f7 = figure(7);
     imshow(stereoAnaglyph(J1,J2))
     title("Rectified Stereo Images (Red - Left Image, Cyan - Right Image)")
 
@@ -116,22 +112,25 @@ for i = 1:length(imageFileNames1)
 %     disparityMap = disparitySGM(frameLeftGray, frameRightGray,'UniquenessThreshold',UniquenessThreshold); % semi-global matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    exportgraphics(f1,fullfile(rectifiedImagesDir, ['f1-' num2str(i) '.png']),'Resolution',600); 
+    exportgraphics(f2,fullfile(rectifiedImagesDir, ['f2-' num2str(i) '.png']),'Resolution',600);
+    exportgraphics(f3,fullfile(rectifiedImagesDir, ['f3-' num2str(i) '.png']),'Resolution',600);
+    exportgraphics(f4,fullfile(rectifiedImagesDir, ['f4-' num2str(i) '.png']),'Resolution',600);
+    exportgraphics(f5,fullfile(rectifiedImagesDir, ['f5-' num2str(i) '.png']),'Resolution',600);
+    exportgraphics(f6,fullfile(rectifiedImagesDir, ['f6-' num2str(i) '.png']),'Resolution',600);
+    exportgraphics(f7,fullfile(rectifiedImagesDir, ['f7-' num2str(i) '.png']),'Resolution',600);
+
     % Plotting
-    f1 = figure(1);
+    f8 = figure(8);
     imshow(stereoAnaglyph(J1,J2)); % Display rectified images
     filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
-    exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
-    f2 = figure(2); 
+    exportgraphics(f8,fullFilePath,'Resolution',600); % Save rectified images as PNG
+    f9 = figure(9); 
     imshow(disparityMap, [0, 64]); % Display disparity map
     colormap jet; colorbar;
     filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
-    exportgraphics(f2,fullFilePath,'Resolution',600); % Save disparity map as PNG
+    exportgraphics(f9,fullFilePath,'Resolution',600); % Save disparity map as PNG
 
-    % Save .mat
-    filename = imageFileNames1{i}(end-18:end-4);
-    fullFilePath = fullfile(matDir, filename);
-    save(fullFilePath,'I1','I2','J1','J2','frameLeftGray', 'frameRightGray','reprojectionMatrix','disparityMap','calib_path');
-    
 end

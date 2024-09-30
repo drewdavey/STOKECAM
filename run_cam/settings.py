@@ -18,7 +18,7 @@ def fast():
     config['main']['size'] = (1440, 1080)
     config['main']['format'] = 'RGB888'
     config['controls']['FrameDurationLimits'] = (2000, 2000)  
-    config['controls']['ExposureTime'] = 1000
+    # config['controls']['ExposureTime'] = 1000
     cam.close()
     return config
 
