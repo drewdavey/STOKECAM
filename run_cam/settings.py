@@ -9,6 +9,7 @@ def auto():
     cam = Picamera2()
     config = cam.create_still_configuration()
     config['main']['size'] = (1440, 1080)
+    config['controls']['FrameDurationLimits'] = (500, 500)  
     cam.close()
     return config
 
