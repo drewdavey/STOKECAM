@@ -100,24 +100,28 @@ def exit_standby(fname_log):
     time.sleep(2)
     standby = False
 
-def cam_0(fdir_cam0, dt):
+def cam_0(fdir_cam0, dt, twait):
     i = 0
+    time.sleep(twait - datetime.now(timezone.utc))
     while right_button.is_pressed:
         red.on()
-        tnow = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+        tnow = datetime.now(timezone.utc)
         tnext = tnow + timedelta(seconds=dt)
-        cam0.capture_file(f"{fdir_cam0}0_{tnow}_{i+1:05}.jpg")
+        tstr = tnow.strftime('%H%M%S%f')[:-3]
+        cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         i += 1
         time.sleep(tnext - datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3])
     red.off()
 
-def cam_1(fdir_cam1, dt):
+def cam_1(fdir_cam1, dt, twait):
     i = 0
+    time.sleep(twait - datetime.now(timezone.utc))
     while right_button.is_pressed:
         red.on()
-        tnow = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+        tnow = datetime.now(timezone.utc)
         tnext = tnow + timedelta(seconds=dt)
-        cam1.capture_file(f"{fdir_cam1}1_{tnow}_{i+1:05}.jpg")
+        tstr = tnow.strftime('%H%M%S%f')[:-3]
+        cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         i += 1
         time.sleep(tnext - datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3])
     red.off()
@@ -132,11 +136,11 @@ def enter_standby(fdir, fname_log, dt, mode):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"test_{mode}")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
-        tnow = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-        tnext = tnow + timedelta(seconds=dt)
+        tnow = datetime.now(timezone.utc)
+        twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed:  
-            cam_0(fdir_cam0, dt, tnext)
-            cam_1(fdir_cam1, dt, tnext)
+            cam_0(fdir_cam0, dt, twait)
+            cam_1(fdir_cam1, dt, twait)
         time.sleep(0.2)
     imu_process.terminate()
     exit_standby(fname_log)
