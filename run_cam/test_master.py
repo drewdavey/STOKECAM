@@ -50,18 +50,17 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     imu_process.terminate()
 
 def monitor_gps():
-    global busy
-    if not busy:
-        ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) 
-        s = ez.sensor
-        if ez.current_data.has_any_position:                              
-            if ez.current_data.position_uncertainty_estimated > 10:
-                green.blink(0.25, 0.25)
-            elif ez.current_data.position_uncertainty_estimated <= 10:
-                green.on()
-        else:
-            green.blink(0.5, 0.5) 
-        s.disconnect()
+ 
+    ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) 
+    s = ez.sensor
+    if ez.current_data.has_any_position:                              
+        if ez.current_data.position_uncertainty_estimated > 10:
+            green.blink(0.25, 0.25)
+        elif ez.current_data.position_uncertainty_estimated <= 10:
+            green.on()
+    else:
+        green.blink(0.5, 0.5) 
+    s.disconnect()
 
 def toggle_modes():
     global cam0, cam1, config, mode
