@@ -184,7 +184,7 @@ while True:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
-        enter_standby(fdir, fname_log, dt, num_frames, mode)    
+        enter_standby(fdir, fname_log, dt, mode)    
     if left_button.is_held and not standby and not right_button.is_pressed:
         calib(fdir, fname_log, calib_dt, calib_frames, mode)
         monitor_gps()
