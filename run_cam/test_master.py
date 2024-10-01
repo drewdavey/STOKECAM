@@ -110,7 +110,7 @@ def cam_0(fdir_cam0, dt, twait):
         tstr = tnow.strftime('%H%M%S%f')[:-3]
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         i += 1
-        time.sleep(tnext - datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3])
+        time.sleep(tnext - datetime.now(timezone.utc))
     red.off()
 
 def cam_1(fdir_cam1, dt, twait):
@@ -123,7 +123,7 @@ def cam_1(fdir_cam1, dt, twait):
         tstr = tnow.strftime('%H%M%S%f')[:-3]
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         i += 1
-        time.sleep(tnext - datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3])
+        time.sleep(tnext - datetime.now(timezone.utc))
     red.off()
 
 def enter_standby(fdir, fname_log, dt, mode):
