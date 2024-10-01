@@ -102,7 +102,7 @@ def exit_standby(fname_log):
 
 def cam_0(fdir_cam0, dt, twait):
     i = 0
-    time.sleep(twait - datetime.now(timezone.utc))
+    # time.sleep(twait - datetime.now(timezone.utc))
     while right_button.is_pressed:
         red.on()
         tnow = datetime.now(timezone.utc)
@@ -115,7 +115,7 @@ def cam_0(fdir_cam0, dt, twait):
 
 def cam_1(fdir_cam1, dt, twait):
     i = 0
-    time.sleep(twait - datetime.now(timezone.utc))
+    # time.sleep(twait - datetime.now(timezone.utc))
     while right_button.is_pressed:
         red.on()
         tnow = datetime.now(timezone.utc)
