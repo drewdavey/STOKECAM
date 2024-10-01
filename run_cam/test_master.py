@@ -11,7 +11,7 @@ from settings import *
 from signal import pause
 from picamera2 import Picamera2
 from gpiozero import Button, LED
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 def configure_cameras(fname_log, mode):
     global cam0, cam1, config 
@@ -105,7 +105,7 @@ def cam_0(fdir_cam0, dt):
     while right_button.is_pressed:
         red.on()
         tnow = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-        tnext = tnow + dt
+        tnext = tnow + timedelta(seconds=dt)
         cam0.capture_file(f"{fdir_cam0}0_{tnow}_{i+1:05}.jpg")
         i += 1
         time.sleep(tnext - datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3])
@@ -116,7 +116,7 @@ def cam_1(fdir_cam1, dt):
     while right_button.is_pressed:
         red.on()
         tnow = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-        tnext = tnow + dt
+        tnext = tnow + timedelta(seconds=dt)
         cam1.capture_file(f"{fdir_cam1}1_{tnow}_{i+1:05}.jpg")
         i += 1
         time.sleep(tnext - datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3])
@@ -133,7 +133,7 @@ def enter_standby(fdir, fname_log, dt, mode):
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         tnow = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-        tnext = tnow + dt
+        tnext = tnow + timedelta(seconds=dt)
         if right_button.is_pressed:  
             cam_0(fdir_cam0, dt, tnext)
             cam_1(fdir_cam1, dt, tnext)
