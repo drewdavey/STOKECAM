@@ -6,18 +6,20 @@
 import sys
 import signal
 from utils import *
+from settings import *
 from picamera2 import Picamera2
 from datetime import datetime, timezone, timedelta
 
-cam1 = Picamera2(1)                             # Initialize cam0     
-cam1.configure()                            # Configure cam0      
-cam1.start()
-
-
 running = True
 
-def capture(fdir_cam1,dt):
+def capture(fdir_cam1, mode, dt):
     global running
+
+    config = get_config(mode)                       # Get the configuration for the cameras
+    cam1 = Picamera2(1)                             # Initialize cam0     
+    cam1.configure(config)                            # Configure cam0    
+    cam1.start()
+
     i = 0
     # time.sleep(twait - datetime.now(timezone.utc))
     while running:
@@ -43,4 +45,4 @@ if __name__ == '__main__':
     fdir, fname_log = setup_logging()             
     inputs = read_inputs_yaml(fname_log)
     dt = inputs['dt']           
-    capture(sys.argv[1],dt)
+    capture(sys.argv[1],sys.argv[2], dt)
