@@ -109,7 +109,6 @@ def enter_standby(fdir, fname_log, dt, config, mode):
     yellow.on()
     cam0.stop(), cam1.stop() # Stop the cameras
     cam0.close(), cam1.close() # Close the cameras
-    time.sleep(1)
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log.write(f"{tstr}:     Entering standby: Session {i}\n\n")
@@ -121,8 +120,8 @@ def enter_standby(fdir, fname_log, dt, config, mode):
         twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            capture0 = subprocess.Popen(['python3', 'capture0.py', fdir_cam0, config])
-            capture1 = subprocess.Popen(['python3', 'capture1.py', fdir_cam1, config])
+            capture0 = subprocess.Popen(['python3', 'capture0.py', fdir_cam0, mode])
+            capture1 = subprocess.Popen(['python3', 'capture1.py', fdir_cam1, mode])
             while right_button.is_pressed:
                 time.sleep(0.1)
             red.off()

@@ -4,6 +4,7 @@
 # Args: (1) fname_imu (2) fname_log (3) imu_dt 
 ##################################
 import sys
+import time
 import signal
 from utils import *
 from settings import *
@@ -12,10 +13,11 @@ from datetime import datetime, timezone, timedelta
 
 running = True
 
-def capture(fdir_cam0, config, dt):
+def capture(fdir_cam0, mode, dt):
     global running
 
-    # config = get_config(mode)                       # Get the configuration for the cameras
+    config = get_config(mode)                       # Get the configuration for the cameras
+    time.sleep(1)
     cam0 = Picamera2(0)                             # Initialize cam0     
     cam0.configure(config)                            # Configure cam0    
     cam0.start()
