@@ -107,7 +107,7 @@ def enter_standby(fdir, fname_log, dt, config, mode):
     global i
     i += 1
     yellow.on()
-    cam0.stop(), cam1.stop() # Stop the cameras
+    # cam0.stop(), cam1.stop() # Stop the cameras
     cam0.close(), cam1.close() # Close the cameras
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
