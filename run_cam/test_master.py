@@ -125,8 +125,8 @@ def enter_standby(fdir, fname_log, dt, mode):
             capture1 = subprocess.Popen(['python3', 'capture1.py', fdir_cam1, dt])
             while right_button.is_pressed:
                 time.sleep(0.1)
-        red.off()
-        capture0.terminate(), capture1.terminate() # Terminate the capture processes
+            red.off()
+            capture0.terminate(), capture1.terminate() # Terminate the capture processes
         time.sleep(0.2)
     imu_process.terminate() # Terminate the imu process
     exit_standby(fname_log)
