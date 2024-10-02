@@ -50,7 +50,6 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     imu_process.terminate()
 
 def monitor_gps():
- 
     ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) 
     s = ez.sensor
     if ez.current_data.has_any_position:                              
@@ -63,7 +62,7 @@ def monitor_gps():
     s.disconnect()
 
 def toggle_modes():
-    global cam0, cam1, config, mode
+    global cam0, cam1, config, mode, shooting_modes
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
@@ -90,7 +89,11 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
 
 def exit_standby(fname_log):
-    global standby
+    global cam0, cam1, config, mode, standby, shooting_modes
+    config = get_config(mode)                       # Get the configuration for the cameras
+    cam0 = Picamera2(0)                             # Initialize cam0       
+    cam1 = Picamera2(1)                             # Initialize cam1
+    configure_cameras(fname_log, mode)              # Configure the cameras
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
@@ -100,49 +103,32 @@ def exit_standby(fname_log):
     time.sleep(2)
     standby = False
 
-def cam_0(fdir_cam0, dt, twait):
-    i = 0
-    # time.sleep(twait - datetime.now(timezone.utc))
-    while right_button.is_pressed:
-        red.on()
-        tnow = datetime.now(timezone.utc)
-        tnext = tnow + timedelta(seconds=dt)
-        tstr = tnow.strftime('%H%M%S%f')[:-3]
-        cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
-        i += 1
-        # time.sleep(tnext - datetime.now(timezone.utc))
-    red.off()
-
-def cam_1(fdir_cam1, dt, twait):
-    i = 0
-    # time.sleep(twait - datetime.now(timezone.utc))
-    while right_button.is_pressed:
-        red.on()
-        tnow = datetime.now(timezone.utc)
-        tnext = tnow + timedelta(seconds=dt)
-        tstr = tnow.strftime('%H%M%S%f')[:-3]
-        cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
-        i += 1
-        # time.sleep(tnext - datetime.now(timezone.utc))
-    red.off()
-
 def enter_standby(fdir, fname_log, dt, mode):
+    global i
+    i += 1
     yellow.on()
+    cam0.stop(), cam1.stop() # Stop the cameras
+    cam0.close(), cam1.close() # Close the cameras
     time.sleep(1)
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
-    log.write(f"{tstr}:     Entering standby...\n\n")
+    log.write(f"{tstr}:     Entering standby: Session {i}\n\n")
     log.close()
-    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"test_{mode}")
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session{i}_{mode}")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         tnow = datetime.now(timezone.utc)
         twait = tnow + timedelta(seconds=1)
-        if right_button.is_pressed:  
-            cam_0(fdir_cam0, dt, twait)
-            cam_1(fdir_cam1, dt, twait)
+        if right_button.is_pressed and not left_button.is_pressed:  
+            red.on()
+            capture0 = subprocess.Popen(['python3', 'capture0.py', fdir_cam0, dt])
+            capture1 = subprocess.Popen(['python3', 'capture1.py', fdir_cam1, dt])
+            while right_button.is_pressed:
+                time.sleep(0.1)
+        red.off()
+        capture0.terminate(), capture1.terminate() # Terminate the capture processes
         time.sleep(0.2)
-    imu_process.terminate()
+    imu_process.terminate() # Terminate the imu process
     exit_standby(fname_log)
 
 ############################ Initialization ############################
@@ -154,7 +140,6 @@ left_button = Button(17, hold_time=3)   # Left button
 
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
-num_frames = inputs['num_frames']
 dt = inputs['dt']
 calib_frames = inputs['calib_frames']
 calib_dt = inputs['calib_dt']
@@ -162,7 +147,8 @@ gps_wait_time = inputs['gps_wait_time']
 
 sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
 
-global cam0, cam1, config, mode, standby, shooting_modes
+global i, cam0, cam1, config, mode, standby, shooting_modes
+i = 0
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
 mode = shooting_modes[0]                        # Default to 'auto'
 config = get_config(mode)                       # Get the configuration for the cameras
@@ -206,10 +192,6 @@ while True:
 #######################################################################
 
 ############################## Cleanup ###############################
-cam0.stop() # Stop the cameras
-cam1.stop()
-cam0.close() # Close the cameras
-cam1.close()
 green.close()
 yellow.close() # Close the LEDs
 red.close() 
