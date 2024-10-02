@@ -11,6 +11,7 @@ from datetime import datetime, timezone, timedelta
 
 cam1 = Picamera2(1)                             # Initialize cam0       
 cam1.start()
+cam1.configure()
 
 running = True
 
