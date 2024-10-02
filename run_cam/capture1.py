@@ -27,7 +27,7 @@ def capture(fdir_cam1, mode, dt):
     while running:
         tnow = datetime.now(timezone.utc)
         tnext = tnow + timedelta(seconds=dt)
-        tstr = tnow.strftime('%H%M%S%f')[:-3]
+        tstr = tnow.strftime('%H%M%S%f')
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         i += 1
         # time.sleep(tnext - datetime.now(timezone.utc))

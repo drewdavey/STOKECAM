@@ -23,11 +23,11 @@ def imu_run(fname_imu,fname_log,imu_dt):
     global running
     imu = open(fname_imu, 'a')
     log = open(fname_log, 'a')
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     IMU started.\n")
     imu.write(imu_headerLine)
     while running:
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
         gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
         # ins = s.read_ins_solution_lla() # Read the INS solution
@@ -37,7 +37,7 @@ def imu_run(fname_imu,fname_log,imu_dt):
         # imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
         # imu.write(f"{tstr}, {ypr.x}, {ypr.y}, {ypr.z}" + '\n')
         time.sleep(imu_dt)
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     IMU stopped.\n\n")
     log.close()
     imu.close()

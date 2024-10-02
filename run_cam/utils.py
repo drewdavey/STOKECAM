@@ -69,7 +69,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
     with open(fname_log, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
         i = 0 
@@ -81,7 +81,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
             if i > gps_wait_time:
                 log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
                 break
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         if ez.current_data.has_any_position:
             pos = ez.current_data.position_estimated_lla
             log.write(f"{tstr}:     GPS Position (LLA): ({pos.x}, {pos.y}, {pos.z})\n")

@@ -15,7 +15,7 @@ from datetime import datetime, timezone, timedelta
 
 def configure_cameras(fname_log, mode):
     global cam0, cam1, config 
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
     for idx, cam in enumerate([cam0, cam1]):
@@ -32,7 +32,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     [led.off() for led in (red, green, yellow)]
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"calib_{mode}")
     log = open(fname_log, 'a')
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n")
     log.close()
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
@@ -42,7 +42,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
         red.on(), time.sleep(0.5)
         [led.blink(0.5,0.5) for led in (red, green, yellow)], time.sleep(3)
         [led.on() for led in (red, green, yellow)],time.sleep(1.5)
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3] 
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f') 
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         [led.off() for led in (red, green, yellow)]
@@ -94,7 +94,7 @@ def exit_standby(fname_log):
     cam0 = Picamera2(0)                             # Initialize cam0       
     cam1 = Picamera2(1)                             # Initialize cam1
     configure_cameras(fname_log, mode)              # Configure the cameras
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
     log.close()
@@ -110,7 +110,7 @@ def enter_standby(fdir, fname_log, dt, config, mode):
     cam0.stop(), cam1.stop() # Stop the cameras
     cam0.close(), cam1.close() # Close the cameras
     log = open(fname_log, 'a')
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     Entering standby: Session {i}\n\n")
     log.close()
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session{i}_{mode}")
