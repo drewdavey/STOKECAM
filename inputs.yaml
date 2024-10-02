@@ -12,5 +12,5 @@ calib_frames: 50       # Number of frames to be captured by calib mode
 calib_dt: 3            # Time between frames in seconds (for calibration)
 
 num_frames: 10         # Number of frames to be captured by numFrames mode
-dt: 0.1                  # Time between frames in seconds (for numFrames and burst mode)
+dt: 1                  # Time between frames in seconds (for numFrames and burst mode)
 imu_dt: 0              # Time between IMU readings in seconds
