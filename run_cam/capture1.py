@@ -39,4 +39,6 @@ signal.signal(signal.SIGINT, disconnect)
 
 if __name__ == '__main__':
     fdir, fname_log = setup_logging()             
-    capture(sys.argv[1],sys.argv[2])
+    inputs = read_inputs_yaml(fname_log)
+    dt = inputs['dt']           
+    capture(sys.argv[1],dt)

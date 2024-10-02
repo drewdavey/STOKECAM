@@ -121,8 +121,8 @@ def enter_standby(fdir, fname_log, dt, mode):
         twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            capture0 = subprocess.Popen(['python3', 'capture0.py', fdir_cam0, dt])
-            capture1 = subprocess.Popen(['python3', 'capture1.py', fdir_cam1, dt])
+            capture0 = subprocess.Popen(['python3', 'capture0.py', fdir_cam0])
+            capture1 = subprocess.Popen(['python3', 'capture1.py', fdir_cam1])
             while right_button.is_pressed:
                 time.sleep(0.1)
             red.off()
