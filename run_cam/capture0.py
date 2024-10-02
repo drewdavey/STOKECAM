@@ -12,10 +12,10 @@ from datetime import datetime, timezone, timedelta
 
 running = True
 
-def capture(fdir_cam0, mode, dt):
+def capture(fdir_cam0, config, dt):
     global running
 
-    config = get_config(mode)                       # Get the configuration for the cameras
+    # config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0     
     cam0.configure(config)                            # Configure cam0    
     cam0.start()
@@ -26,7 +26,7 @@ def capture(fdir_cam0, mode, dt):
         tnow = datetime.now(timezone.utc)
         tnext = tnow + timedelta(seconds=dt)
         tstr = tnow.strftime('%H%M%S%f')[:-3]
-        cam0.capture_file(f"{fdir_cam0}1_{tstr}_{i+1:05}.jpg")
+        cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         i += 1
         # time.sleep(tnext - datetime.now(timezone.utc))
 

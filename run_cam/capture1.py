@@ -12,10 +12,10 @@ from datetime import datetime, timezone, timedelta
 
 running = True
 
-def capture(fdir_cam1, mode, dt):
+def capture(fdir_cam1, config, dt):
     global running
 
-    config = get_config(mode)                       # Get the configuration for the cameras
+    # config = get_config(mode)                       # Get the configuration for the cameras
     cam1 = Picamera2(1)                             # Initialize cam0     
     cam1.configure(config)                            # Configure cam0    
     cam1.start()
