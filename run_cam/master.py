@@ -11,6 +11,7 @@ from settings import *
 from signal import pause
 from picamera2 import Picamera2
 from gpiozero import Button, LED
+from multiprocessing import Process
 from datetime import datetime, timezone, timedelta
 
 def configure_cameras(fname_log, mode):
@@ -89,11 +90,6 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
 
 def exit_standby(fname_log):
-    global cam0, cam1, config, mode, standby, shooting_modes
-    config = get_config(mode)                       # Get the configuration for the cameras
-    cam0 = Picamera2(0)                             # Initialize cam0       
-    cam1 = Picamera2(1)                             # Initialize cam1
-    configure_cameras(fname_log, mode)              # Configure the cameras
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
@@ -103,12 +99,30 @@ def exit_standby(fname_log):
     time.sleep(2)
     standby = False
 
+def cap0(fdir_cam0):
+    global cam0
+    i = 0
+    while right_button.is_pressed:
+        tnow = datetime.now(timezone.utc)
+        tnext = tnow + timedelta(seconds=dt)
+        tstr = tnow.strftime('%H%M%S%f')
+        cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
+        i += 1
+
+def cap1(fdir_cam1):
+    global cam1
+    i = 0
+    while right_button.is_pressed:
+        tnow = datetime.now(timezone.utc)
+        tnext = tnow + timedelta(seconds=dt)
+        tstr = tnow.strftime('%H%M%S%f')
+        cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+        i += 1
+
 def enter_standby(fdir, fname_log, dt, config, mode):
-    global i, cam0, cam1, standby
+    global i, cam0, cam1
     i += 1
     yellow.on()
-    # cam0.stop(), cam1.stop() # Stop the cameras
-    cam0.close(), cam1.close() # Close the cameras
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     Entering standby: Session {i}\n\n")
@@ -120,12 +134,13 @@ def enter_standby(fdir, fname_log, dt, config, mode):
         twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            capture0 = subprocess.Popen(['python3', 'cap0.py', fdir_cam0])
-            capture1 = subprocess.Popen(['python3', 'cap1.py', fdir_cam1])
+            capture0 = Process(target=cap0, args=(fdir_cam0,))
+            capture1 = Process(target=cap1, args=(fdir_cam1,))
+            capture0.run(), capture1.run()
             while right_button.is_pressed:
                 time.sleep(0.1)
             red.off()
-            capture0.terminate(), capture1.terminate() # Terminate the capture processes
+            capture0.kill(), capture1.kill() # Terminate the capture processes
         time.sleep(0.2)
     imu_process.terminate() # Terminate the imu process
     exit_standby(fname_log)
@@ -191,6 +206,8 @@ while True:
 #######################################################################
 
 ############################## Cleanup ###############################
+cam0.stop(), cam1.stop() # Stop the cameras
+cam0.close(), cam1.close() # Close the cameras
 green.close()
 yellow.close() # Close the LEDs
 red.close() 
