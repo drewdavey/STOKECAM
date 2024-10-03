@@ -5,16 +5,14 @@
 ##################################
 import sys
 import time
+import threading
 import subprocess
+from vnpy import *
 from utils import *
 from settings import *
 from signal import pause
 from picamera2 import Picamera2
 from gpiozero import Button, LED
-
-from multiprocessing import Process
-import threading
-
 from datetime import datetime, timezone, timedelta
 
 def configure_cameras(fname_log, mode):
@@ -27,8 +25,7 @@ def configure_cameras(fname_log, mode):
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
         log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
-    log.write('\n')
-    log.close()
+    log.write('\n'), log.close()
 
 def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     [led.on() for led in (red, green, yellow)]
@@ -37,8 +34,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"calib_{mode}")
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n")
-    log.close()
+    log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n"), log.close()
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     for i in range(int(calib_frames)):
         green.on(), time.sleep(0.5)
@@ -124,12 +120,11 @@ def exit_standby(fname_log):
     global standby
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
-    log.write(f"{tstr}:     Exiting standby.\n\n")
-    log.close()
-    yellow.off() # Close the lights
-    red.off()
-    time.sleep(2)
+    log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
+    yellow.off(), red.off() # Close the lights
     standby = False
+    monitor_gps()
+    time.sleep(2)
 
 def enter_standby(fdir, fname_log, dt, mode):
     global j
@@ -137,8 +132,7 @@ def enter_standby(fdir, fname_log, dt, mode):
     yellow.on()
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    log.write(f"{tstr}:     Entering standby: Session {j}\n\n")
-    log.close()
+    log.write(f"{tstr}:     Entering standby: Session {j}\n\n"), log.close()
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session{j}_{mode}")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
@@ -165,8 +159,8 @@ left_button = Button(17, hold_time=3)   # Left button
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 dt = inputs['dt']
-calib_frames = inputs['calib_frames']
 calib_dt = inputs['calib_dt']
+calib_frames = inputs['calib_frames']
 gps_wait_time = inputs['gps_wait_time']
 
 sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
@@ -185,14 +179,12 @@ tnow = time.time()
 monitor_gps()
 #######################################################################
 
-
 ############################# Main loop ###############################
 # Hold right button ONLY for 3 seconds to enter standby mode    
 # Hold left button ONLY for 3 seconds to calibrate the cameras
 # Hold both buttons for 3 seconds to toggle modes, then:
 #                         - release both to toggle modes
-#                         - release left ONLY to exit script
-                                 
+#                         - release left ONLY to exit script                              
 while True: 
     if time.time() - tnow > 10 and not standby:
         monitor_gps()
@@ -217,12 +209,9 @@ while True:
 #######################################################################
 
 ############################## Cleanup ###############################
-cam0.stop(), cam1.stop() # Stop the cameras
-cam0.close(), cam1.close() # Close the cameras
-green.close()
-yellow.close() # Close the LEDs
-red.close() 
-right_button.close() 
-left_button.close() # Close the buttons
+cam0.stop(), cam1.stop()                   # Stop the cameras
+cam0.close(), cam1.close()                 # Close the cameras
+green.close(), yellow.close(), red.close() # Close the LEDs
+right_button.close(), left_button.close()  # Close the buttons
 sys.exit(0)
 #######################################################################
