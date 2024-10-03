@@ -103,7 +103,7 @@ def exit_standby(fname_log):
     time.sleep(2)
     standby = False
 
-def cap0(fdir_cam0, tstart):
+def cap0(fdir_cam0, tstart, dt):
     i = 0
     tnow = datetime.now(timezone.utc)
     while tnow < tstart:
@@ -114,8 +114,11 @@ def cap0(fdir_cam0, tstart):
         tstr = tnow.strftime('%H%M%S%f')
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
         i += 1
+        while tnow < tnext:
+            tnow = datetime.now(timezone.utc)
 
-def cap1(fdir_cam1, tstart):
+
+def cap1(fdir_cam1, tstart, dt):
     i = 0
     tnow = datetime.now(timezone.utc)
     while tnow < tstart:
@@ -126,6 +129,8 @@ def cap1(fdir_cam1, tstart):
         tstr = tnow.strftime('%H%M%S%f')
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         i += 1
+        while tnow < tnext:
+            tnow = datetime.now(timezone.utc)
 
 def enter_standby(fdir, fname_log, dt, mode):
     global j
@@ -142,8 +147,8 @@ def enter_standby(fdir, fname_log, dt, mode):
         tstart = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            p0 = threading.Thread(target=cap0, args=[fdir_cam0, tstart])
-            p1 = threading.Thread(target=cap1, args=[fdir_cam1, tstart]) 
+            p0 = threading.Thread(target=cap0, args=[fdir_cam0, tstart, dt])
+            p1 = threading.Thread(target=cap1, args=[fdir_cam1, tstart, dt]) 
             p0.start(), p1.start()
             p0.join(), p1.join()
             red.off()
