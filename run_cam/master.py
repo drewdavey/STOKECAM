@@ -127,13 +127,11 @@ def exit_standby(fname_log):
     time.sleep(2)
 
 def enter_standby(fdir, fname_log, dt, mode):
-    global j
-    j += 1
     yellow.on()
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    log.write(f"{tstr}:     Entering standby: Session {j}\n\n"), log.close()
-    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session{j}_{mode}")
+    log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"_{mode}_session")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         tnow = datetime.now(timezone.utc)
@@ -165,8 +163,7 @@ gps_wait_time = inputs['gps_wait_time']
 
 sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
 
-global j, cam0, cam1, config, mode, standby, shooting_modes
-j = 0
+global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
 mode = shooting_modes[0]                        # Default to 'auto'
 config = get_config(mode)                       # Get the configuration for the cameras
