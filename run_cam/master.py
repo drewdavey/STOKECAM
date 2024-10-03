@@ -42,9 +42,10 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
         red.on(), time.sleep(0.5)
         [led.blink(0.5,0.5) for led in (red, green, yellow)], time.sleep(3)
         [led.on() for led in (red, green, yellow)],time.sleep(1.5)
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f') 
-        cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
-        cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+        p0 = threading.Thread(target=cap0, args=[fdir_cam0, 0, i])
+        p1 = threading.Thread(target=cap1, args=[fdir_cam1, 0, i]) 
+        p0.start(), p1.start()
+        p0.join(), p1.join()
         [led.off() for led in (red, green, yellow)]
         time.sleep(calib_dt)
     imu_process.terminate()
@@ -104,13 +105,13 @@ def cap1(fdir_cam1, tnext, i):
 
 def exit_standby(fname_log):
     global standby
+    yellow.off(), red.off() # Close the lights
+    time.sleep(2)
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
-    yellow.off(), red.off() # Close the lights
     standby = False
     monitor_gps()
-    time.sleep(2)
 
 def enter_standby(fdir, fname_log, dt, mode):
     yellow.on()
