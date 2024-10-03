@@ -100,7 +100,6 @@ def exit_standby(fname_log):
     standby = False
 
 def cap0(fdir_cam0):
-    global cam0
     i = 0
     while right_button.is_pressed:
         tnow = datetime.now(timezone.utc)
@@ -110,7 +109,6 @@ def cap0(fdir_cam0):
         i += 1
 
 def cap1(fdir_cam1):
-    global cam1
     i = 0
     while right_button.is_pressed:
         tnow = datetime.now(timezone.utc)
@@ -120,14 +118,14 @@ def cap1(fdir_cam1):
         i += 1
 
 def enter_standby(fdir, fname_log, dt, mode):
-    global i, cam0, cam1
-    i += 1
+    global j
+    j += 1
     yellow.on()
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    log.write(f"{tstr}:     Entering standby: Session {i}\n\n")
+    log.write(f"{tstr}:     Entering standby: Session {j}\n\n")
     log.close()
-    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session{i}_{mode}")
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session{j}_{mode}")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         tnow = datetime.now(timezone.utc)
@@ -136,7 +134,7 @@ def enter_standby(fdir, fname_log, dt, mode):
             red.on()
             p0 = Process(target=cap0, args=(fdir_cam0,))
             p1 = Process(target=cap1, args=(fdir_cam1,))
-            p0.start(), p1.start()
+            p0.run(), p1.run()
             # p0.kill(), p1.kill()
             red.off()
         time.sleep(0.2)
@@ -159,8 +157,7 @@ gps_wait_time = inputs['gps_wait_time']
 
 sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
 
-global i, cam0, cam1, config, mode, standby, shooting_modes
-i = 0
+global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
 mode = shooting_modes[0]                        # Default to 'auto'
 config = get_config(mode)                       # Get the configuration for the cameras
