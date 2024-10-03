@@ -136,8 +136,8 @@ def enter_standby(fdir, fname_log, dt, mode):
         twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            p0 = threading.Thread(target=cap0, args=(fdir_cam0,))
-            p1 = threading.Thread(target=cap1, args=(fdir_cam1,))
+            p0 = threading.Thread(target=cap0, args=[fdir_cam0])
+            p1 = threading.Thread(target=cap1, args=[fdir_cam1])
             p0.start(), p1.start()
             p0.join(), p1.join()
             red.off()
@@ -188,6 +188,7 @@ while True:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
+        time.sleep(0.2)
         enter_standby(fdir, fname_log, dt, mode)    
     if left_button.is_held and not standby and not right_button.is_pressed:
         calib(fdir, fname_log, calib_dt, calib_frames, mode)
