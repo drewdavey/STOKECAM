@@ -140,7 +140,7 @@ def enter_standby(fdir, fname_log, dt, config, mode):
             while right_button.is_pressed:
                 time.sleep(0.1)
             red.off()
-            capture0.kill(), capture1.kill() # Terminate the capture processes
+            capture0.terminate(), capture1.terminate() # Terminate the capture processes
         time.sleep(0.2)
     imu_process.terminate() # Terminate the imu process
     exit_standby(fname_log)
