@@ -13,14 +13,12 @@ from datetime import datetime, timezone, timedelta
 
 running = True
 
-def capture(fdir_cam0, mode, dt):
+def capture(fdir_cam0, config, dt):
     global running
 
-    # config = get_config(mode)                       # Get the configuration for the cameras
-    # time.sleep(5)
-    # cam0 = Picamera2(0)                             # Initialize cam0     
-    # cam0.configure(config)                            # Configure cam0    
-    # cam0.start()
+    cam0 = Picamera2(0)                             # Initialize cam0     
+    cam0.configure(config)                            # Configure cam0    
+    cam0.start()
 
     i = 0
     # time.sleep(twait - datetime.now(timezone.utc))
@@ -33,7 +31,7 @@ def capture(fdir_cam0, mode, dt):
         # time.sleep(tnext - datetime.now(timezone.utc))
 
     # cam0.stop() # Stop the camera
-    # cam0.close() # Close the camera
+    cam0.close() # Close the camera
     sys.exit(0)
 
 def disconnect(signum, frame):
@@ -47,4 +45,7 @@ if __name__ == '__main__':
     fdir, fname_log = setup_logging()  
     inputs = read_inputs_yaml(fname_log)
     dt = inputs['dt']           
-    capture(sys.argv[1],sys.argv[2],dt)
+    shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
+    mode = shooting_modes[0]                        # Default to 'auto'
+    config = get_config(mode)                       # Get the configuration for the cameras
+    capture(sys.argv[1],config,dt)

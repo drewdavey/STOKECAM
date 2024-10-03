@@ -89,11 +89,11 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
 
 def exit_standby(fname_log):
-    # global cam0, cam1, config, mode, standby, shooting_modes
-    # config = get_config(mode)                       # Get the configuration for the cameras
-    # cam0 = Picamera2(0)                             # Initialize cam0       
-    # cam1 = Picamera2(1)                             # Initialize cam1
-    # configure_cameras(fname_log, mode)              # Configure the cameras
+    global cam0, cam1, config, mode, standby, shooting_modes
+    config = get_config(mode)                       # Get the configuration for the cameras
+    cam0 = Picamera2(0)                             # Initialize cam0       
+    cam1 = Picamera2(1)                             # Initialize cam1
+    configure_cameras(fname_log, mode)              # Configure the cameras
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
@@ -108,7 +108,7 @@ def enter_standby(fdir, fname_log, dt, config, mode):
     i += 1
     yellow.on()
     # cam0.stop(), cam1.stop() # Stop the cameras
-    # cam0.close(), cam1.close() # Close the cameras
+    cam0.close(), cam1.close() # Close the cameras
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     Entering standby: Session {i}\n\n")
@@ -120,8 +120,8 @@ def enter_standby(fdir, fname_log, dt, config, mode):
         twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            capture0 = subprocess.Popen(['python3', 'cap0.py', fdir_cam0, mode])
-            capture1 = subprocess.Popen(['python3', 'cap1.py', fdir_cam1, mode])
+            capture0 = subprocess.Popen(['python3', 'cap0.py', fdir_cam0])
+            capture1 = subprocess.Popen(['python3', 'cap1.py', fdir_cam1])
             while right_button.is_pressed:
                 time.sleep(0.1)
             red.off()
