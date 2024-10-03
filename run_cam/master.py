@@ -11,7 +11,10 @@ from settings import *
 from signal import pause
 from picamera2 import Picamera2
 from gpiozero import Button, LED
+
 from multiprocessing import Process
+import threading
+
 from datetime import datetime, timezone, timedelta
 
 def configure_cameras(fname_log, mode):
@@ -99,11 +102,7 @@ def exit_standby(fname_log):
     time.sleep(2)
     standby = False
 
-def cap0(fdir_cam0,fdir_cam1):
-
-    p1 = Process(target=cap1, args=(fdir_cam1,))
-    p1.run()
-    
+def cap0(fdir_cam0):
     i = 0
     while right_button.is_pressed:
         tnow = datetime.now(timezone.utc)
@@ -136,10 +135,10 @@ def enter_standby(fdir, fname_log, dt, mode):
         twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            p0 = Process(target=cap0, args=(fdir_cam0,fdir_cam1))
-            p0.run()
-            # p1 = Process(target=cap1, args=(fdir_cam1,))
-            # p0.run(), p1.run()
+            p0 = threading.Thread(target=cap0, args=(fdir_cam0,))
+            p1 = threading.Thread(target=cap1, args=(fdir_cam1,))
+            p0.start(), p1.start()
+            p0.join(), p1.join()
             red.off()
         time.sleep(0.2)
     imu_process.terminate() # Terminate the imu process
