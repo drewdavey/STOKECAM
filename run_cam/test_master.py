@@ -88,33 +88,19 @@ def toggle_modes():
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
-def cap0(fdir_cam0, tstart, dt):
-    i = 0
+def cap0(fdir_cam0, tnext, i):
     tnow = datetime.now(timezone.utc)
-    while tnow < tstart:
+    while tnow < tnext:
         tnow = datetime.now(timezone.utc)
-    while right_button.is_pressed:
-        tnext = tnow + timedelta(seconds=dt)
-        tstr = tnow.strftime('%H%M%S%f')
-        cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
-        tnow = datetime.now(timezone.utc)
-        i += 1
-        while tnow < tnext:
-            tnow = datetime.now(timezone.utc)
+    tstr = tnow.strftime('%H%M%S%f')
+    cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
 
-def cap1(fdir_cam1, tstart, dt):
-    i = 0
+def cap1(fdir_cam1, tnext, i):
     tnow = datetime.now(timezone.utc)
-    while tnow < tstart:
+    while tnow < tnext:
         tnow = datetime.now(timezone.utc)
-    while right_button.is_pressed:
-        tnext = tnow + timedelta(seconds=dt)
-        tstr = tnow.strftime('%H%M%S%f')
-        cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
-        tnow = datetime.now(timezone.utc)
-        i += 1
-        while tnow < tnext:
-            tnow = datetime.now(timezone.utc)
+    tstr = tnow.strftime('%H%M%S%f')
+    cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
 
 def exit_standby(fname_log):
     global standby
@@ -135,14 +121,17 @@ def enter_standby(fdir, fname_log, dt, mode):
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
     time.sleep(0.5)
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
-        tnow = datetime.now(timezone.utc)
-        tstart = tnow + timedelta(seconds=2)
         if right_button.is_pressed and not left_button.is_pressed:  
+            i = 0
             red.on()
-            p0 = threading.Thread(target=cap0, args=[fdir_cam0, tstart, dt])
-            p1 = threading.Thread(target=cap1, args=[fdir_cam1, tstart, dt]) 
-            p0.start(), p1.start()
-            p0.join(), p1.join()
+            while right_button.is_pressed:
+                i += 1
+                tnow = datetime.now(timezone.utc)
+                tnext = tnow + timedelta(seconds=dt)
+                p0 = threading.Thread(target=cap0, args=[fdir_cam0, tnext, i])
+                p1 = threading.Thread(target=cap1, args=[fdir_cam1, tnext, i]) 
+                p0.start(), p1.start()
+                p0.join(), p1.join()
             red.off()
         time.sleep(0.2)
     imu_process.terminate() # Terminate the imu process
