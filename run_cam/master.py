@@ -157,7 +157,8 @@ gps_wait_time = inputs['gps_wait_time']
 
 sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
 
-global cam0, cam1, config, mode, standby, shooting_modes
+global j, cam0, cam1, config, mode, standby, shooting_modes
+j = 0
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
 mode = shooting_modes[0]                        # Default to 'auto'
 config = get_config(mode)                       # Get the configuration for the cameras
