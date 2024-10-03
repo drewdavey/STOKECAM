@@ -137,6 +137,7 @@ def enter_standby(fdir, fname_log, dt, config, mode):
             capture0 = Process(target=cap0, args=[fdir_cam0])
             capture1 = Process(target=cap1, args=[fdir_cam1])
             capture0.start(), capture1.start()
+            capture0.join(), capture1.join()
             red.off()
         time.sleep(0.2)
     imu_process.terminate() # Terminate the imu process
