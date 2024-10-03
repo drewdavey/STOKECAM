@@ -10,7 +10,6 @@ import subprocess
 from vnpy import *
 from utils import *
 from settings import *
-from signal import pause
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone, timedelta
@@ -112,7 +111,6 @@ def exit_standby(fname_log):
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
     standby = False
-    monitor_gps()
 
 def enter_standby(fdir, fname_log, dt, mode):
     yellow.on()
