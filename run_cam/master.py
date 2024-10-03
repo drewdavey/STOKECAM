@@ -119,7 +119,7 @@ def cap1(fdir_cam1):
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
         i += 1
 
-def enter_standby(fdir, fname_log, dt, config, mode):
+def enter_standby(fdir, fname_log, dt, mode):
     global i, cam0, cam1
     i += 1
     yellow.on()
@@ -134,10 +134,10 @@ def enter_standby(fdir, fname_log, dt, config, mode):
         twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            capture0 = Process(target=cap0, args=[fdir_cam0])
-            capture1 = Process(target=cap1, args=[fdir_cam1])
-            capture0.start(), capture1.start()
-            capture0.join(), capture1.join()
+            p0 = Process(target=cap0, args=(fdir_cam0,))
+            p1 = Process(target=cap1, args=(fdir_cam1,))
+            p0.start(), p1.start()
+            # p0.kill(), p1.kill()
             red.off()
         time.sleep(0.2)
     imu_process.terminate() # Terminate the imu process
@@ -186,7 +186,7 @@ while True:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
-        enter_standby(fdir, fname_log, dt, config, mode)    
+        enter_standby(fdir, fname_log, dt, mode)    
     if left_button.is_held and not standby and not right_button.is_pressed:
         calib(fdir, fname_log, calib_dt, calib_frames, mode)
         monitor_gps()
