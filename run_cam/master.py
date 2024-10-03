@@ -93,6 +93,7 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
 
 def exit_standby(fname_log):
+    global standby
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n")
