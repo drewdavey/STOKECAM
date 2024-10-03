@@ -134,13 +134,10 @@ def enter_standby(fdir, fname_log, dt, config, mode):
         twait = tnow + timedelta(seconds=1)
         if right_button.is_pressed and not left_button.is_pressed:  
             red.on()
-            capture0 = Process(target=cap0, args=(fdir_cam0,))
-            capture1 = Process(target=cap1, args=(fdir_cam1,))
-            capture0.run(), capture1.run()
-            while right_button.is_pressed:
-                time.sleep(0.1)
+            capture0 = Process(target=cap0, args=[fdir_cam0])
+            capture1 = Process(target=cap1, args=[fdir_cam1])
+            capture0.start(), capture1.start()
             red.off()
-            capture0.terminate(), capture1.terminate() # Terminate the capture processes
         time.sleep(0.2)
     imu_process.terminate() # Terminate the imu process
     exit_standby(fname_log)
