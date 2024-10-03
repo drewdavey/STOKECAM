@@ -16,11 +16,11 @@ running = True
 def capture(fdir_cam0, mode, dt):
     global running
 
-    config = get_config(mode)                       # Get the configuration for the cameras
-    time.sleep(5)
-    cam0 = Picamera2(0)                             # Initialize cam0     
-    cam0.configure(config)                            # Configure cam0    
-    cam0.start()
+    # config = get_config(mode)                       # Get the configuration for the cameras
+    # time.sleep(5)
+    # cam0 = Picamera2(0)                             # Initialize cam0     
+    # cam0.configure(config)                            # Configure cam0    
+    # cam0.start()
 
     i = 0
     # time.sleep(twait - datetime.now(timezone.utc))
@@ -32,8 +32,8 @@ def capture(fdir_cam0, mode, dt):
         i += 1
         # time.sleep(tnext - datetime.now(timezone.utc))
 
-    cam0.stop() # Stop the camera
-    cam0.close() # Close the camera
+    # cam0.stop() # Stop the camera
+    # cam0.close() # Close the camera
     sys.exit(0)
 
 def disconnect(signum, frame):
