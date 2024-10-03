@@ -92,17 +92,6 @@ def toggle_modes():
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
-def exit_standby(fname_log):
-    global standby
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    log = open(fname_log, 'a')
-    log.write(f"{tstr}:     Exiting standby.\n\n")
-    log.close()
-    yellow.off() # Close the lights
-    red.off()
-    time.sleep(2)
-    standby = False
-
 def cap0(fdir_cam0, tstart, dt):
     i = 0
     tnow = datetime.now(timezone.utc)
@@ -117,7 +106,6 @@ def cap0(fdir_cam0, tstart, dt):
         while tnow < tnext:
             tnow = datetime.now(timezone.utc)
 
-
 def cap1(fdir_cam1, tstart, dt):
     i = 0
     tnow = datetime.now(timezone.utc)
@@ -131,6 +119,17 @@ def cap1(fdir_cam1, tstart, dt):
         i += 1
         while tnow < tnext:
             tnow = datetime.now(timezone.utc)
+
+def exit_standby(fname_log):
+    global standby
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    log = open(fname_log, 'a')
+    log.write(f"{tstr}:     Exiting standby.\n\n")
+    log.close()
+    yellow.off() # Close the lights
+    red.off()
+    time.sleep(2)
+    standby = False
 
 def enter_standby(fdir, fname_log, dt, mode):
     global j
@@ -199,7 +198,7 @@ while True:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
-        time.sleep(0.2)
+        time.sleep(0.5)
         enter_standby(fdir, fname_log, dt, mode)    
     if left_button.is_held and not standby and not right_button.is_pressed:
         calib(fdir, fname_log, calib_dt, calib_frames, mode)
