@@ -11,5 +11,5 @@ shooting_mode2: 'max' # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fa
 calib_frames: 50       # Number of frames to be captured by calib mode
 calib_dt: 3            # Time between frames in seconds (for calibration)
 
-dt: 0.0333              # Time between frames in seconds
+dt: 0.05              # Time between frames in seconds
 imu_dt: 0              # Time between IMU readings in seconds
