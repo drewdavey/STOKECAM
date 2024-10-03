@@ -98,10 +98,10 @@ def cap0(fdir_cam0, tstart, dt):
     while tnow < tstart:
         tnow = datetime.now(timezone.utc)
     while right_button.is_pressed:
-        tnow = datetime.now(timezone.utc)
         tnext = tnow + timedelta(seconds=dt)
         tstr = tnow.strftime('%H%M%S%f')
         cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
+        tnow = datetime.now(timezone.utc)
         i += 1
         while tnow < tnext:
             tnow = datetime.now(timezone.utc)
@@ -112,10 +112,10 @@ def cap1(fdir_cam1, tstart, dt):
     while tnow < tstart:
         tnow = datetime.now(timezone.utc)
     while right_button.is_pressed:
-        tnow = datetime.now(timezone.utc)
         tnext = tnow + timedelta(seconds=dt)
         tstr = tnow.strftime('%H%M%S%f')
         cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+        tnow = datetime.now(timezone.utc)
         i += 1
         while tnow < tnext:
             tnow = datetime.now(timezone.utc)
