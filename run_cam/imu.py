@@ -1,6 +1,6 @@
-# Last updated: 2024-04-10
+# Last updated: 2024-10-03
 ##################################
-# This script is launched in the background during capture and passed 3 arguments from a parent script.
+# This script is launched in the background during standby and passed 3 arguments from a parent script.
 # Args: (1) fname_imu (2) fname_log (3) imu_dt 
 ##################################
 import sys

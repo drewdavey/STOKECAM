@@ -1,6 +1,6 @@
-# Last updated: 2024-09-03
+# Last updated: 2024-10-03
 ##################################
-# This script launches standby mode, which allows the user to choose between burst and numFrames shooting modes.
+# This script allows the user to toggle through camera settings, launch standby mode, and capture images syncronously by holding right button.
 # The user can also calibrate the cameras by holding the left button for more than 5 seconds.
 ##################################
 import sys

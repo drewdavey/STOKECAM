@@ -1,4 +1,4 @@
-# Last updated: 2024-04-10
+# Last updated: 2024-10-03
 ##################################
 # Housekeeping funcs for the stereo camera system
 ##################################

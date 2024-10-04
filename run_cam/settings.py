@@ -1,4 +1,4 @@
-# Last updated: 2024-04-10
+# Last updated: 2024-10-03
 ##################################
 # This file contains functions defining the camera settings for various shooting modes
 ##################################
@@ -78,5 +78,3 @@ def get_config(mode):
         return dark()
     else:
         raise ValueError(f"Invalid mode: {mode}")
-
-
