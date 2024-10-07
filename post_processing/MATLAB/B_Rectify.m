@@ -10,6 +10,8 @@ load([calib_path '/calib.mat']);
 
 path = uigetdir('../../','Select path to session for reconstruction'); % load path to dir to reconstruct
 
+%%%% Queue up multiple dirs ^^^^^^^^^^^
+
 matDir = [path '/mats'];
 if ~exist(matDir, 'dir')
     mkdir(matDir); % mkdir for .mats
@@ -19,6 +21,11 @@ rectifiedImagesDir = [path '/Rectified_Images'];
 if ~exist(rectifiedImagesDir, 'dir')
     mkdir(rectifiedImagesDir); % mkdir for rectified images
 end
+
+% ptCloudDir = [path '/ptClouds'];
+% if ~exist(ptCloudDir, 'dir')
+%     mkdir(ptCloudDir); % mkdir for ptClouds
+% end
 
 dir1 = dir([path '/cam1/*.jpg']);
 dir2 = dir([path '/cam0/*.jpg']);
@@ -42,9 +49,6 @@ end
 for i = 1:length(imageFileNames1)
     I1 = imread(imageFileNames1{i});
     I2 = imread(imageFileNames2{i});
-    
-%     I1 = im2gray(I1);
-%     I2 = im2gray(I2);
 
     %%% Rectify Images %%%
     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='valid'); 
@@ -53,7 +57,9 @@ for i = 1:length(imageFileNames1)
     frameRightGray = im2gray(J2);
     %%%%%%%%%%%%%%%%%%%%%%%
 
-    %%% Compute Disparity Map %%%
+    %%%%%%%%%%%%% Compute Disparity Map %%%%%%%%%%%%%%%%%%
+
+    %%%%%%%%%%%%% Block Matching %%%%%%%%%%%%%
 %     DisparityRange = [0 64];
 %     BlockSize = 25;
 %     ContrastThreshold = 0.5;
@@ -68,8 +74,8 @@ for i = 1:length(imageFileNames1)
 %         'ContrastThreshold', ContrastThreshold,...
 %         'DistanceThreshold',DistanceThreshold,...
 %         'TextureThreshold',TextureThreshold);
-                       % use J1 and J2?
 
+     %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
     disparityMap = disparitySGM(frameLeftGray, frameRightGray);
 %     disparityMap = disparitySGM(frameLeftGray, frameRightGray,'UniquenessThreshold',UniquenessThreshold); % semi-global matching
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,34 +93,23 @@ for i = 1:length(imageFileNames1)
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     exportgraphics(f2,fullFilePath,'Resolution',600); % Save disparity map as PNG
 
+    % Create point cloud
+    points3D = reconstructScene(disparityMap, reprojectionMatrix); % for single disparity map
+    points3D = points3D ./ 1000; % Convert to meters and create a pointCloud object
+    ptCloud = pointCloud(points3D, Color=J1);
+
+    %     % Save ptCloud as .ply
+%     filename = matFileNames{i}(end-18:end-4);
+%     fullFilePath = fullfile(ptCloudDir, filename);
+%     pcwrite(ptCloud, fullFilePath);
+
     % Save .mat
     filename = imageFileNames1{i}(end-18:end-4);
     fullFilePath = fullfile(matDir, filename);
-    save(fullFilePath,'I1','I2','J1','J2','frameLeftGray', 'frameRightGray','reprojectionMatrix','disparityMap','calib_path');
+    save(fullFilePath,'I1','I2','J1','J2','frameLeftGray',...
+        'frameRightGray','reprojectionMatrix','disparityMap', ...
+        'calib_path', 'ptCloud', 'points3D');
     
 end
 
-%% Write rectified images as a movie
-% outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'rectified_movie'));
-% outputVideo.FrameRate = 5;
-% open(outputVideo);
-% for i = 1:length(imageFileNames1)
-%     filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
-%     fullFilePath = fullfile(rectifiedImagesDir, filename);
-%     img = imread(fullFilePath);
-%     writeVideo(outputVideo, img);
-% end
-% close(outputVideo);
-% 
-% %% Write disparity images as a movie
-% outputVideo = VideoWriter(fullfile(rectifiedImagesDir, 'disparity_movie'));
-% outputVideo.FrameRate = 5;
-% open(outputVideo);
-% for i = 1:length(imageFileNames1)
-%     filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
-%     fullFilePath = fullfile(rectifiedImagesDir, filename);
-%     img = imread(fullFilePath);
-%     writeVideo(outputVideo, img);
-% end
-% close(outputVideo);
 
