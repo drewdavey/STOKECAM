@@ -1,6 +1,6 @@
-% Stereo Calibration Code
+% STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-03-05 
+% Last updated: 2024-10-06
 
 clear; clc; close all;
 

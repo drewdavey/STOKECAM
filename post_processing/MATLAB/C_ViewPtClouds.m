@@ -1,6 +1,6 @@
-% View Point Clouds
+% STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-03-17 
+% Last updated: 2024-10-06
 
 clear; clc; close all;
 

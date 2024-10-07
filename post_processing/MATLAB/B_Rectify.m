@@ -1,6 +1,6 @@
-% Stereo Reconstruction Code
+% STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-03-17
+% Last updated: 2024-10-06
 
 clear; clc; close all;
 
@@ -10,7 +10,7 @@ load([calib_path '/calib.mat']);
 
 path = uigetdir('../../','Select path to session for reconstruction'); % load path to dir to reconstruct
 
-%%%% Queue up multiple dirs ^^^^^^^^^^^
+%%%%               ^^^^^^^^^^^^ Queue up multiple dirs ^^^^^^^^^^^
 
 matDir = [path '/mats'];
 if ~exist(matDir, 'dir')

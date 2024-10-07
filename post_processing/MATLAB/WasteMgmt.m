@@ -1,6 +1,6 @@
-% Stereo Camera Code
+% STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-09-09
+% Last updated: 2024-10-06
 
 clear; clc; close all;
 

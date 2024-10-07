@@ -1,12 +1,14 @@
-% Clean Point Clouds
+% STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-03-17 
+% Last updated: 2024-10-06
 
 clear; clc; close all;
 
 %% Inputs
 
 path = uigetdir('../../','Select path to session to clean ptClouds'); % load path to dir to clean ptClouds
+%%%%               ^^^^^^^^^^^^ Queue up multiple dirs ^^^^^^^^^^^
+
 path = [path '/mats'];
 if ~exist(path, 'dir')
     disp('No mats/ directory in this session.');
