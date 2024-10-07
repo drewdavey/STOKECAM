@@ -4,13 +4,15 @@
 
 clear; clc; close all;
 
+%% Inputs 
+
 path = uigetdir('../../','Select path to session'); % load path to session
 
 cam0Dir = fullfile(path, 'cam0');
 cam1Dir = fullfile(path, 'cam1');
 
 cam0Files = dir(fullfile(cam0Dir, '0_*.jpg'));
-cam1Files = dir(fullfile(cam1Dir, '1_*.jpg')); 
+cam1Files = dir(fullfile(cam1Dir, '1_*.jpg'));
 
 cam0Filenames = {cam0Files.name};
 cam1Filenames = {cam1Files.name};
@@ -18,12 +20,13 @@ cam1Filenames = {cam1Files.name};
 % Loop through the cam0 files and find corresponding cam1 files
 for i = 1:length(cam0Files)
     
-    coreName = cam0Files(i).name(3:end); 
-
-    % Check if the corresponding '1_' prefixed file exists in cam1
-    cam1Name = ['1_' coreName];
+    [cameraID0, timestamp0, imageNum0] = parse_filename(cam0Files(i).name);
     
-    if ~ismember(cam1Name, cam1Filenames)
+    % Find the corresponding cam1 file
+    correspondingFile = find_corresponding_file(cameraID0, timestamp0, imageNum0, cam1Files);
+    
+    % If no corresponding file is found, delete the cam0 file
+    if isempty(correspondingFile)
         delete(fullfile(cam0Dir, cam0Files(i).name));
         fprintf('Deleted: %s\n', fullfile(cam0Dir, cam0Files(i).name));
     end
@@ -32,18 +35,45 @@ end
 % Loop through the cam1 files and find corresponding cam0 files
 for i = 1:length(cam1Files)
 
-    coreName = cam1Files(i).name(3:end); % Remove '1_' prefix
+    [cameraID1, timestamp1, imageNum1] = parse_filename(cam1Files(i).name);
 
-    % Check if the corresponding '0_' prefixed file exists in cam0
-    cam0Name = ['0_' coreName];
+    % Find the corresponding cam0 file
+    correspondingFile = find_corresponding_file(cameraID1, timestamp1, imageNum1, cam0Files);
     
-    if ~ismember(cam0Name, cam0Filenames)
+    % If no corresponding file is found, delete the cam1 file
+    if isempty(correspondingFile)
         delete(fullfile(cam1Dir, cam1Files(i).name));
         fprintf('Deleted: %s\n', fullfile(cam1Dir, cam1Files(i).name));
     end
 end
 
 disp('Cleanup complete.');
+
+%% Functions
+
+% Parse the filename into cameraID, timestamp (up to seconds), and imageNum
+function [cameraID, timestamp, imageNum] = parse_filename(filename)
+    parts = split(filename, '_');
+    cameraID = parts{1}; % '0' or '1'
+    timestamp = parts{2}(1:6); % Ignore milliseconds, keep only HHMMSS
+    imageNum = parts{3}(1:end-4); % Remove '.jpg' extension
+end
+
+% Function to find the corresponding file in the other camera folder
+function correspondingFile = find_corresponding_file(cameraID, timestamp, imageNum, files)
+    correspondingFile = [];
+    
+    for i = 1:numel(files)
+        [~, ts, imgNum] = parse_filename(files(i).name);
+        
+        % Compare timestamp up to seconds and image number
+        if strcmp(ts, timestamp) && strcmp(imgNum, imageNum)
+            correspondingFile = files(i);
+            return;
+        end
+    end
+end
+
 
 
 

@@ -142,6 +142,3 @@ function waveIndex = get_wave_folder_index(mainDir)
     waveIndex = numel(waveFolders) + 1; % Increment based on existing wave folders
 end
 
-
-
-
