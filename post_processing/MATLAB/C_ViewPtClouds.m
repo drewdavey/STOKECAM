@@ -12,7 +12,6 @@ matDir = [path '/mats'];
 viewFlag = 1;
 
 depth = [0, 30];
-
 xbounds = [-5, 5];
 ybounds = [-5, 5];
 
@@ -21,7 +20,7 @@ ybounds = [-5, 5];
 while viewFlag
     % Choose point cloud
     file = uigetfile([path '/Rectified_Images/*.png'],'Select file to view point cloud');
-    file = file(end-23:end-9);
+    file = file(1:end-9);
     % Load mat
     load([matDir '/' file '.mat']);
     % Create a streaming point cloud viewer

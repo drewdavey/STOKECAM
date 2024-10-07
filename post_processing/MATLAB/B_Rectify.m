@@ -4,31 +4,54 @@
 
 clear; clc; close all;
 
-%% Load mat and create dir
-calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
-load([calib_path '/calib.mat']);
+%% Inputs
+
+plys = 0;        % save .plys seperate in ptCloud directory?
+BM_SGBM = 0;     % use block matching? (1) semi-global block matching? (0)
+specs = 0;       % use specs (1) or default (0)
+
+DisparityRange = [0 64];       % only applied if specs
+BlockSize = 25;                % only applied if specs
+ContrastThreshold = 0.5;       % only applied if specs
+UniquenessThreshold = 15;      % only applied if specs
+DistanceThreshold = 20;        % only applied if specs
+TextureThreshold = 0.00002;    % only applied if specs
 
 path = uigetdir('../../','Select path to session for reconstruction'); % load path to dir to reconstruct
-
 %%%%               ^^^^^^^^^^^^ Queue up multiple dirs ^^^^^^^^^^^
 
-matDir = [path '/mats'];
-if ~exist(matDir, 'dir')
-    mkdir(matDir); % mkdir for .mats
-end
+dir1 = dir([path '/cam1/*.jpg']); % THESE ARE FLIPPED
+dir2 = dir([path '/cam0/*.jpg']); % THESE ARE FLIPPED
 
+%% Load calibration and create dirs
+
+calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
+load([calib_path '/calib.mat']); uiwait(gcf); uiwait(gcf); 
+
+matDir = [path '/mats'];
 rectifiedImagesDir = [path '/Rectified_Images']; 
+ptCloudDir = [path '/ptClouds'];
+
 if ~exist(rectifiedImagesDir, 'dir')
     mkdir(rectifiedImagesDir); % mkdir for rectified images
 end
-
-% ptCloudDir = [path '/ptClouds'];
-% if ~exist(ptCloudDir, 'dir')
-%     mkdir(ptCloudDir); % mkdir for ptClouds
-% end
-
-dir1 = dir([path '/cam1/*.jpg']);
-dir2 = dir([path '/cam0/*.jpg']);
+if plys && ~exist(ptCloudDir, 'dir')
+    mkdir(ptCloudDir); % mkdir for ptClouds
+end
+if ~exist(matDir, 'dir')
+    mkdir(matDir); % mkdir for .mats
+else 
+    answer = questdlg('Overwrite?', ...
+    'Overwrite existing directories? ', ...
+    'Yes','No','Yes');
+    switch answer
+        case 'Yes'
+            disp('Overwriting previous files...'); 
+        case 'No'
+            disp('Exiting.'); 
+            return;
+    end
+end
 
 %% Parse data
  
@@ -52,44 +75,50 @@ for i = 1:length(imageFileNames1)
 
     %%% Rectify Images %%%
     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='valid'); 
-%     [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='full'); 
+    %[J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='full'); 
     frameLeftGray  = im2gray(J1);
     frameRightGray = im2gray(J2);
     %%%%%%%%%%%%%%%%%%%%%%%
 
     %%%%%%%%%%%%% Compute Disparity Map %%%%%%%%%%%%%%%%%%
+    if BM_SGBM
+        %%%%%%%%%%%%% Block Matching %%%%%%%%%%%%%
+        if specs
+            disparityMap = disparityBM(frameLeftGray, frameRightGray,'DisparityRange',DisparityRange,...
+                'BlockSize',BlockSize,...
+                'UniquenessThreshold',UniquenessThreshold,...
+                'ContrastThreshold', ContrastThreshold,...
+                'DistanceThreshold',DistanceThreshold,...
+                'TextureThreshold',TextureThreshold);
+        else
+            disparityMap = disparityBM(frameLeftGray, frameRightGray); % default block matching
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    else
+        %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
+        if specs
+            disparityMap = disparitySGM(frameLeftGray, frameRightGray,'UniquenessThreshold',UniquenessThreshold); 
+        else
+            disparityMap = disparitySGM(frameLeftGray, frameRightGray); % default semi-global matching
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    %%%%%%%%%%%%% Block Matching %%%%%%%%%%%%%
-%     DisparityRange = [0 64];
-%     BlockSize = 25;
-%     ContrastThreshold = 0.5;
-%     UniquenessThreshold = 15;
-%     DistanceThreshold = 20;
-%     TextureThreshold = 0.00002;
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%     disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
-%     disparityMap = disparityBM(frameLeftGray, frameRightGray,'DisparityRange',DisparityRange,...
-%         'BlockSize',BlockSize,...
-%         'UniquenessThreshold',UniquenessThreshold,...
-%         'ContrastThreshold', ContrastThreshold,...
-%         'DistanceThreshold',DistanceThreshold,...
-%         'TextureThreshold',TextureThreshold);
-
-     %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
-    disparityMap = disparitySGM(frameLeftGray, frameRightGray);
-%     disparityMap = disparitySGM(frameLeftGray, frameRightGray,'UniquenessThreshold',UniquenessThreshold); % semi-global matching
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Extract timestamp and image number from selected file
+    [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));
 
     % Plotting
     f1 = figure(1);
     imshow(stereoAnaglyph(J1,J2)); % Display rectified images
-    filename = [imageFileNames1{i}(end-18:end-4) '_rect.png'];
+    filename = [timestamp '_' imageNum '_rect.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
     f2 = figure(2); 
     imshow(disparityMap, [0, 64]); % Display disparity map
     colormap jet; colorbar;
-    filename = [imageFileNames1{i}(end-18:end-4) '_disp.png'];
+    filename = [timestamp '_' imageNum '_disp.png'];
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     exportgraphics(f2,fullFilePath,'Resolution',600); % Save disparity map as PNG
 
@@ -98,18 +127,26 @@ for i = 1:length(imageFileNames1)
     points3D = points3D ./ 1000; % Convert to meters and create a pointCloud object
     ptCloud = pointCloud(points3D, Color=J1);
 
-    %     % Save ptCloud as .ply
-%     filename = matFileNames{i}(end-18:end-4);
-%     fullFilePath = fullfile(ptCloudDir, filename);
-%     pcwrite(ptCloud, fullFilePath);
+    if plys 
+        filename = [timestamp '_' imageNum];
+        fullFilePath = fullfile(ptCloudDir, filename);
+        pcwrite(ptCloud, fullFilePath); % Save ptCloud as .ply
+    end 
 
     % Save .mat
-    filename = imageFileNames1{i}(end-18:end-4);
+    filename = [timestamp '_' imageNum];
     fullFilePath = fullfile(matDir, filename);
     save(fullFilePath,'I1','I2','J1','J2','frameLeftGray',...
         'frameRightGray','reprojectionMatrix','disparityMap', ...
         'calib_path', 'ptCloud', 'points3D');
-    
 end
 
+%% Functions
 
+% Parse the filename into cameraID, timestamp, and imageNum
+function [cameraID, timestamp, imageNum] = parse_filename(filename)
+    parts = split(filename, '_');
+    cameraID = parts{1}; % '0' or '1'
+    timestamp = parts{2}(1:6); % Ignore microseconds, keep only HHMMSS
+    imageNum = parts{3}(1:end-4); % Remove '.jpg' extension
+end

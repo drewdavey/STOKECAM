@@ -8,6 +8,8 @@ clear; clc; close all;
 
 path = uigetdir('../../','Select path to session'); % load path to session
 
+%% Cleanup dirs
+
 cam0Dir = fullfile(path, 'cam0');
 cam1Dir = fullfile(path, 'cam1');
 
@@ -73,10 +75,3 @@ function correspondingFile = find_corresponding_file(cameraID, timestamp, imageN
         end
     end
 end
-
-
-
-
-
-
-

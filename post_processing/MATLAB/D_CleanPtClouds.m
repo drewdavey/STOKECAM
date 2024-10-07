@@ -12,6 +12,7 @@ path = uigetdir('../../','Select path to session to clean ptClouds'); % load pat
 path = [path '/mats'];
 if ~exist(path, 'dir')
     disp('No mats/ directory in this session.');
+    return;
 end
 
 cleanFlag = 0; % Set to 1 for manual point cloud editing, or 0 for automatic cleaning
@@ -34,9 +35,9 @@ for i = 1:length(matFiles)
     load(matFile);
 
     % Reshape points3D and J1 into M-by-3 format
-    [rows, cols, ~] = size(points3D);  % Get the dimensions
-    points3D_reshaped = reshape(points3D, [], 3);  % Reshape to M-by-3
-    J1_reshaped = reshape(J1, [], 3);  % Reshape color to M-by-3
+%     [rows, cols, ~] = size(points3D);  % Get the dimensions
+%     points3D_reshaped = reshape(points3D, [], 3);  % Reshape to M-by-3
+%     J1_reshaped = reshape(J1, [], 3);  % Reshape color to M-by-3
 
     % Save previous versions with timestamp before applying changes
     timestamp = datestr(now, 'yyyymmdd_HHMMSS');
@@ -48,17 +49,25 @@ for i = 1:length(matFiles)
     % Save timestamped variables to the mat file
     save(matFile, ['points3D_', timestamp], ['ptCloud_', timestamp], '-append');
     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%% Apply QA/QC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    % Apply QA/QC techniques here
-    points3D_cleaned = trimBounds(points3D_reshaped, bounds, binSize); % Update points3D after QA/QC
-    ptCloud = pointCloud(points3D_cleaned, 'Color', J1_reshaped(1:size(points3D_cleaned, 1), :)); % Create the new point cloud
+%     points3D_cleaned = trimBounds(points3D_reshaped, bounds, binSize); % Update points3D after QA/QC
+%     ptCloud = pointCloud(points3D_cleaned, 'Color', J1_reshaped(1:size(points3D_cleaned, 1), :)); % Create the new point cloud
+% %     points3D = trimBounds(points3D, bounds, binSize); % Update points3D after QA/QC
+% %     ptCloud = pointCloud(points3D, Color=J1);
 
-%     % Apply QA/QC techniques here
-%     points3D = trimBounds(points3D, bounds, binSize); % Update points3D after QA/QC
-%     ptCloud = pointCloud(points3D, Color=J1);
+    % MATLAB Point Cloud functions
+
+    ptCloud = pcdenoise(ptCloud);
+
+
+
+    % Save updated points3D and ptCloud
+    save(matFile, 'points3D', 'ptCloud', '-append');
 
     % If cleanFlag is set, manually edit the point cloud using the brush tool
     if cleanFlag
+        pcshow(ptCloud); % display ptCloud
         title('Use the brush tool to manually clean the point cloud');
         h = uicontrol('Style', 'pushbutton', 'String', 'Finish Editing', ...
                       'Position', [20 20 100 40], 'Callback', 'uiresume(gcbf)');
@@ -67,12 +76,8 @@ for i = 1:length(matFiles)
         % Re-save after manual editing
         points3D = ptCloud.Location; % Extract manually cleaned points3D
         save(matFile, 'points3D', 'ptCloud', '-append');
-        ptCloud = pointCloud(points3D, Color=J1);   % Recreate ptCloud from updated points3D
+        ptCloud = pointCloud(points3D);   % Recreate ptCloud from updated points3D
     end
-    
-    % Save updated points3D and ptCloud
-    save(matFile, 'points3D', 'ptCloud', '-append');
-    
 end
 
 %% QA/QC Functions
