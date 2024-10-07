@@ -4,6 +4,8 @@
 
 clear; clc; close all;
 
+addpath('functions/');
+
 %% Inputs
 
 squareSize = 45;  % in units of 'millimeters'

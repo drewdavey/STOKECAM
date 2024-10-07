@@ -4,6 +4,8 @@
 
 clear; clc; close all;
 
+addpath('functions/');
+
 %% Inputs
 
 path = uigetdir('../../','Select path to session for point cloud viewing'); % load path to dir

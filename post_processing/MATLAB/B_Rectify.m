@@ -4,6 +4,8 @@
 
 clear; clc; close all;
 
+addpath('functions/');
+
 %% Inputs
 
 plys = 0;        % save .plys seperate in ptCloud directory?
@@ -139,14 +141,4 @@ for i = 1:length(imageFileNames1)
     save(fullFilePath,'I1','I2','J1','J2','frameLeftGray',...
         'frameRightGray','reprojectionMatrix','disparityMap', ...
         'calib_path', 'ptCloud', 'points3D');
-end
-
-%% Functions
-
-% Parse the filename into cameraID, timestamp, and imageNum
-function [cameraID, timestamp, imageNum] = parse_filename(filename)
-    parts = split(filename, '_');
-    cameraID = parts{1}; % '0' or '1'
-    timestamp = parts{2}(1:6); % Ignore microseconds, keep only HHMMSS
-    imageNum = parts{3}(1:end-4); % Remove '.jpg' extension
 end

@@ -4,6 +4,8 @@
 
 clear; clc; close all;
 
+addpath('functions/');
+
 %% Inputs 
 
 path = uigetdir('../../','Select path to session'); % load path to session
@@ -50,28 +52,3 @@ for i = 1:length(cam1Files)
 end
 
 disp('Cleanup complete.');
-
-%% Functions
-
-% Parse the filename into cameraID, timestamp (up to seconds), and imageNum
-function [cameraID, timestamp, imageNum] = parse_filename(filename)
-    parts = split(filename, '_');
-    cameraID = parts{1}; % '0' or '1'
-    timestamp = parts{2}(1:6); % Ignore milliseconds, keep only HHMMSS
-    imageNum = parts{3}(1:end-4); % Remove '.jpg' extension
-end
-
-% Function to find the corresponding file in the other camera folder
-function correspondingFile = find_corresponding_file(cameraID, timestamp, imageNum, files)
-    correspondingFile = [];
-    
-    for i = 1:numel(files)
-        [~, ts, imgNum] = parse_filename(files(i).name);
-        
-        % Compare timestamp up to seconds and image number
-        if strcmp(ts, timestamp) && strcmp(imgNum, imageNum)
-            correspondingFile = files(i);
-            return;
-        end
-    end
-end
