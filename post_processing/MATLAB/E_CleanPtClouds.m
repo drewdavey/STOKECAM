@@ -9,10 +9,30 @@ clear; clc; close all;
 path = uigetdir('../../','Select path to session for point cloud cleaning'); % load path to dir
 matDir = [path '/mats'];
 
-cleanFlag = 1;
-saveFlag = 1;
+cleanFlag = 0;
+saveFlag = 0;
 
-%% Clean point clouds
+%% QA/QC
+
+depth = [0, 30];
+
+xbounds = [-5, 5];
+ybounds = [-5, 5];
+
+
+% Trim ptcloud
+
+% Cubically filter out >3std from mean
+
+% Specify z-step distance and output X/Y points at Z depths
+% Save these cross sections, label in order, fit curves?
+
+
+
+
+
+
+%% Manually clean point clouds
 
 while cleanFlag
     % Choose point cloud

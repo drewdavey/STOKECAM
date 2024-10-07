@@ -54,12 +54,12 @@ for i = 1:length(imageFileNames1)
     %%%%%%%%%%%%%%%%%%%%%%%
 
     %%% Compute Disparity Map %%%
-    DisparityRange = [0 64];
-    BlockSize = 25;
-    ContrastThreshold = 0.5;
-    UniquenessThreshold = 15;
-    DistanceThreshold = 20;
-    TextureThreshold = 0.00002;
+%     DisparityRange = [0 64];
+%     BlockSize = 25;
+%     ContrastThreshold = 0.5;
+%     UniquenessThreshold = 15;
+%     DistanceThreshold = 20;
+%     TextureThreshold = 0.00002;
 
 %     disparityMap = disparityBM(frameLeftGray, frameRightGray); % block matching
 %     disparityMap = disparityBM(frameLeftGray, frameRightGray,'DisparityRange',DisparityRange,...
