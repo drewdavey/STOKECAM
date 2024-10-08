@@ -8,6 +8,10 @@ addpath('functions/');
 
 %% Inputs
 
+cleanFlag = 0; % Set to 1 for manual point cloud editing, or 0 for automatic cleaning
+bounds = [-5 5 -5 5 0 30];   % [xmin xmax ymin ymax zmin zmax] for trimming points (meters)
+binSize = 1;    % size of the cubic bin for stepping through points (meters)
+
 path = uigetdir('../../','Select path to session to clean ptClouds'); % load path to dir to clean ptClouds
 %%%%               ^^^^^^^^^^^^ Queue up multiple dirs ^^^^^^^^^^^
 
@@ -16,12 +20,6 @@ if ~exist(path, 'dir')
     disp('No mats/ directory in this session.');
     return;
 end
-
-cleanFlag = 0; % Set to 1 for manual point cloud editing, or 0 for automatic cleaning
-
-bounds = [-5 5 -5 5 0 30];   % [xmin xmax ymin ymax zmin zmax] for trimming points (meters)
-
-binSize = 1;    % size of the cubic bin for stepping through points (meters)
 
 %% Process ptClouds
     
@@ -61,7 +59,6 @@ for i = 1:length(matFiles)
     % MATLAB Point Cloud functions
 
     ptCloud = pcdenoise(ptCloud);
-
 
 
     % Save updated points3D and ptCloud

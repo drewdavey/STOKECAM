@@ -11,14 +11,13 @@ addpath('functions/');
 clipWaves = 1;      % Repetition flag
 segment = 1;        % Segment images?
 
-
 while clipWaves
     mainDir = uigetdir('../../','Select path to session'); % load path to session
     waveFolder = organize_images(mainDir);
     if segment
         segment_images(waveFolder);
     end
-    answer = questdlg('Another?', ...
+    answer = questdlg('Clip another wave?', ...
     'Clip another wave?', ...
     'Yes','No','Yes');
     switch answer

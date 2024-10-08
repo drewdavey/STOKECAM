@@ -27,7 +27,7 @@ for i = 1:length(cam0Files)
     [cameraID0, timestamp0, imageNum0] = parse_filename(cam0Files(i).name);
     
     % Find the corresponding cam1 file
-    correspondingFile = find_corresponding_file(cameraID0, timestamp0, imageNum0, cam1Files);
+    correspondingFile = find_corresponding_file(cameraID0, timestamp0, imageNum0, cam0Files, cam1Files);
     
     % If no corresponding file is found, delete the cam0 file
     if isempty(correspondingFile)
@@ -42,7 +42,7 @@ for i = 1:length(cam1Files)
     [cameraID1, timestamp1, imageNum1] = parse_filename(cam1Files(i).name);
 
     % Find the corresponding cam0 file
-    correspondingFile = find_corresponding_file(cameraID1, timestamp1, imageNum1, cam0Files);
+    correspondingFile = find_corresponding_file(cameraID1, timestamp1, imageNum1, cam0Files, cam1Files);
     
     % If no corresponding file is found, delete the cam1 file
     if isempty(correspondingFile)
