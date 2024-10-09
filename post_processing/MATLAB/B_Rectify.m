@@ -127,12 +127,18 @@ for i = 1:length(imageFileNames1)
     % Create point cloud
     points3D = reconstructScene(disparityMap, reprojectionMatrix); % for single disparity map
     points3D = points3D ./ 1000; % Convert to meters and create a pointCloud object
-    ptCloud = pointCloud(points3D, Color=J1);
+    ptCloud_orig = pointCloud(points3D, Color=J1);
+
+    % Reshape the point cloud data into an Nx3 matrix
+    points3D = reshape(points3D, [], 3);  % Convert to N x 3 format for point cloud
+    
+    % Reshape the color information into an Nx3 matrix
+    colors = reshape(J1, [], 3);  % Convert to N x 3 format for RGB colors
 
     if plys 
         filename = [timestamp '_' imageNum];
         fullFilePath = fullfile(ptCloudDir, filename);
-        pcwrite(ptCloud, fullFilePath); % Save ptCloud as .ply
+        pcwrite(ptCloud_orig, fullFilePath); % Save ptCloud as .ply
     end 
 
     % Save .mat
@@ -140,5 +146,5 @@ for i = 1:length(imageFileNames1)
     fullFilePath = fullfile(matDir, filename);
     save(fullFilePath,'I1','I2','J1','J2','frameLeftGray',...
         'frameRightGray','reprojectionMatrix','disparityMap', ...
-        'calib_path', 'ptCloud', 'points3D');
+        'calib_path', 'ptCloud_orig', 'points3D','colors');
 end

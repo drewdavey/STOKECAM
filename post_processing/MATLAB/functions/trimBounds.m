@@ -2,7 +2,7 @@
 % Drew Davey
 % Last updated: 2024-10-06
 
-function points3D_cleaned = trimBounds(points3D, bounds, binSize)
+function [points3D_cleaned, colors_cleaned] = trimBounds(points3D, colors, bounds)
     
     % Get the min and max values of the points3D for safety
     xMinPts = min(points3D(:,1));
@@ -30,43 +30,7 @@ function points3D_cleaned = trimBounds(points3D, bounds, binSize)
                    (y >= bounds(3) & y <= bounds(4)) & ...
                    (z >= bounds(5) & z <= bounds(6));
     
-    points3D = points3D(withinBounds, :);
-    
-    % Now step through the points cubically in bins of size binSize
-    xMin = bounds(1); xMax = bounds(2);
-    yMin = bounds(3); yMax = bounds(4);
-    zMin = bounds(5); zMax = bounds(6);
-    
-    points3D_cleaned = [];
-    
-    for xStart = xMin:binSize:xMax
-        for yStart = yMin:binSize:yMax
-            for zStart = zMin:binSize:zMax
-                % Define the current bin
-                xEnd = xStart + binSize;
-                yEnd = yStart + binSize;
-                zEnd = zStart + binSize;
-                
-                % Find points within this bin
-                inBin = (points3D(:,1) >= xStart & points3D(:,1) < xEnd) & ...
-                        (points3D(:,2) >= yStart & points3D(:,2) < yEnd) & ...
-                        (points3D(:,3) >= zStart & points3D(:,3) < zEnd);
-                
-                binPoints = points3D(inBin, :);
-                
-                if ~isempty(binPoints)
-                    % Compute the mean and standard deviation for each dimension
-                    binMean = mean(binPoints, 1);
-                    binStd = std(binPoints, 1);
-                    
-                    % Find points within 3 standard deviations of the mean
-                    deviationFromMean = abs(binPoints - binMean);
-                    within3Std = all(deviationFromMean <= 3 * binStd, 2);
-                    
-                    % Add the cleaned points for this bin to the final output
-                    points3D_cleaned = [points3D_cleaned; binPoints(within3Std, :)]; %#ok<AGROW>
-                end
-            end
-        end
-    end
+    points3D_cleaned = points3D(withinBounds, :);
+    colors_cleaned = colors(withinBounds, :);
+
 end

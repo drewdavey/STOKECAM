@@ -25,15 +25,18 @@ while viewFlag
     file = file(1:end-9);
     % Load mat
     load([matDir '/' file '.mat']);
+
     % Create a streaming point cloud viewer
     player3D = pcplayer(xbounds, ybounds, depth, VerticalAxis="y", ...
         VerticalAxisDir="down");
+
     % Visualize the point cloud
     view(player3D, ptCloud);
     while isOpen(player3D)
         pause(0.1)
     end
-    answer = questdlg('Another?', ...
+
+    answer = questdlg('View another point cloud?', ...
     'View another point cloud', ...
     'Yes','No','Yes');
     switch answer

@@ -9,10 +9,9 @@ addpath('functions/');
 %% Inputs
 
 clipWaves = 1;      % Repetition flag
-segment = 1;        % Segment images?
+segment = 0;        % Segment images?
 
 while clipWaves
-    
     mainDir = uigetdir('../../','Select path to session'); % load path to session
     waveFolder = organize_images(mainDir);
 
