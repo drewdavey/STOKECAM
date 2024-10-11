@@ -9,11 +9,12 @@ addpath('functions/');
 %% Inputs
 
 plys = 0;        % save .plys seperate in ptCloud directory?
-BM_SGBM = 0;     % use block matching? (1) semi-global block matching? (0)
+BM_SGBM = 0;     % use block matching? (1) default semi-global block matching? (0)
 specs = 0;       % use specs (1) or default (0)
+def_calib = 0;   % select calib (1) or default (0)
 
 DisparityRange = [0 64];       % only applied if specs
-BlockSize = 25;                % only applied if specs
+BlockSize = 11;                % only applied if specs
 ContrastThreshold = 0.5;       % only applied if specs
 UniquenessThreshold = 15;      % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
@@ -27,7 +28,12 @@ dir2 = dir([path '/cam0/*.jpg']); % THESE ARE FLIPPED
 
 %% Load calibration and create dirs
 
-calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
+if def_calib
+    calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
+else
+    calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib2_SIO'; 
+end
+
 load([calib_path '/calib.mat']); uiwait(gcf); uiwait(gcf); 
 
 matDir = [path '/mats'];
@@ -127,6 +133,7 @@ for i = 1:length(imageFileNames1)
     % Create point cloud
     points3D = reconstructScene(disparityMap, reprojectionMatrix); % for single disparity map
     points3D = points3D ./ 1000; % Convert to meters and create a pointCloud object
+    ptCloud = pointCloud(points3D, Color=J1);
     ptCloud_orig = pointCloud(points3D, Color=J1);
 
     % Reshape the point cloud data into an Nx3 matrix
@@ -146,5 +153,5 @@ for i = 1:length(imageFileNames1)
     fullFilePath = fullfile(matDir, filename);
     save(fullFilePath,'I1','I2','J1','J2','frameLeftGray',...
         'frameRightGray','reprojectionMatrix','disparityMap', ...
-        'calib_path', 'ptCloud_orig', 'points3D','colors');
+        'calib_path', 'ptCloud_orig','ptCloud', 'points3D','colors');
 end

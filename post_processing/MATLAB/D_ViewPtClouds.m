@@ -11,14 +11,15 @@ addpath('functions/');
 path = uigetdir('../../','Select path to session for point cloud viewing'); % load path to dir
 matDir = [path '/mats'];
 
-viewFlag = 1;
+viewPtCloud_orig = 0; % display original ptCloud? helps determine where to cut off background
 
-depth = [0, 30];
-xbounds = [-5, 5];
-ybounds = [-5, 5];
+depth = [0, 20];
+xbounds = [-10, 10];
+ybounds = [-10, 10];
 
 %% View point clouds
 
+viewFlag = 1;
 while viewFlag
     % Choose point cloud
     file = uigetfile([path '/Rectified_Images/*.png'],'Select file to view point cloud');
@@ -31,7 +32,12 @@ while viewFlag
         VerticalAxisDir="down");
 
     % Visualize the point cloud
-    view(player3D, ptCloud);
+    if viewPtCloud_orig
+        view(player3D, ptCloud_orig);
+    else
+        view(player3D, ptCloud);
+    end
+
     while isOpen(player3D)
         pause(0.1)
     end

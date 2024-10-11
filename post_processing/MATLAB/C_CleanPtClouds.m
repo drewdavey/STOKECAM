@@ -7,10 +7,9 @@ clear; clc; close all;
 addpath('functions/');
 
 %% Inputs
-
-cleanFlag = 1;               % continuity
+           
 vers_control = 1;            % timestamp and save current ptCloud?
-manualFlag = 1;              % Set to 1 for manual point cloud editing, or 0 for automatic cleaning
+manualFlag = 1;              % Set to 1 for manual point cloud editing, or 0 for only automatic cleaning
 bounds = [-5 5 -5 5 0 30];   % [xmin xmax ymin ymax zmin zmax] for trimming points (meters)
 binSize = 1;                 % size of the cubic bin for stepping through points (meters)
 
@@ -25,6 +24,7 @@ end
 
 %% Process ptClouds
 
+cleanFlag = 1; 
 while cleanFlag
     % Choose point cloud
     file = uigetfile([path '/Rectified_Images/*.png'],'Select file to view point cloud');
