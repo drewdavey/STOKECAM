@@ -158,9 +158,9 @@ yline(0, '--k', 'LineWidth',2);
 maxValue = max(abs(timeDiffs));  % Find the max absolute value
 ylim([-maxValue, maxValue]);     % Set y-limits symmetrically
 xlabel('Image Pair (Index)');
-ylabel('Time Difference (Microseconds)');
-title('Time Difference Between cam0 and cam1 (Microseconds)');
-exportgraphics(f1, fullfile(figDir, 'TimeDifferencePlot.png'), 'Resolution', res);
+ylabel('Time Difference (\mus)');
+title('Image Delay');
+exportgraphics(f1, fullfile(figDir, 'TimeDifferencePlot.png'), 'Resolution', res, 'Padding','Figure');
 close(gcf);  % Close the figure after saving
 
 %% Plot X-Y cross sections
@@ -237,7 +237,8 @@ for k = 1:length(matFilenames)
         caxis([minZ maxZ]);  % Set the colorbar limits to match the Z range
         
         % Save the figure in the shapes/ directory
-        exportgraphics(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))), 'Resolution', res);
+        exportgraphics(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
+            'Resolution', res, 'Padding', 'Figure');
         close(gcf); 
     else
         disp(['points3D not found in ', matFiles(k).name, ' or ', matFiles(k).name, ' not yet cleaned.']);
