@@ -155,7 +155,7 @@ def exit_standby(fname_log):
     time.sleep(2)
     standby = False
 
-def enter_standby(fdir, fname_log, dt, num_frames, mode):
+def enter_standby(fdir, fname_log, dt, mode):
     yellow.on()
     time.sleep(1)
     global busy
@@ -168,9 +168,9 @@ def enter_standby(fdir, fname_log, dt, num_frames, mode):
         if right_button.is_pressed and not left_button.is_pressed and not busy:
             busy = True # Hold right button ONLY for burst   
             burst(fdir, fname_log, dt, mode)
-        if left_button.is_pressed and not right_button.is_pressed and not busy:
-            busy = True # Press left button ONLY for 3 numFrames
-            numFrames(fdir, fname_log, dt, num_frames, mode)
+        # if left_button.is_pressed and not right_button.is_pressed and not busy:
+        #     busy = True # Press left button ONLY for 3 numFrames
+        #     numFrames(fdir, fname_log, dt, mode)
         time.sleep(0.2)
     exit_standby(fname_log)
 
@@ -183,7 +183,6 @@ left_button = Button(17, hold_time=3)   # Left button
 
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
-num_frames = inputs['num_frames']
 dt = inputs['dt']
 calib_frames = inputs['calib_frames']
 calib_dt = inputs['calib_dt']
@@ -218,7 +217,7 @@ while True:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
-        enter_standby(fdir, fname_log, dt, num_frames, mode)    
+        enter_standby(fdir, fname_log, dt, mode)    
     if left_button.is_held and not standby and not right_button.is_pressed:
         calib(fdir, fname_log, calib_dt, calib_frames, mode)
         monitor_gps()
