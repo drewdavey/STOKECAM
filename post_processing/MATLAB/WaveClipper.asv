@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-10-10
+% Last updated: 2024-10-06
 
 clear; clc; close all;
 
@@ -56,7 +56,7 @@ while clipWaves
             imwrite(maskedI2,cam1File);
 
             clearvars BW
-            % close all
+            close all
         end
     end
     answer = questdlg('Clip another wave?', ...

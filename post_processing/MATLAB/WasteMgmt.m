@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-10-06
+% Last updated: 2024-10-10
 
 clear; clc; close all;
 
@@ -25,8 +25,8 @@ end
 
 %% Cleanup dirs
 
-matFiles = dir(fullfile(matDir, '*'));
-rectFiles = dir(fullfile(rectifiedImagesDir, '*'));
+matFiles = dir(fullfile(matDir, '*.mat'));
+rectFiles = dir(fullfile(rectifiedImagesDir, '*.png'));
 cam0Files = dir(fullfile(cam0Dir, '0_*.jpg'));
 cam1Files = dir(fullfile(cam1Dir, '1_*.jpg'));
 

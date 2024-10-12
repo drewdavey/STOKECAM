@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-10-06
+% Last updated: 2024-10-10
 
 clear; clc; close all;
 
@@ -8,10 +8,10 @@ addpath('functions/');
 
 %% Inputs
 
-plys = 0;        % save .plys seperate in ptCloud directory?
-BM_SGBM = 0;     % use block matching? (1) default semi-global block matching? (0)
-specs = 0;       % use specs (1) or default (0)
-def_calib = 0;   % select calib (1) or default (0)
+plys = 0;        % save .plys seperate in a 'ptCloud' directory?
+BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1) 
+specs = 0;       % default specs (0) or input specs (1)
+def_calib = 0;   % default calib (0) or select calib (1)
 
 DisparityRange = [0 64];       % only applied if specs
 BlockSize = 11;                % only applied if specs
@@ -130,17 +130,24 @@ for i = 1:length(imageFileNames1)
     fullFilePath = fullfile(rectifiedImagesDir, filename);
     exportgraphics(f2,fullFilePath,'Resolution',600); % Save disparity map as PNG
 
-    % Create point cloud
+    % Create points3D
     points3D = reconstructScene(disparityMap, reprojectionMatrix); % for single disparity map
     points3D = points3D ./ 1000; % Convert to meters and create a pointCloud object
-    ptCloud = pointCloud(points3D, Color=J1);
-    ptCloud_orig = pointCloud(points3D, Color=J1);
 
     % Reshape the point cloud data into an Nx3 matrix
     points3D = reshape(points3D, [], 3);  % Convert to N x 3 format for point cloud
-    
     % Reshape the color information into an Nx3 matrix
     colors = reshape(J1, [], 3);  % Convert to N x 3 format for RGB colors
+
+   % Flip the sign of Y
+%     points3D(:,2) = -points3D(:,2);  % Flip the sign of the Y dimension
+
+    % Create point cloud
+    ptCloud = pointCloud(points3D, 'Color', colors);
+    ptCloud_orig = pointCloud(points3D, 'Color', colors);
+
+    % Send clean flag
+    clean = 0;
 
     if plys 
         filename = [timestamp '_' imageNum];
@@ -153,5 +160,5 @@ for i = 1:length(imageFileNames1)
     fullFilePath = fullfile(matDir, filename);
     save(fullFilePath,'I1','I2','J1','J2','frameLeftGray',...
         'frameRightGray','reprojectionMatrix','disparityMap', ...
-        'calib_path', 'ptCloud_orig','ptCloud', 'points3D','colors');
+        'calib_path', 'ptCloud_orig','ptCloud', 'points3D','colors','clean');
 end

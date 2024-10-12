@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-10-06
+% Last updated: 2024-10-10
 
 clear; clc; close all;
 
@@ -10,7 +10,7 @@ addpath('functions/');
            
 vers_control = 1;            % timestamp and save current ptCloud?
 manualFlag = 1;              % Set to 1 for manual point cloud editing, or 0 for only automatic cleaning
-bounds = [-5 5 -5 5 0 30];   % [xmin xmax ymin ymax zmin zmax] for trimming points (meters)
+bounds = [-10 10 -10 10 0 20];   % [xmin xmax ymin ymax zmin zmax] for trimming points (meters)
 binSize = 1;                 % size of the cubic bin for stepping through points (meters)
 
 path = uigetdir('../../','Select path to session to clean ptClouds'); % load path to dir to clean ptClouds
@@ -61,8 +61,11 @@ while cleanFlag
     ptCloud = pointCloud(points3D, 'Color', colors);
     ptCloud = pcdenoise(ptCloud);
   
+    % Change clean flag
+    clean = 1;
+
     % Save updated points3D and ptCloud
-    save(matFile, 'points3D', 'colors', 'ptCloud', '-append');
+    save(matFile, 'points3D', 'colors', 'ptCloud', 'clean', '-append');
 
     % If manualFlag is set, manually edit the point cloud using the brush tool
     if manualFlag
