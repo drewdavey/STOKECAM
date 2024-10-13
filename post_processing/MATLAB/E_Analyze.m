@@ -10,8 +10,8 @@ addpath('functions/');
 
 res = 300;          % resolution for figures (.pngs)
 
-dX = 0.001;     % X step size for plotting (meters)
-dY = 0.01;     % Y step size for plotting (meters)
+dX = 0.1;     % X step size for plotting (meters)
+dY = 0.1;     % Y step size for plotting (meters)
 dZ = 1;       % Z step size for plotting (meters)
 
 path = uigetdir('../../','Select path to session for analysis'); % load path to dir 
@@ -146,22 +146,24 @@ end
 timeDiffs = zeros(1, length(tstamps0));  
 for i = 1:length(tstamps0)
     % Calculate the difference in time for each image pair (in seconds)
-    timeDiffInSeconds = seconds(tstamps0(i) - tstamps1(i));
+    timeDiffInSeconds = seconds(tstamps1(i) - tstamps0(i));
     % Convert the time difference to microseconds (1 second = 1e6 microseconds)
     timeDiffs(i) = timeDiffInSeconds * 1e6;
 end
 
 %% Plot timestamps
 f1 = figure; hold on; grid on; box on; 
-plot(1:length(timeDiffs), timeDiffs, 'o-');
+plot(1:length(timeDiffs), timeDiffs, 'o-', 'LineWidth', 1.5);
 yline(0, '--k', 'LineWidth',2);
 maxValue = max(abs(timeDiffs));  % Find the max absolute value
-ylim([-maxValue, maxValue]);     % Set y-limits symmetrically
+% ylim([-maxValue, maxValue]);     % Set y-limits symmetrically
+% ylim([0, maxValue]);     % Set y-limits symmetrically
 xlabel('Image Pair (Index)');
 ylabel('Time Difference (\mus)');
 title('Image Delay');
-exportgraphics(f1, fullfile(figDir, 'TimeDifferencePlot.png'), 'Resolution', res, 'Padding','Figure');
-close(gcf);  % Close the figure after saving
+% exportgraphics(f1, fullfile(figDir, 'TimeDifferencePlot.png'), 'Resolution', res);
+print(f1, fullfile(figDir, 'TimeDifferencePlot.png'), '-dpng', ['-r', num2str(res)]);
+% close(gcf);  % Close the figure after saving
 
 %% Plot X-Y cross sections
 shapesDir = fullfile(figDir, 'shapes');
@@ -237,8 +239,10 @@ for k = 1:length(matFilenames)
         caxis([minZ maxZ]);  % Set the colorbar limits to match the Z range
         
         % Save the figure in the shapes/ directory
-        exportgraphics(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
-            'Resolution', res, 'Padding', 'Figure');
+        % exportgraphics(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
+        %     'Resolution', res);
+        print(gcf, fullfile(figDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
+            '-dpng', ['-r', num2str(res)]);
         close(gcf); 
     else
         disp(['points3D not found in ', matFiles(k).name, ' or ', matFiles(k).name, ' not yet cleaned.']);

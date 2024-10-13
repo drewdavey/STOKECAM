@@ -8,10 +8,10 @@ addpath('functions/');
 
 %% Inputs
 
-plys = 0;        % save .plys seperate in a 'ptCloud' directory?
+def_calib = 0;   % default calib (0) or select calib (1)
 BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1) 
 specs = 0;       % default specs (0) or input specs (1)
-def_calib = 0;   % default calib (0) or select calib (1)
+plys = 0;        % save .plys seperate in a 'ptCloud' directory?
 
 DisparityRange = [0 64];       % only applied if specs
 BlockSize = 11;                % only applied if specs
