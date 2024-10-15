@@ -16,15 +16,6 @@ dZ = 1;       % Z step size for plotting (meters)
 
 path = uigetdir('../../','Select path to session for analysis'); % load path to dir 
 
-choice = questdlg('Select a subset of images?', ...
-    'Subset Selection', ...
-    'Yes', 'No', 'No');
-switch choice
-    case 'Yes'
-        subset = 1;  % Select subset of images
-    case 'No'
-        subset = 0;  % Do not select subset
-end
 
 %% Organize dirs
 cam0Dir = fullfile(path, 'cam0');
@@ -47,76 +38,19 @@ else
 end
 
 %% Select images from cam0 and cam1
-if subset == 1
-    % Select subset of images from either cam0 or cam1
-    [selectedFiles, folderIndex] = select_files(cam0Dir, cam1Dir); 
-    % Automatically find the corresponding files from the other camera
-    if folderIndex == 1
-        % Selected files are from cam0, find corresponding files in cam1
-        selectedFiles0 = selectedFiles;  % cam0 selected
-        selectedFiles1 = [];
-        selectedMatFiles = [];
-        for i = 1:length(selectedFiles0)
-            [cameraID0, tshort0, imageNum0, ~] = parse_filename(selectedFiles0(i).name);
-            cam0Filename = selectedFiles0(i).name;
-            % Find the corresponding cam1 file using the helper function
-            correspondingFile = find_corresponding_file(cameraID0, tshort0, imageNum0, cam0Files, cam1Files);
-            selectedFiles1(i).name = correspondingFile.name;
-            if loadMats
-                matIndex = find(contains({matFiles.name}, tshort0) & contains({matFiles.name}, imageNum0));
-                if ~isempty(matIndex)
-                    % Add the corresponding .mat file to the selected list
-                    selectedMatFiles = [selectedMatFiles, matFiles(matIndex)];
-                end
-            end
-        end
-        if loadMats
-            matFilenames = {selectedMatFiles.name};
-        else
-            matFilenames = [];
-            disp('No mats/ to analyze.');
-        end
-    else
-        % Selected files are from cam1, find corresponding files in cam0
-        selectedFiles1 = selectedFiles;  % cam1 selected
-        selectedFiles0 = [];
-        selectedMatFiles = [];
-        for i = 1:length(selectedFiles1)
-            [cameraID1, tshort1, imageNum1, ~] = parse_filename(selectedFiles1(i).name);
-            cam1Filename = selectedFiles1(i).name;
-            % Find the corresponding cam0 file using the helper function
-            correspondingFile = find_corresponding_file(cameraID1, tshort1, imageNum1, cam0Files, cam1Files);
-            selectedFiles0(i).name = correspondingFile.name;
-            if loadMats
-                matIndex = find(contains({matFiles.name}, tshort1) & contains({matFiles.name}, imageNum1));
-                if ~isempty(matIndex)
-                    % Add the corresponding .mat file to the selected list
-                    selectedMatFiles = [selectedMatFiles, matFiles(matIndex)];
-                end
-            end
-        end
-        if loadMats
-            matFilenames = {selectedMatFiles.name};
-        else
-            matFilenames = [];
-            disp('No mats/ to analyze.');
-        end
-    end
+
+cam0Images = dir(fullfile(cam0Dir, '*.jpg'));
+cam1Images = dir(fullfile(cam1Dir, '*.jpg'));
+% Convert filenames into struct arrays same as select_files output
+selectedFiles0 = struct('name', {cam0Images.name});
+selectedFiles1 = struct('name', {cam1Images.name});
+% Select all mats automatically
+if loadMats
+    matFiles = dir(fullfile(matDir, '*.mat'));
+    matFilenames = {matFiles.name};
 else
-    % Select all images automatically
-    cam0Images = dir(fullfile(cam0Dir, '*.jpg'));
-    cam1Images = dir(fullfile(cam1Dir, '*.jpg'));
-    % Convert filenames into struct arrays same as select_files output
-    selectedFiles0 = struct('name', {cam0Images.name});
-    selectedFiles1 = struct('name', {cam1Images.name});
-    % Select all mats automatically
-    if loadMats
-        matFiles = dir(fullfile(matDir, '*.mat'));
-        matFilenames = {matFiles.name};
-    else
-        matFilenames = [];
-        disp('No mats/ to analyze.');
-    end
+    matFilenames = [];
+    disp('No mats/ to analyze.');
 end
 
 %% Parse filenames to extract timestamps
@@ -148,21 +82,24 @@ for i = 1:length(tstamps0)
     % Calculate the difference in time for each image pair (in seconds)
     timeDiffInSeconds = seconds(tstamps1(i) - tstamps0(i));
     % Convert the time difference to microseconds (1 second = 1e6 microseconds)
-    timeDiffs(i) = timeDiffInSeconds * 1e6;
+    % timeDiffs(i) = timeDiffInSeconds * 1e6;
+    % Convert the time difference to milliseconds
+    timeDiffs(i) = timeDiffInSeconds * 1e3;
 end
 
 %% Plot timestamps
 f1 = figure; hold on; grid on; box on; 
-plot(1:length(timeDiffs), timeDiffs, 'o-', 'LineWidth', 1.5);
+plot(1:length(timeDiffs), timeDiffs, 'o-b', 'LineWidth', 1.5);
 yline(0, '--k', 'LineWidth',2);
 maxValue = max(abs(timeDiffs));  % Find the max absolute value
 % ylim([-maxValue, maxValue]);     % Set y-limits symmetrically
-% ylim([0, maxValue]);     % Set y-limits symmetrically
+ylim([-10, maxValue]);     % Set y-limits symmetrically
 xlabel('Image Pair (Index)');
-ylabel('Time Difference (\mus)');
+ylabel('Time Difference (ms)');
 title('Image Delay');
+legend('Before fix')
 % exportgraphics(f1, fullfile(figDir, 'TimeDifferencePlot.png'), 'Resolution', res);
-print(f1, fullfile(figDir, 'TimeDifferencePlot.png'), '-dpng', ['-r', num2str(res)]);
+print(f1, fullfile(figDir, 'fig1.png'), '-dpng', ['-r', num2str(res)]);
 % close(gcf);  % Close the figure after saving
 
 %% Plot X-Y cross sections

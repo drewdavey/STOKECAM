@@ -91,7 +91,8 @@ while cleanFlag
         % Delete the brushed points
         points3D = points3D(~brushedIdx, :);
         colors = colors(~brushedIdx, :);
-        
+        % points3D(:,2) = -points3D(:,2);  % Flip the sign of the Y dimension
+        points3D(:,1) = -points3D(:,1);  % Flip the sign of the Y dimension
         % Write updated ptCloud
         ptCloud = pointCloud(points3D, 'Color', colors);
 

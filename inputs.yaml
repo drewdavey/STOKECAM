@@ -13,3 +13,5 @@ calib_dt: 2             # Time between frames in seconds (for calibration)
 
 dt: 0.04                # Time between frames in seconds
 imu_dt: 0.01            # Time between IMU readings in seconds
+
+num_frames: 10          # Number of frames to be captured   
