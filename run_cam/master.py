@@ -119,7 +119,7 @@ def enter_standby(fdir, fname_log, dt, mode):
     log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
     imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
-    time.sleep(0.5)
+    time.sleep(1)
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 0
