@@ -6,9 +6,9 @@ clear; clc; close all;
 
 addpath('functions/');
 
-%% Inputs 
+%% Filepath
 
-path = uigetdir('../../','Select path to session'); % load path to session
+path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session'); % load path to session
 
 matDir = fullfile(path, 'mats');
 rectifiedImagesDir = fullfile(path, 'Rectified_Images');
@@ -16,11 +16,11 @@ rectifiedImagesDir = fullfile(path, 'Rectified_Images');
 cam0Dir = fullfile(path, 'cam0');
 cam1Dir = fullfile(path, 'cam1');
 
-% Set cleanMats if mat and rectified dirs exist
+% Set cleanAll if mat and rectified dirs exist
 if exist(matDir, 'dir') && exist(rectifiedImagesDir, 'dir')
-    cleanMats = 1; % Enable cleaning mats based on rectified images
+    cleanAll = 1; % Enable cleaning mats based on rectified images
 else
-    cleanMats = 0; % Skip cleaning mats
+    cleanAll = 0; % Skip cleaning mats
 end
 
 %% Cleanup dirs
@@ -65,8 +65,9 @@ for i = 1:length(cam1Files)
     end
 end
 
-if cleanMats
-    % Loop through rectified files and check if corresponding mat files exist
+if cleanAll
+
+    % Loop through mat files and check if corresponding files exist
     for i = 1:length(rectFiles)
         % Parse timestamp and image number from rect file (no microseconds in mats)
         tokens = regexp(rectFiles(i).name, '(\d{6})_(\d+)', 'tokens', 'once');
@@ -79,28 +80,58 @@ if cleanMats
         % Check if the corresponding _rect or _disp file exists
         rectFileExists = exist(fullfile(rectifiedImagesDir, sprintf('%s_%s_rect.png', timestamp, imageNum)), 'file');
         dispFileExists = exist(fullfile(rectifiedImagesDir, sprintf('%s_%s_disp.png', timestamp, imageNum)), 'file');
-        
-        % If either rect or disp is missing, delete the corresponding mat file
-        if ~rectFileExists || ~dispFileExists
-            matFilePath = fullfile(matDir, sprintf('%s_%s.mat', timestamp, imageNum));
-            if exist(matFilePath, 'file')
-                delete(matFilePath);
-                fprintf('Deleted mat file: %s\n', matFilePath);
-            end
-        end
-        
+     
         % If rect file is missing, delete the disp file
         if ~rectFileExists && dispFileExists
             dispFilePath = fullfile(rectifiedImagesDir, sprintf('%s_%s_disp.png', timestamp, imageNum));
             delete(dispFilePath);
             fprintf('Deleted disp file: %s\n', dispFilePath);
         end
-        
         % If disp file is missing, delete the rect file
         if ~dispFileExists && rectFileExists
             rectFilePath = fullfile(rectifiedImagesDir, sprintf('%s_%s_rect.png', timestamp, imageNum));
             delete(rectFilePath);
-            fprintf('Deleted rect file: %s\n', rectFilePath);
+            fprintf('Deleted rect file: %s\n', rectFilePath);  
+        end
+    end
+
+    % Loop through mat files and check if corresponding files exist
+    for i = 1:length(matFiles)
+        % Parse timestamp and image number from rect file (no microseconds in mats)
+        tokens = regexp(matFiles(i).name, '(\d{6})_(\d+)', 'tokens', 'once');
+        if isempty(tokens)
+            continue; % Skip if the filename doesn't match the expected format
+        end
+        timestamp = tokens{1};
+        imageNum = tokens{2};
+        
+        % Check if the corresponding _rect or _disp file exists
+        rectFileExists = exist(fullfile(rectifiedImagesDir, sprintf('%s_%s_rect.png', timestamp, imageNum)), 'file');
+        dispFileExists = exist(fullfile(rectifiedImagesDir, sprintf('%s_%s_disp.png', timestamp, imageNum)), 'file');
+        
+        % If either rect or disp is missing, delete corresponding files
+        if ~rectFileExists || ~dispFileExists
+            matFilePath = fullfile(matDir, sprintf('%s_%s.mat', timestamp, imageNum));
+            if exist(matFilePath, 'file')
+                delete(matFilePath);
+                fprintf('Deleted mat file: %s\n', matFilePath);
+            end
+            
+            % Find the corresponding cam1 file
+            cam1File = find_corresponding_file('0', timestamp, imageNum, cam0Files, cam1Files);
+            cam1FilePath = fullfile(cam1File.folder, cam1File.name);
+            if exist(cam1FilePath, 'file')
+                delete(cam1FilePath); 
+                fprintf('Deleted cam1 file: %s\n', cam1FilePath);
+            end
+            
+            % Find the corresponding cam1 file
+            cam0File = find_corresponding_file('1', timestamp, imageNum, cam0Files, cam1Files);
+            cam0FilePath = fullfile(cam0File.folder, cam0File.name);
+            if exist(cam0FilePath, 'file')
+                delete(cam0FilePath); 
+                fprintf('Deleted cam0 file: %s\n', cam0FilePath); 
+            end
         end
     end
 end

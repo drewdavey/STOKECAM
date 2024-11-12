@@ -15,7 +15,6 @@ manualFlag = 0;     % manually clean
 bounds = [-10 10 -10 10 0 30];   % [xmin xmax ymin ymax zmin zmax] for trimming points (meters)
 
 %% Filepath
-
 path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session to clean ptClouds'); % load path to dir to clean ptClouds
 %%%%               ^^^^^^^^^^^^ Queue up multiple dirs ^^^^^^^^^^^
 

@@ -20,8 +20,11 @@ UniquenessThreshold = 15;      % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
 TextureThreshold = 0.00002;    % only applied if specs
 
-path = uigetdir('../../','Select path to session for reconstruction'); % load path to dir to reconstruct
+%% Filepath
+
+path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for reconstruction'); % load path to dir to reconstruct
 %%%%               ^^^^^^^^^^^^ Queue up multiple dirs ^^^^^^^^^^^
+%%%%               ^^^^^ while loop select; for path in paths ^^^^
 
 dir1 = dir([path '/cam1/*.jpg']); % THESE ARE FLIPPED
 dir2 = dir([path '/cam0/*.jpg']); % THESE ARE FLIPPED
@@ -29,12 +32,12 @@ dir2 = dir([path '/cam0/*.jpg']); % THESE ARE FLIPPED
 %% Load calibration and create dirs
 
 if def_calib
-    calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
+    calib_path = uigetdir('../../../FSR/stereo_cam/DATA/calibrations/','Select path to calibration session'); % load path to calibration session
 else
-    calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib2_SIO'; 
+    calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib3_SIO'; 
 end
 
-load([calib_path '/calib.mat']); uiwait(gcf); uiwait(gcf); 
+load([calib_path '/calib.mat']); % uiwait(gcf); uiwait(gcf); 
 
 matDir = [path '/mats'];
 rectifiedImagesDir = [path '/Rectified_Images']; 
@@ -146,8 +149,12 @@ for i = 1:length(imageFileNames1)
     ptCloud = pointCloud(points3D, 'Color', colors);
     ptCloud_orig = pointCloud(points3D, 'Color', colors);
 
-    % Send clean flag
-    clean = 0;
+    % Create data struct
+    data.points3D = points3D;
+    data.colors = colors;
+    data.ptCloud = ptCloud;
+    data.ptCloud_orig = ptCloud_orig;
+    data.clean = 0; % Send clean flag
 
     if plys 
         filename = [timestamp '_' imageNum];
@@ -160,5 +167,5 @@ for i = 1:length(imageFileNames1)
     fullFilePath = fullfile(matDir, filename);
     save(fullFilePath,'I1','I2','J1','J2','frameLeftGray',...
         'frameRightGray','reprojectionMatrix','disparityMap', ...
-        'calib_path', 'ptCloud_orig','ptCloud', 'points3D','colors','clean');
+        'calib_path', 'data');
 end

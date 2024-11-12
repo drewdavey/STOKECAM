@@ -14,7 +14,7 @@ segment = 0;        % Segment images?
 
 clipWaves = 1;
 while clipWaves
-    mainDir = uigetdir('../../','Select path to session'); % load path to session
+    mainDir = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session'); % load path to session
     waveFolder = organize_images(mainDir); % wave* directory containing 'cam0' and 'cam1' folders
 
     if segment

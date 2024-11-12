@@ -8,14 +8,16 @@ addpath('functions/');
 
 %% Inputs
 
-path = uigetdir('../../','Select path to session for point cloud viewing'); % load path to dir
-matDir = [path '/mats'];
-
 viewPtCloud_orig = 0; % display original ptCloud? helps determine where to cut off background
 
-depth = [0, 20];
+depth = [0, 30];
 xbounds = [-10, 10];
 ybounds = [-10, 10];
+
+%% Filepath
+
+path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for point cloud viewing'); % load path to dir
+matDir = [path '/mats'];
 
 %% View point clouds
 
@@ -33,9 +35,9 @@ while viewFlag
 
     % Visualize the point cloud
     if viewPtCloud_orig
-        view(player3D, ptCloud_orig);
+        view(player3D, data.ptCloud_orig);
     else
-        view(player3D, ptCloud);
+        view(player3D, data.ptCloud);
     end
 
     while isOpen(player3D)

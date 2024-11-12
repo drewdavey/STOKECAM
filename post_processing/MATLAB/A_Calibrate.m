@@ -10,6 +10,8 @@ addpath('functions/');
 
 squareSize = 45;  % in units of 'millimeters'
 
+%% Filepath
+
 calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
 
 dir1 = dir([calib_path '/cam1/*.jpg']); % THESE ARE FLIPPED

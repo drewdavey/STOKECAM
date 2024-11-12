@@ -14,7 +14,9 @@ dX = 0.1;     % X step size for plotting (meters)
 dY = 0.1;     % Y step size for plotting (meters)
 dZ = 1;       % Z step size for plotting (meters)
 
-path = uigetdir('../../','Select path to session for analysis'); % load path to dir 
+%% Filepath
+
+path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
 
 choice = questdlg('Select a subset of images?', ...
     'Subset Selection', ...
@@ -173,6 +175,7 @@ end
 
 for k = 1:length(matFilenames)
     matData = load(fullfile(matDir, matFilenames{k}));
+    matData = matData.data;
     if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
         points3D = matData.points3D;
         
@@ -241,7 +244,7 @@ for k = 1:length(matFilenames)
         % Save the figure in the shapes/ directory
         % exportgraphics(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
         %     'Resolution', res);
-        print(gcf, fullfile(figDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
+        print(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
             '-dpng', ['-r', num2str(res)]);
         close(gcf); 
     else
