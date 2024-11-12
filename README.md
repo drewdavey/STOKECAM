@@ -1,4 +1,4 @@
-## STereo imaging system for Overturning wave KinEmatics (STOKE)
+## STereo imaging system for Overturning wave KinEmatiCs and dynAMics (STOKECAM)
 # Last Updated: 2024-02-21
 # Author: Drew Davey
 
