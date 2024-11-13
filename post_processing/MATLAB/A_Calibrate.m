@@ -59,5 +59,5 @@ displayErrors(estimationErrors, stereoParams);
 
 %% Save mat
 save([calib_path '/full_calibration.mat']);
-clearvars -except stereoParams calib_path h1 h2
+clearvars -except stereoParams calib_path h1 h2 % comment h1/h2 if you don't want figs to pop up
 save([calib_path '/calib.mat']);
