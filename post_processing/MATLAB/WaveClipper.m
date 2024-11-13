@@ -8,7 +8,7 @@ addpath('functions/');
 
 %% Inputs
 
-segment = 0;        % Segment images?
+segment = 0;        % Segment images? Don't for now
 
 %% Clip Waves
 

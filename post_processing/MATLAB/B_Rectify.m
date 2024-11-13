@@ -163,6 +163,10 @@ for m = 1:length(paths)
         points3D = reconstructScene(disparityMap, reprojectionMatrix); % for single disparity map
         points3D = points3D ./ 1000; % Convert to meters and create a pointCloud object
     
+        % Save originals
+        points3D_orig = points3D;
+        colors_orig = J1;
+
         % Reshape the point cloud data into an Nx3 matrix
         points3D = reshape(points3D, [], 3);  % Convert to N x 3 format for point cloud
         % Reshape the color information into an Nx3 matrix
@@ -179,7 +183,11 @@ for m = 1:length(paths)
         data.points3D = points3D;
         data.colors = colors;
         data.ptCloud = ptCloud;
+
+        data.points3D_orig = points3D_orig;
+        data.colors_orig = colors_orig;
         data.ptCloud_orig = ptCloud_orig;
+
         data.clean = 0; % Send clean flag
     
         if plys 
