@@ -2,9 +2,9 @@
 % Drew Davey
 % Last updated: 2024-11-13
 
-function [points3D, colors] = colorThresh(J1, points3D, colors)
+function [points3D, colors] = colorThresh(points3D, colors, colors_tmp)
         % Load image
-        figure; imshow(J1); 
+        figure; imshow(colors_tmp); 
         hold on;
         
         % Arrays to store all pixel values from foreground and background ROIs
@@ -32,7 +32,7 @@ function [points3D, colors] = colorThresh(J1, points3D, colors)
             centerY = y1 + (y2 - y1) / 2;
     
             % Extract the region of interest
-            roi = J1(y1:y2, x1:x2, :);
+            roi = colors_tmp(y1:y2, x1:x2, :);
     
             % Accumulate all pixel values from the selected regions
             if i <= 3

@@ -2,7 +2,7 @@
 % Drew Davey
 % Last updated: 2024-10-06
 
-function [points3D_cleaned, colors_cleaned] = trimBounds(points3D, colors, bounds)
+function [points3D, colors] = trimBounds(points3D, colors, bounds)
     
     % Get the min and max values of the points3D for safety
     xMinPts = min(points3D(:,1));
@@ -30,7 +30,7 @@ function [points3D_cleaned, colors_cleaned] = trimBounds(points3D, colors, bound
                    (y >= bounds(3) & y <= bounds(4)) & ...
                    (z >= bounds(5) & z <= bounds(6));
     
-    points3D_cleaned = points3D(withinBounds, :);
-    colors_cleaned = colors(withinBounds, :);
+    points3D = points3D(withinBounds, :);
+    colors = colors(withinBounds, :);
 
 end

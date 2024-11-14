@@ -30,8 +30,8 @@ paths{end + 1} = path;  % Add selected session to paths array
 
 % Queue up additional sessions?
 while true
-    answer = questdlg('Select another session?', ...
-    'Select another session?', ...
+    answer = questdlg('Queue another session?', ...
+    'Queue another session?', ...
     'Yes','No','Yes');
     switch answer
         case 'Yes'
@@ -68,6 +68,7 @@ for m = 1:length(paths)
     if ~exist(rectifiedImagesDir, 'dir')
         mkdir(rectifiedImagesDir); % mkdir for rectified images
     end
+    
     if plys && ~exist(ptCloudDir, 'dir')
         mkdir(ptCloudDir); % mkdir for ptClouds
     end
@@ -162,38 +163,36 @@ for m = 1:length(paths)
         % Create points3D
         points3D = reconstructScene(disparityMap, reprojectionMatrix); % for single disparity map
         points3D = points3D ./ 1000; % Convert to meters and create a pointCloud object
-    
-        % Save originals
-        points3D_orig = points3D;
-        colors_orig = J1;
-
-        % Reshape the point cloud data into an Nx3 matrix
-        points3D = reshape(points3D, [], 3);  % Convert to N x 3 format for point cloud
-        % Reshape the color information into an Nx3 matrix
-        colors = reshape(J1, [], 3);  % Convert to N x 3 format for RGB colors
-    
-       % Flip the sign of Y
-    %     points3D(:,2) = -points3D(:,2);  % Flip the sign of the Y dimension
+        
+        % Use J1 as color matrix
+        colors = J1;
     
         % Create point cloud
         ptCloud = pointCloud(points3D, 'Color', colors);
-        ptCloud_orig = pointCloud(points3D, 'Color', colors);
-    
+        
         % Create data struct
         data.points3D = points3D;
         data.colors = colors;
         data.ptCloud = ptCloud;
 
-        data.points3D_orig = points3D_orig;
-        data.colors_orig = colors_orig;
-        data.ptCloud_orig = ptCloud_orig;
+        % Duplicate originals
+        data.points3D_orig = points3D;
+        data.colors_orig = colors;
+        data.ptCloud_orig = ptCloud;
 
-        data.clean = 0; % Send clean flag
+        % Reshape points3D into an Nx3 matrix
+        data.points3D = reshape(data.points3D, [], 3);  
+        % Reshape colors into an Nx3 matrix
+        data.colors = reshape(data.colors, [], 3);  
     
+        % Send clean flag
+        data.clean = 0; 
+    
+        % Save ptCloud as .ply
         if plys 
             filename = [timestamp '_' imageNum];
             fullFilePath = fullfile(ptCloudDir, filename);
-            pcwrite(ptCloud_orig, fullFilePath); % Save ptCloud as .ply
+            pcwrite(ptCloud_orig, fullFilePath); 
         end 
     
         % Save .mat

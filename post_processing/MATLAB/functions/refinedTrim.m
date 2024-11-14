@@ -2,12 +2,12 @@
 % Drew Davey
 % Last updated: 2024-11-13
 
-function [points3D, colors] = refinedTrim(J1, points3D, colors)
+function [points3D, colors] = refinedTrim(points3D, colors, colors_tmp)
     % Get image dimensions
-    [imgHeight, imgWidth, ~] = size(J1);
+    [imgHeight, imgWidth, ~] = size(colors_tmp);    
 
     % Display the image
-    figure; imshow(J1);
+    figure; imshow(colors_tmp);
     hold on;
     title('Select points to define the polygon (double-click to finish)');
 
@@ -25,6 +25,7 @@ function [points3D, colors] = refinedTrim(J1, points3D, colors)
 
     % Determine which pixels are inside the polygon
     inPolygon = inpolygon(X, Y, polygonVertices(:, 1), polygonVertices(:, 2));
+
     % Filter points3D and colors based on the polygon mask
     points3D = points3D(inPolygon, :);
     colors = colors(inPolygon, :);
