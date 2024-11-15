@@ -5,7 +5,7 @@
 function [points3D, colors] = manualClean(points3D, colors)
 
         % Create a 3D scatter plot with the points and colors
-        f = figure;
+        f = figure; axis equal;
         p = scatter3(points3D(:,1), points3D(:,2), points3D(:,3), 1, double(colors) / 255, 'filled');
         xlabel('X'); ylabel('Y'); zlabel('Z');
         title('Brush Data to Delete Points');

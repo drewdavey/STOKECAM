@@ -165,7 +165,7 @@ ylabel('Time Difference (\mus)');
 title('Image Delay');
 % exportgraphics(f1, fullfile(figDir, 'TimeDifferencePlot.png'), 'Resolution', res);
 print(f1, fullfile(figDir, 'TimeDifferencePlot.png'), '-dpng', ['-r', num2str(res)]);
-% close(gcf);  % Close the figure after saving
+close(gcf);  % Close the figure after saving
 
 %% Plot X-Y cross sections
 shapesDir = fullfile(figDir, 'shapes');
@@ -228,8 +228,8 @@ for k = 1:length(matFilenames)
 
             %%%%%%%%%%%%%%%% Plot X-Y %%%%%%%%%%%%%%%%%%
 %             plot(X, Y, 'Color', color, 'LineWidth', 1.5);
-            plot(X, Y, 'o', 'Color', color, 'MarkerFaceColor', color,'MarkerSize', 5);
-%             plot(X, Y, '-o', 'Color', color, 'MarkerFaceColor', color, 'LineWidth', 1.5);
+            % plot(X, Y, 'o', 'Color', color, 'MarkerFaceColor', color,'MarkerSize', 5);
+            plot(X, Y, '-o', 'Color', color, 'MarkerFaceColor', color, 'LineWidth', 1.5);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         end
      

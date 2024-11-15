@@ -49,17 +49,17 @@ while cleanFlag
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%% Apply QA/QC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    if colorFlag && ~trimFlag
+    if colorFlag && ~data.clean
         % Trim via color thresholds
         [data.points3D, data.colors] = colorThresh(data.points3D, data.colors, data.colors_orig);
     end
 
-    if trimFlag && ~colorFlag
+    if trimFlag && ~data.clean
         % Trim to polygon
         [data.points3D, data.colors] = refinedTrim(data.points3D, data.colors, data.colors_orig);
     end
 
-    if basicFlag
+    if basicFlag && ~data.clean
         % Trim to bounds
         [data.points3D, data.colors] = trimBounds(data.points3D, data.colors, data.bounds); 
     end
