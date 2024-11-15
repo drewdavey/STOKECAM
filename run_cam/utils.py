@@ -62,10 +62,10 @@ def create_dirs(fdir, mode):
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def sync_clock_and_imu(fname_log, gps_wait_time):
-    ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) # Create sensor object and connect to the VN-200 
-    s = ez.sensor                                    # at the baud rate of 115200 (115,200 bytes/s) 
     # s = VnSensor()
     # s.connect('/dev/ttyUSB0', 115200)
+    ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) # Create sensor object and connect to the VN-200 
+    s = ez.sensor                                    # at the baud rate of 115200 (115,200 bytes/s) 
     with open(fname_log, 'a') as log:
         model_num = s.read_model_number()
         serial_num = s.read_serial_number()
