@@ -34,8 +34,8 @@ while time.time() - start_time < duration:
 
     # print(f" {gps.num_sats}, {gps.time}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
 
-    t = cd.time_utc
-    print(f"Time: {t}" + '\n')
+    print(f"Time: {cd.time_utc}" + '\n')
+    print(f"position_gps_lla: {cd.position_gps_lla}" + '\n')
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
