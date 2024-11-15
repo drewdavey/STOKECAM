@@ -15,6 +15,8 @@ from vnpy import *
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
 
+cd = CompositeData()
+cd.connect('/dev/ttyUSB0', 115200)
 
 # Record the start time
 start_time = time.time()
@@ -22,15 +24,19 @@ duration = 30  # seconds
 
 while time.time() - start_time < duration:
     # Read yaw, pitch, and roll values
-    ypr = s.read_yaw_pitch_roll()
-    print(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}"+ '\n')
+    # ypr = s.read_yaw_pitch_roll()
+    # print(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}"+ '\n')
 
-    gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
+    # gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
 
-    reg = s.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates()
-    print(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}"+ '\n')
+    # reg = s.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates()
+    # print(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}"+ '\n')
 
-    print(f" {gps.num_sats}, {gps.time.utc}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
+    # print(f" {gps.num_sats}, {gps.time}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
+
+    t = cd.time_utc
+    print(f"Time: {t}" + '\n')
+
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
 
