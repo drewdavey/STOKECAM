@@ -8,15 +8,20 @@ addpath('functions/');
 
 %% Inputs
 
+default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib3_SIO';
+
 def_calib = 0;   % default calib (0) or select calib (1)
-BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1) 
+BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1)
 specs = 0;       % default specs (0) or input specs (1)
 plys = 0;        % save .plys seperate in a 'ptCloud' directory?
 
+% Applied to BM & SGBM
+UniquenessThreshold = 15;      % only applied if specs
+
+% Applied to BM only
 DisparityRange = [0 64];       % only applied if specs
 BlockSize = 11;                % only applied if specs
 ContrastThreshold = 0.5;       % only applied if specs
-UniquenessThreshold = 15;      % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
 TextureThreshold = 0.00002;    % only applied if specs
 
@@ -52,9 +57,9 @@ for m = 1:length(paths)
     %% Load calibration and create dirs
     
     if def_calib
-        calib_path = uigetdir('../../../FSR/stereo_cam/DATA/calibrations/','Select path to calibration session'); % load path to calibration session
+        calib_path = uigetdir('../../../FSR/stereo_cam/DATA/calibrations/', 'Select path to calibration session'); % load path to calibration session
     else
-        calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib3_SIO'; 
+        calib_path = default_calib; 
     end
     
     load([calib_path '/calib.mat']); 
@@ -112,8 +117,8 @@ for m = 1:length(paths)
         I2 = imread(imageFileNames2{i});
     
         %%% Rectify Images %%%
-        [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='valid'); 
-        %[J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams,OutputView='full'); 
+        [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams, OutputView='valid'); 
+        %[J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams, OutputView='full'); 
         frameLeftGray  = im2gray(J1);
         frameRightGray = im2gray(J2);
         %%%%%%%%%%%%%%%%%%%%%%%
@@ -122,12 +127,12 @@ for m = 1:length(paths)
         if BM_SGBM
             %%%%%%%%%%%%% Block Matching %%%%%%%%%%%%%
             if specs
-                disparityMap = disparityBM(frameLeftGray, frameRightGray,'DisparityRange',DisparityRange,...
-                    'BlockSize',BlockSize,...
-                    'UniquenessThreshold',UniquenessThreshold,...
+                disparityMap = disparityBM(frameLeftGray, frameRightGray,'DisparityRange', DisparityRange,...
+                    'BlockSize', BlockSize,...
+                    'UniquenessThreshold', UniquenessThreshold,...
                     'ContrastThreshold', ContrastThreshold,...
-                    'DistanceThreshold',DistanceThreshold,...
-                    'TextureThreshold',TextureThreshold);
+                    'DistanceThreshold', DistanceThreshold,...
+                    'TextureThreshold', TextureThreshold);
             else
                 disparityMap = disparityBM(frameLeftGray, frameRightGray); % default block matching
             end
@@ -135,7 +140,7 @@ for m = 1:length(paths)
         else
             %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
             if specs
-                disparityMap = disparitySGM(frameLeftGray, frameRightGray,'UniquenessThreshold',UniquenessThreshold); 
+                disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'UniquenessThreshold', UniquenessThreshold); 
             else
                 disparityMap = disparitySGM(frameLeftGray, frameRightGray); % default semi-global matching
             end

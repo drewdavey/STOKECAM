@@ -3,6 +3,8 @@
 % Last updated: 2024-11-13
 
 function [points3D, colors] = colorThresh(points3D, colors, colors_tmp)
+
+
         % Load image
         figure; imshow(colors_tmp); 
         hold on;
@@ -68,9 +70,11 @@ function [points3D, colors] = colorThresh(points3D, colors, colors_tmp)
                 (colors(:,2) >= backgroundThresholds(1,2) & colors(:,2) <= backgroundThresholds(2,2)) & ...
                 (colors(:,3) >= backgroundThresholds(1,3) & colors(:,3) <= backgroundThresholds(2,3));
     
-        % Filter out background points and keep foreground points
-        colors = colors(fgIdx & ~bgIdx, :);
-        points3D = points3D(fgIdx & ~bgIdx, :);
+        % % Filter out background points and keep foreground points
+        % colors = colors(fgIdx & ~bgIdx, :);
+        % points3D = points3D(fgIdx & ~bgIdx, :);
+        colors(~fgIdx & bgIdx, :) = NaN;
+        points3D(~fgIdx & bgIdx, :) = NaN;
     
         close(gcf);
 end

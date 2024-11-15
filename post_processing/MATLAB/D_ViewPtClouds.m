@@ -8,7 +8,7 @@ addpath('functions/');
 
 %% Inputs
 
-viewPtCloud_orig = 0; % display original ptCloud? helps determine where to cut off background
+viewPtCloud_orig = 0; % display original ptCloud?
 
 depth = [0, 30];
 xbounds = [-10, 10];

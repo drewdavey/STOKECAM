@@ -19,7 +19,7 @@ if ping -c 1 8.8.8.8 &> /dev/null; then
     # Find all bash and python scripts in the directory and make them executable
     find . -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod +x {} \;
 
-    echo "stereo_repo updated and all scripts are now executable."
+    echo "STOKECAM updated and all scripts are now executable."
 else
   # Internet is down, do nothing
   echo "No internet connection."

@@ -227,9 +227,9 @@ for k = 1:length(matFilenames)
             end
 
             %%%%%%%%%%%%%%%% Plot X-Y %%%%%%%%%%%%%%%%%%
-%             plot(X, Y, 'Color', color, 'LineWidth', 1.5);
-            % plot(X, Y, 'o', 'Color', color, 'MarkerFaceColor', color,'MarkerSize', 5);
-            plot(X, Y, '-o', 'Color', color, 'MarkerFaceColor', color, 'LineWidth', 1.5);
+            % plot(X, Y, 'Color', color, 'LineWidth', 1.5);
+            plot(X, Y, 'o', 'Color', color, 'MarkerFaceColor', color,'MarkerSize', 5);
+            % plot(X, Y, '-o', 'Color', color, 'MarkerFaceColor', color, 'LineWidth', 1.5);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         end
      

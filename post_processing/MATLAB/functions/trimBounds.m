@@ -30,7 +30,9 @@ function [points3D, colors] = trimBounds(points3D, colors, bounds)
                    (y >= bounds(3) & y <= bounds(4)) & ...
                    (z >= bounds(5) & z <= bounds(6));
     
-    points3D = points3D(withinBounds, :);
-    colors = colors(withinBounds, :);
+    % points3D = points3D(withinBounds, :);
+    % colors = colors(withinBounds, :);
+    points3D(~withinBounds, :) = NaN;
+    colors(~withinBounds, :) = NaN;
 
 end

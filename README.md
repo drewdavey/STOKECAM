@@ -2,7 +2,7 @@
 # Last Updated: 2024-02-21
 # Author: Drew Davey
 
-## Stereo Repository
+## STOKECAM Repository
 
 This repository contains scripts for stereo processing.
 

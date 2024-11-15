@@ -8,9 +8,9 @@ addpath('functions/');
 
 %% Inputs
 
+basicFlag = 1;      % basic QC and trim to bbox 
 trimFlag = 1;       % trim to refined polygon
-colorFlag = 0;      % filter by RGB thresholds
-basicFlag = 1;      % basic QC and trim to bbox  
+colorFlag = 1;      % filter by RGB thresholds
 manualFlag = 1;     % manually clean 
 
 bounds = [-10 10 -10 10 0 30];   % [xmin xmax ymin ymax zmin zmax] for trimming points (meters)
@@ -49,6 +49,11 @@ while cleanFlag
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%% Apply QA/QC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    if basicFlag && ~data.clean
+        % Trim to bounds
+        [data.points3D, data.colors] = trimBounds(data.points3D, data.colors, data.bounds); 
+    end
+
     if colorFlag && ~data.clean
         % Trim via color thresholds
         [data.points3D, data.colors] = colorThresh(data.points3D, data.colors, data.colors_orig);
@@ -57,11 +62,6 @@ while cleanFlag
     if trimFlag && ~data.clean
         % Trim to polygon
         [data.points3D, data.colors] = refinedTrim(data.points3D, data.colors, data.colors_orig);
-    end
-
-    if basicFlag && ~data.clean
-        % Trim to bounds
-        [data.points3D, data.colors] = trimBounds(data.points3D, data.colors, data.bounds); 
     end
 
     if manualFlag
@@ -77,7 +77,7 @@ while cleanFlag
     data.colors = data.colors(validRows, :);  % Keep corresponding color rows
     % Write updated point cloud
     data.ptCloud = pointCloud(data.points3D, 'Color', data.colors);
-    % MATLAB denoise function
+    % MATLAB denoise ptCloud
     data.ptCloud = pcdenoise(data.ptCloud);
 
     answer = questdlg('Save changes?', ...
