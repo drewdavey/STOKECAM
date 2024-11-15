@@ -30,7 +30,7 @@ while time.time() - start_time < duration:
     reg = s.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates()
     print(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}"+ '\n')
 
-    print(f" {gps.num_sats}, {gps.time}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
+    print(f" {gps.num_sats}, {gps.time.utc}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
 
