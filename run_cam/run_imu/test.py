@@ -44,7 +44,7 @@ while time.time() - start_time < duration:
     nd = ez.next_data()
     print(cd.time_utc)
     print(f"Next: {nd.time_utc}" + '\n')
-    print(nd.time_utc)
+    print(nd.pressure)
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
