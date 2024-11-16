@@ -29,7 +29,7 @@ from vectornav.Plugins import SimpleLogger
 
 def main(argv):
 
-    sensorComPort = argv[0] if len(argv) == 1 else "COM30"
+    sensorComPort = argv[0] if len(argv) == 1 else "'/dev/ttyUSB0'"
     filePath = argv[1] if len(argv) == 2 else "log.bin"
     
     vs = Sensor()
