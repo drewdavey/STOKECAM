@@ -17,6 +17,8 @@ s.connect('/dev/ttyUSB0', 115200)
 
 print(dir(s))# cd = CompositeData()
 
+pack = s.Packet
+print(pack.datstr)
 
 # Record the start time
 # start_time = time.time()
