@@ -15,7 +15,7 @@ from vnpy import *
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
 
-print(dir(s))# cd = CompositeData()
+# print(dir(s))# cd = CompositeData()
 
 pack = Packet()
 print(pack.datastr)
