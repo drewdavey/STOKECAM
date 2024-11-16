@@ -8,17 +8,17 @@ import sys
 import time
 
 # Import vnpy library
-from vnpy import *
+# from vnpy import *
+from vectornav import *
+# from vectornav import Sensor, ByteBuffer, Registers
+# from vectornav.Plugins import SimpleLogger
 
 # Create sensor object and connect to the VN-200 
 # at the baud rate of 115200 (115,200 bytes/s)
-# s = VnSensor()
-# s.connect('/dev/ttyUSB0', 115200)
-ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-s = ez.sensor
-s.write_async_data_output_frequency(40)
-
- # print(dir(s))
+s = Sensor()
+s.connect('/dev/ttyUSB0', 115200)
+if not s.verifySensorConnectivity():
+    raise Exception("Wrong baud rate or incorrect port")
 
 # Record the start time
 start_time = time.time()
@@ -40,11 +40,16 @@ while time.time() - start_time < duration:
     # print(f"Time: {cd.time_utc}" + '\n')
     # print(f"position_gps_lla: {cd.position_gps_lla}" + '\n')
 
-    cd = ez.current_data
-    nd = ez.next_data()
-    print(cd.time_utc)
-    print(f"Next: {nd.time_utc}" + '\n')
-    print(nd.pressure)
+    # cd = ez.current_data
+    # nd = ez.next_data()
+    # print(cd.time_utc)
+    # print(f"Next: {nd.time_utc}" + '\n')
+    # print(nd.pressure)
+
+    modelRegister = Registers.Model()
+
+    s.readRegister(modelRegister)
+    print(f"Sensor Model Number: {modelRegister.model}")
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
