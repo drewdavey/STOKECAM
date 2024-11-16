@@ -17,7 +17,7 @@ s.connect('/dev/ttyUSB0', 115200)
 
 # print(dir(s))# cd = CompositeData()
 
-pack = Packet()
+pack = vnpy.Packet()
 print(pack.datastr)
 
 # Record the start time
