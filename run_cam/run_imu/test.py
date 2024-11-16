@@ -15,7 +15,7 @@ from vnpy import *
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
 
-dir(s)# cd = CompositeData()
+print(dir(s))# cd = CompositeData()
 
 
 # Record the start time
