@@ -18,17 +18,17 @@ def setup_logging():
         header_block = """
 ########################################################################################################################
 #                                                                                                                      #
-#                               *****      *******      ****      *    *     *******                                   #
-#                              *              *        *    *     *  *       *                                         #
-#                               *****         *        *    *     * *        ****                                      #
-#                                    *        *        *    *     *  *       *                                         #    
-#                               *****         *         ****      *    *     *******                                   #   
+#            *****      *******      ****      *    *     *******       ******         *             *   *             # 
+#           *              *        *    *     *  *       *            *              * *           * * * *            #
+#            *****         *        *    *     * *        ****        *              *****         *   *   *           #
+#                 *        *        *    *     *  *       *            *            *     *       *         *          #
+#            *****         *         ****      *    *     *******       ******     *       *     *           *         #   
 #                                                                                                                      #
 ########################################################################################################################
-                                # STereo camera system for Overturning wave KinEmatics #
-                                #   Developed at Scripps Institution of Oceanography   #
-                                #             Date: {}                #
-                                ########################################################
+                    # STereo camera system for Overturning wave KinEmatiCs and dynAMics #
+                    #          Developed at Scripps Institution of Oceanography         #
+                    #                       Date: {}                                    #
+                    #####################################################################
 """.format(datetime.now(timezone.utc).strftime('%Y-%m-%d-%H-%M-%S'))
         with open(fname_log, 'w') as log:
             tstr = datetime.now(timezone.utc).strftime('%Y-%m-%d')
