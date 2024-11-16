@@ -16,7 +16,7 @@ from vnpy import *
 # s.connect('/dev/ttyUSB0', 115200)
 ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
 s = ez.sensor
-s.write_async_data_output_frequency(10)
+s.write_async_data_output_frequency(40)
 
  # print(dir(s))
 
