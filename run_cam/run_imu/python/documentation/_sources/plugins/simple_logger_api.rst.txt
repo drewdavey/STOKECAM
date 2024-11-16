@@ -1,0 +1,19 @@
+SimpleLogger API
+################
+
+SimpleLogger
+============
+
+.. py:class:: vectornav.Plugins.SimpleLogger(byteBuffer: ByteBuffer, filePath: str)
+
+    .. py:method:: start
+
+        Starts a backgroud thread to log data to the specified file
+
+    .. py:method:: stop
+
+        Stops the logging thread and closes the file
+    
+    .. py:method:: isLogging
+
+        Checks if the logger is actively logging

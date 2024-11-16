@@ -1,0 +1,17 @@
+.. _exhale_class_class_v_n_s_d_k_1_1_file_exporter:
+
+Class FileExporter
+==================
+
+- Defined in :ref:`file_documentation__DataExport_CLI_Exporter.hpp`
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: VNSDK::FileExporter
+   :project: VectorNav SDK
+   :members:
+   :protected-members:
+   :undoc-members:

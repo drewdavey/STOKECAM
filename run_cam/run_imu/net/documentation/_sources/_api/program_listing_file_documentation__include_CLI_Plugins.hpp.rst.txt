@@ -1,0 +1,21 @@
+
+.. _program_listing_file_documentation__include_CLI_Plugins.hpp:
+
+Program Listing for File CLI_Plugins.hpp
+========================================
+
+|exhale_lsh| :ref:`Return to documentation for file <file_documentation__include_CLI_Plugins.hpp>` (``documentation\_include\CLI_Plugins.hpp``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+.. code-block:: cpp
+
+   #ifndef __CLI_PLUGINS_HPP__
+   #define __CLI_PLUGINS_HPP__
+   
+   #include "CLI_Exporter.hpp"
+   #include "CLI_FirmwareUpdate.hpp"
+   #include "CLI_RegisterScan.hpp"
+   #include "CLI_SimpleLogger.hpp"
+   
+   #endif // __CLI_PLUGINS_HPP__
