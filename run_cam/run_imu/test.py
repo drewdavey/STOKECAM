@@ -14,8 +14,8 @@ from vnpy import *
 # at the baud rate of 115200 (115,200 bytes/s)
 s = VnSensor()
 s.connect('/dev/ttyUSB0', 115200)
-s.start()
-# cd = CompositeData()
+
+dir(s)# cd = CompositeData()
 
 
 # Record the start time
