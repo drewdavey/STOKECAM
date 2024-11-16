@@ -1,9 +1,8 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-11-13
+% Last updated: 2024-11-15
 
 function [points3D, colors] = colorThresh(points3D, colors, colors_tmp)
-
 
         % Load image
         figure; imshow(colors_tmp); 

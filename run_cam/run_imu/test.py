@@ -41,7 +41,9 @@ while time.time() - start_time < duration:
     # print(f"position_gps_lla: {cd.position_gps_lla}" + '\n')
 
     cd = ez.current_data
+    nd = ez.next_data()
     print(cd.time_utc)
+    print(nd)
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
