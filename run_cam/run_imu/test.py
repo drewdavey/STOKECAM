@@ -43,7 +43,8 @@ while time.time() - start_time < duration:
     cd = ez.current_data
     nd = ez.next_data()
     print(cd.time_utc)
-    print(nd)
+    print(dir(nd))
+    print(nd.time_utc)
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
