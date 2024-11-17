@@ -12,7 +12,7 @@ import time
 import vectornav
 from vectornav import *
 from vectornav.Plugins import SimpleLogger
-from vectornav import Sensor, ByteBuffer, Registers, ExporterCsv
+from vectornav import Sensor, ByteBuffer, Registers
 
 # Create sensor object and connect to the VN-200 
 # at the baud rate of 115200 (115,200 bytes/s)
@@ -35,27 +35,26 @@ if not s.verifySensorConnectivity():
 start_time = time.time()
 duration = 10  # seconds
 
-# filePath = "log.bin"
-# # Set up resources needed for data logging
-# bufferToLog = ByteBuffer(8192)
-# logger = SimpleLogger(bufferToLog, filePath)
-# # Register the logger's input buffer to receive all bytes from the sensor
-# s.registerReceivedByteBuffer(bufferToLog)
-# if (logger.start()):
-#     print("Error: Failed to write to file")
-# print(f"Logging to {filePath}")
+filePath = "log.bin"
+# Set up resources needed for data logging
+bufferToLog = ByteBuffer(8192)
+logger = SimpleLogger(bufferToLog, filePath)
+# Register the logger's input buffer to receive all bytes from the sensor
+s.registerReceivedByteBuffer(bufferToLog)
+if (logger.start()):
+    print("Error: Failed to write to file")
+print(f"Logging to {filePath}")
 
-vs = Sensor()
-csvExporter = ExporterCsv('.', True) # exporting with system timestamps
-# subscribe to binary VectorNav ascii packets
-vs.subscribeToMessage(
-        csvExporter.getQueuePtr(),
-        "VN",
-        vectornav.AsciiPacketDispatcher.SubscriberFilterType.StartsWith
-)
-vs.autoConnect('/dev/ttyUSB0')
-
-csvExporter.start()
+# vs = Sensor()
+# csvExporter = ExporterCsv('.', True) # exporting with system timestamps
+# # subscribe to binary VectorNav ascii packets
+# vs.subscribeToMessage(
+#         csvExporter.getQueuePtr(),
+#         "VN",
+#         vectornav.AsciiPacketDispatcher.SubscriberFilterType.StartsWith
+# )
+# vs.autoConnect('/dev/ttyUSB0')
+# csvExporter.start()
 
 
 while time.time() - start_time < duration:
@@ -83,25 +82,26 @@ while time.time() - start_time < duration:
     # gps = s.readRegister(gnss)
     # print(gps)
 
-    # cd = s.getNextMeasurement()
+    cd = s.getMostRecentMeasurement()
     # if not cd: continue
     # # if cd.matchesMessage("VNINS"):
-    # accel = cd.imu.accel
-    # print(f"Accel: {accel}")
-    # ypr = cd.attitude.ypr
-    # print(f"YPR: {ypr}")
+    print(f"Accel: {cd.imu.accel}"+ '\n')
+    print(f"YPR: {cd.attitude.ypr}"+ '\n')
+    print(f"Time: {cd.time.timeUtc}" + '\n')
+    print(f"Unc: {cd.gnss.gnss1PosUncertainty}" + '\n')
+    
 
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
 
-csvExporter.stop()
-# logger.stop()
+# csvExporter.stop()
+logger.stop()
 
-# s.deregisterReceivedByteBuffer()
+s.deregisterReceivedByteBuffer()
 
-# # Disconnect from the sensor
-# s.disconnect()
+# Disconnect from the sensor
+s.disconnect()
 
 
 # s.write_async_data_output_frequency(10)
