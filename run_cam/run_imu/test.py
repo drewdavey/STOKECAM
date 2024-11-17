@@ -10,7 +10,7 @@ import time
 # Import vnpy library
 # from vnpy import *
 from vectornav import *
-from vectornav.Plugins import SimpleLogger
+from vectornav.Plugins import SimpleLogger, ExporterCsv
 # from vectornav import Sensor, ByteBuffer, Registers
 
 # Create sensor object and connect to the VN-200 
@@ -20,35 +20,41 @@ s.connect('/dev/ttyUSB0', 115200)
 if not s.verifySensorConnectivity():
     raise Exception("Wrong baud rate or incorrect port")
 
-# Create register object
-asyncDataOutputFreq = Registers.AsyncOutputFreq()
-gnss = Registers.GnssSolLla()
-
-# Set Output Frequency as 10Hz on Serial Port 1
-asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
-asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
-
-# Write the frequency
-s.writeRegister(asyncDataOutputFreq)
+# # Create register object
+# asyncDataOutputFreq = Registers.AsyncOutputFreq()
+# gnss = Registers.GnssSolLla()
+# # Set Output Frequency as 10Hz on Serial Port 1
+# asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
+# asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+# # Write the frequency
+# s.writeRegister(asyncDataOutputFreq)
 
 
 # Record the start time
 start_time = time.time()
-duration = 30  # seconds
+duration = 10  # seconds
 
-filePath = "log.bin"
+# filePath = "log.bin"
+# # Set up resources needed for data logging
+# bufferToLog = ByteBuffer(8192)
+# logger = SimpleLogger(bufferToLog, filePath)
+# # Register the logger's input buffer to receive all bytes from the sensor
+# s.registerReceivedByteBuffer(bufferToLog)
+# if (logger.start()):
+#     print("Error: Failed to write to file")
+# print(f"Logging to {filePath}")
 
-# Set up resources needed for data logging
-bufferToLog = ByteBuffer(8192)
-logger = SimpleLogger(bufferToLog, filePath)
+vs = Sensor()
+csvExporter = ExporterCsv('.', True) # exporting with system timestamps
+# subscribe to binary VectorNav ascii packets
+vs.subscribeToMessage(
+        csvExporter.getQueuePtr(),
+        "VN",
+        vectornav.AsciiPacketDispatcher.SubscriberFilterType.StartsWith
+)
+vs.autoConnect('/dev/ttyUSB0')
 
-# Register the logger's input buffer to receive all bytes from the sensor
-s.registerReceivedByteBuffer(bufferToLog)
-
-if (logger.start()):
-    print("Error: Failed to write to file")
-
-print(f"Logging to {filePath}")
+csvExporter.start()
 
 
 while time.time() - start_time < duration:
@@ -73,34 +79,28 @@ while time.time() - start_time < duration:
     # print(f"Next: {nd.time_utc}" + '\n')
     # print(nd.pressure)
 
-    gps = s.readRegister(gnss)
-    print(gps)
+    # gps = s.readRegister(gnss)
+    # print(gps)
 
-    cd = s.getNextMeasurement()
-    if not cd: continue
-
-    # if cd.matchesMessage("VNINS"):
-    # t = cd.time.timeUtc
-    # t = s.TimeUtc
-    # print(f"Time: {t}")
-    # print(f"Time: {cd.time.timeStartup}")
-
-    accel = cd.imu.accel
-    print(f"Accel: {accel}")
-    ypr = cd.attitude.ypr
-    print(f"YPR: {ypr}")
+    # cd = s.getNextMeasurement()
+    # if not cd: continue
+    # # if cd.matchesMessage("VNINS"):
+    # accel = cd.imu.accel
+    # print(f"Accel: {accel}")
+    # ypr = cd.attitude.ypr
+    # print(f"YPR: {ypr}")
 
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
 
+csvExporter.stop()
+# logger.stop()
 
-logger.stop()
+# s.deregisterReceivedByteBuffer()
 
-s.deregisterReceivedByteBuffer()
-
-# Disconnect from the sensor
-s.disconnect()
+# # Disconnect from the sensor
+# s.disconnect()
 
 
 # s.write_async_data_output_frequency(10)
