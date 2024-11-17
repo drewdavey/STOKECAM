@@ -24,11 +24,11 @@ if not s.verifySensorConnectivity():
 start_time = time.time()
 duration = 30  # seconds
 
-filepath = "log.bin"
+filePath = "log.bin"
 
 # Set up resources needed for data logging
 bufferToLog = ByteBuffer(8192)
-logger = SimpleLogger(bufferToLog, filepath)
+logger = SimpleLogger(bufferToLog, filePath)
 
 # Register the logger's input buffer to receive all bytes from the sensor
 s.registerReceivedByteBuffer(bufferToLog);
