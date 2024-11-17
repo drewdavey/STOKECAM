@@ -80,6 +80,8 @@ while time.time() - start_time < duration:
     if not cd: continue
 
     # if cd.matchesMessage("VNINS"):
+    t = cd.timeUtc
+    print(f"Time: {t}")
     ypr = cd.attitude.ypr
     print(f"YPR: {ypr}")
 
