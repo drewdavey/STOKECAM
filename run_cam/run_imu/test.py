@@ -83,7 +83,10 @@ while time.time() - start_time < duration:
     # t = cd.time.timeUtc
     # t = s.TimeUtc
     # print(f"Time: {t}")
-    print(f"Time: {cd.time.timeStartup}")
+    # print(f"Time: {cd.time.timeStartup}")
+
+    accel = cd.imu.accel
+    print(f"Accel: {accel}")
     ypr = cd.attitude.ypr
     print(f"YPR: {ypr}")
 
