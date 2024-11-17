@@ -24,6 +24,21 @@ if not s.verifySensorConnectivity():
 start_time = time.time()
 duration = 30  # seconds
 
+filepath = "log.bin"
+
+# Set up resources needed for data logging
+bufferToLog = ByteBuffer(8192)
+logger = SimpleLogger(bufferToLog, filepath)
+
+# Register the logger's input buffer to receive all bytes from the sensor
+s.registerReceivedByteBuffer(bufferToLog);
+
+if (logger.start()):
+    print("Error: Failed to write to file")
+
+print(f"Logging to {filePath}")
+
+
 while time.time() - start_time < duration:
     # # Read yaw, pitch, and roll values
     # ypr = s.read_yaw_pitch_roll()
@@ -53,6 +68,11 @@ while time.time() - start_time < duration:
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
+
+
+logger.stop()
+
+s.deregisterReceivedByteBuffer()
 
 # Disconnect from the sensor
 s.disconnect()
