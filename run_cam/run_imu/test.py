@@ -11,7 +11,7 @@ import time
 # from vnpy import *
 from vectornav import *
 # from vectornav import Sensor, ByteBuffer, Registers
-# from vectornav.Plugins import SimpleLogger
+from vectornav.Plugins import SimpleLogger
 
 # Create sensor object and connect to the VN-200 
 # at the baud rate of 115200 (115,200 bytes/s)
