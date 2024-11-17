@@ -9,6 +9,7 @@ import time
 
 # Import vnpy library
 # from vnpy import *
+import vectornav
 from vectornav import *
 from vectornav.Plugins import SimpleLogger, ExporterCsv
 # from vectornav import Sensor, ByteBuffer, Registers
