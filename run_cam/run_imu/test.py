@@ -83,7 +83,7 @@ while time.time() - start_time < duration:
     # print(gps)
 
     cd = s.getMostRecentMeasurement()
-    # if not cd: continue
+    if not cd: continue
     # # if cd.matchesMessage("VNINS"):
     print(f"Accel: {cd.imu.accel}"+ '\n')
     print(f"YPR: {cd.attitude.ypr}"+ '\n')
