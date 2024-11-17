@@ -1,0 +1,17 @@
+
+RegisterScan API
+################
+
+RegisterScan
+============
+
+.. py:class:: vectornav.Plugins.RegisterScan(sensor: Sensor, port: str)
+
+    .. py:method:: SaveConfiguration(fileLocation: str)
+
+        Save the current configuration on the sensor to fileLocation
+
+    .. py:method:: LoadConfiguration(fileLocation: str)
+
+        Load the configuration from fileLocation onto the sensor
+

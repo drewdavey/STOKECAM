@@ -1,0 +1,60 @@
+
+.. _file_documentation__RegisterScan_CLI_RegisterScan.hpp:
+
+File CLI_RegisterScan.hpp
+=========================
+
+|exhale_lsh| :ref:`Parent directory <dir_documentation__RegisterScan>` (``documentation\_RegisterScan``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+
+.. contents:: Contents
+   :local:
+   :backlinks: none
+
+Definition (``documentation\_RegisterScan\CLI_RegisterScan.hpp``)
+-----------------------------------------------------------------
+
+
+.. toctree::
+   :maxdepth: 1
+
+   program_listing_file_documentation__RegisterScan_CLI_RegisterScan.hpp.rst
+
+
+
+
+
+Includes
+--------
+
+
+- ``CLI_Sensor.hpp`` (:ref:`file_documentation__include_CLI_Sensor.hpp`)
+
+- ``RegisterScan.hpp`` (:ref:`file_documentation__RegisterScan_CLI_RegisterScan.hpp`)
+
+
+
+Included By
+-----------
+
+
+- :ref:`file_documentation__include_CLI_Plugins.hpp`
+
+
+
+
+Namespaces
+----------
+
+
+- :ref:`namespace_VNSDK`
+
+
+Classes
+-------
+
+
+- :ref:`exhale_class_class_v_n_s_d_k_1_1_sensor_configurator`
+

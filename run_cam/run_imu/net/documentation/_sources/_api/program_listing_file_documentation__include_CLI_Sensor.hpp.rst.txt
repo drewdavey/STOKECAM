@@ -1,0 +1,144 @@
+
+.. _program_listing_file_documentation__include_CLI_Sensor.hpp:
+
+Program Listing for File CLI_Sensor.hpp
+=======================================
+
+|exhale_lsh| :ref:`Return to documentation for file <file_documentation__include_CLI_Sensor.hpp>` (``documentation\_include\CLI_Sensor.hpp``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+.. code-block:: cpp
+
+   #ifndef __CLI_SENSOR_HPP__
+   #define __CLI_SENSOR_HPP__
+   
+   #include "CLI_CompositeData.hpp"
+   #include "CLI_Registers.hpp"
+   #include "CLI_ByteBuffer.hpp"
+   
+   #pragma managed(push, off)
+   #include "TemplateLibrary/ByteBuffer.hpp"
+   #include "Interface/Sensor.hpp"
+   #pragma managed(pop)
+   
+   using namespace System;
+   
+   namespace VNSDK
+   {
+   
+      class Exporter;
+   
+    class VnException : public Exception
+   {
+   public:
+       VnException(VN::Error error) : Exception(gcnew String(VN::errorCodeToString(error)))
+       {
+       }
+   };
+   
+    class Sensor
+   {
+   private:
+       VN::Sensor * _sensor;
+   
+   public:
+       using BaudRate = Registers::System::BaudRate::BaudRates;
+       Sensor()
+       {
+           _sensor = new VN::Sensor();
+       }
+       
+       ~Sensor()
+       {
+           delete _sensor;
+       }
+   
+   
+       VN::Sensor &GetNativeInstance()
+       {
+           return *_sensor;
+       };
+   
+       // ------------------------------------------ //@{
+       // ------------------------------------------
+   
+       void Connect(String * portName, UInt32 baudRate);
+   
+       void AutoConnect(String * portName);
+   
+       bool VerifySensorConnectivity();
+   
+       String * ConnectedPortName();
+   
+       uint32_t ConnectedBaudRate();
+   
+       void ChangeBaudRate(UInt32 baudRate);
+   
+       void ChangeHostBaudRate(UInt32 baudRate);
+   
+       void Disconnect();
+   
+       // ------------------------------------------ //@{
+       // ------------------------------------------
+   
+       bool HasMeasurement();
+   
+       Nullable<CompositeData> GetNextMeasurement();
+   
+       Nullable<CompositeData> GetMostRecentMeasurement();
+   
+       // ------------------------------------------ //@{
+       // ------------------------------------------
+   
+       void ReadRegister(Registers::Register * reg);
+   
+       void WriteRegister(Registers::Register * reg);
+   
+       void WriteSettings();
+   
+       void Reset();
+   
+       void RestoreFactorySettings();
+   
+       void KnownMagneticDisturbance(uint8_t state);
+   
+       void KnownAccelerationDisturbance(uint8_t state);
+   
+       void SetInitialHeading(float heading);
+       void SetInitialHeading(Ypr ypr);
+       void SetInitialHeading(Quaternion quat);
+   
+       void AsyncOutputEnable(uint8_t state);
+   
+       void SetFilterBias();
+   
+       // SetBootloader(const SetBootLoader::Processor processorId);  // Unnecessary for CLI.
+   
+       // void SendCommand(String* commandToSend);
+       // void SendCommand(Commands::Command& commandToSend);
+   
+       void SerialSend(String * msgToSend);
+       // ------------------------------------------
+       // Additional logging
+       // ------------------------------------------
+   
+       void RegisterReceivedByteBuffer(ByteBuffer* buffer);
+       void DeregisterReceivedByteBuffer();
+       void RegisterSkippedByteBuffer(ByteBuffer* buffer);
+       void DeregisterSkippedByteBuffer();
+   
+       void RegisterDataExporter(Exporter* exporter);
+       void DeregisterDataExporter(Exporter* exporter);
+   
+       // ------------------------------------------
+       // Unthreaded Packet Processing
+       // ------------------------------------------
+   
+   
+   }; //  class Sensor
+   } // namespace VNSDK
+   
+   #include "CLI_Plugins.hpp"
+   
+   #endif // __CLI_SENSOR_HPP__
