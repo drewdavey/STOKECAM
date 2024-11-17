@@ -64,9 +64,9 @@ while time.time() - start_time < duration:
     cd = s.getNextMeasurement()
     if not cd: continue
 
-    if cd.matchesMessage("VNINS"):
-        ypr = cd.attitude.ypr
-        print(f"YPR: {ypr}")
+    # if cd.matchesMessage("VNINS"):
+    ypr = cd.attitude.ypr
+    print(f"YPR: {ypr}")
 
 
     # Pause for a short time to avoid flooding the command window
