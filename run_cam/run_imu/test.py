@@ -20,7 +20,7 @@ s = Sensor()
 s.connect('/dev/ttyUSB0', 115200)
 if not s.verifySensorConnectivity():
     raise Exception("Wrong baud rate or incorrect port")
-v
+
 # # Create register object
 # asyncDataOutputFreq = Registers.AsyncOutputFreq()
 # gnss = Registers.GnssSolLla()
