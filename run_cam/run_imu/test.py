@@ -22,7 +22,7 @@ if not s.verifySensorConnectivity():
 
 # Create register object
 asyncDataOutputFreq = Registers.AsyncOutputFreq()
-gnss = s.Registers.GNSS.GnssSolLla
+gnss = Registers.GnssSolLla()
 
 # Set Output Frequency as 10Hz on Serial Port 1
 asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
