@@ -31,7 +31,7 @@ bufferToLog = ByteBuffer(8192)
 logger = SimpleLogger(bufferToLog, filePath)
 
 # Register the logger's input buffer to receive all bytes from the sensor
-s.registerReceivedByteBuffer(bufferToLog);
+s.registerReceivedByteBuffer(bufferToLog)
 
 if (logger.start()):
     print("Error: Failed to write to file")
@@ -61,10 +61,13 @@ while time.time() - start_time < duration:
     # print(f"Next: {nd.time_utc}" + '\n')
     # print(nd.pressure)
 
-    modelRegister = Registers.Model()
+    cd = s.getNextMeasurement()
+    if not cd: continue
 
-    s.readRegister(modelRegister)
-    print(f"Sensor Model Number: {modelRegister.model}")
+    if cd.matchesMessage("VNINS"):
+        ypr = cd.attitude.ypr
+        print(f"YPR: {ypr}")
+
 
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
