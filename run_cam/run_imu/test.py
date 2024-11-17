@@ -10,8 +10,8 @@ import time
 # Import vnpy library
 # from vnpy import *
 from vectornav import *
-# from vectornav import Sensor, ByteBuffer, Registers
 from vectornav.Plugins import SimpleLogger
+# from vectornav import Sensor, ByteBuffer, Registers
 
 # Create sensor object and connect to the VN-200 
 # at the baud rate of 115200 (115,200 bytes/s)
@@ -19,6 +19,18 @@ s = Sensor()
 s.connect('/dev/ttyUSB0', 115200)
 if not s.verifySensorConnectivity():
     raise Exception("Wrong baud rate or incorrect port")
+
+# Create register object
+asyncDataOutputFreq = Registers.AsyncOutputFreq()
+gnss = Registers.GNSS.GnssSolLla
+
+# Set Output Frequency as 10Hz on Serial Port 1
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
+asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+
+# Write the frequency
+s.writeRegister(asyncDataOutputFreq)
+
 
 # Record the start time
 start_time = time.time()
@@ -60,6 +72,9 @@ while time.time() - start_time < duration:
     # print(cd.time_utc)
     # print(f"Next: {nd.time_utc}" + '\n')
     # print(nd.pressure)
+
+    gps = s.readRegister(gnss)
+    print(gps)
 
     cd = s.getNextMeasurement()
     if not cd: continue
