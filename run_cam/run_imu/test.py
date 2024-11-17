@@ -35,7 +35,7 @@ if not s.verifySensorConnectivity():
 start_time = time.time()
 duration = 10  # seconds
 
-filePath = "log.bin"
+filePath = "log.txt"
 # Set up resources needed for data logging
 bufferToLog = ByteBuffer(8192)
 logger = SimpleLogger(bufferToLog, filePath)
