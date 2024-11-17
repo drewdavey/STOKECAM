@@ -21,14 +21,15 @@ s.connect('/dev/ttyUSB0', 115200)
 if not s.verifySensorConnectivity():
     raise Exception("Wrong baud rate or incorrect port")
 
-# # Create register object
-# asyncDataOutputFreq = Registers.AsyncOutputFreq()
-# gnss = Registers.GnssSolLla()
-# # Set Output Frequency as 10Hz on Serial Port 1
-# asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
-# asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
-# # Write the frequency
-# s.writeRegister(asyncDataOutputFreq)
+# Create register object
+asyncDataOutputFreq = Registers.AsyncOutputFreq()
+gnss = Registers.GnssSolLla()
+
+# Set Output Frequency as 10Hz on Serial Port 1
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
+asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+# Write the frequency
+s.writeRegister(asyncDataOutputFreq)
 
 
 # Record the start time
@@ -84,7 +85,9 @@ while time.time() - start_time < duration:
 
     cd = s.getMostRecentMeasurement()
     if not cd: continue
-    # # if cd.matchesMessage("VNINS"):
+
+    # if cd.matchesMessage("VNINS"):
+
     print(f"Accel: {cd.imu.accel}"+ '\n')
     print(f"YPR: {cd.attitude.ypr}"+ '\n')
     print(f"Time: {cd.time.timeUtc}" + '\n')
