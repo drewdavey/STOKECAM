@@ -81,8 +81,11 @@ while time.time() - start_time < duration:
     # gps = s.readRegister(gnss)
     # print(gps)
     gnss = Registers.GnssSolLla()
-    print(f"GNSS: {gnss}"+ '\n')
-
+    print("GNSS Information:")
+    for attr in dir(gnss):
+        if not attr.startswith("_"):  # Skip private or built-in attributes
+            value = getattr(gnss, attr)
+            print(f"{attr}: {value}")
 
     cd = s.getMostRecentMeasurement()
     if not cd: continue
