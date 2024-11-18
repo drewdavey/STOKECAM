@@ -32,7 +32,7 @@ s.writeRegister(asyncDataOutputFreq)
 
 # Record the start time
 start_time = time.time()
-duration = 10  # seconds
+duration = 600  # seconds
 
 filePath = "log.txt"
 # Set up resources needed for data logging
@@ -77,8 +77,8 @@ while time.time() - start_time < duration:
 
     # gps = s.readRegister(gnss)
     # print(gps)
-    # gnss = Registers.GnssSolLla()
-    gnss = Registers.gnss()
+    gnss = Registers.GnssSolLla()
+    # gnss = Registers.gnss()
     print("GNSS Information:")
     for attr in dir(gnss):
         if not attr.startswith("_"):  # Skip private or built-in attributes
