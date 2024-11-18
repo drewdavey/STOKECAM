@@ -58,8 +58,8 @@ print(f"Logging to {filePath}")
 
 while time.time() - start_time < duration:
     # Read yaw, pitch, and roll values
-    ypr = s.read_yaw_pitch_roll()
-    print(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}"+ '\n')
+    # ypr = s.read_yaw_pitch_roll()
+    # print(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}"+ '\n')
 
     gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
 
