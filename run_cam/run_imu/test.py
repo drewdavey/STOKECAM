@@ -78,7 +78,7 @@ while time.time() - start_time < duration:
     # gps = s.readRegister(gnss)
     # print(gps)
     # gnss = Registers.GnssSolLla()
-    gnss = Registers.GNSS.GnssSolLla
+    gnss = Registers.gnss()
     print("GNSS Information:")
     for attr in dir(gnss):
         if not attr.startswith("_"):  # Skip private or built-in attributes
