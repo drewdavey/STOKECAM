@@ -23,9 +23,7 @@ if not s.verifySensorConnectivity():
 
 # Create register object
 asyncDataOutputFreq = Registers.AsyncOutputFreq()
-gnss = Registers.GnssSolLla()
-
-# Set Output Frequency as 10Hz on Serial Port 1
+# Set Output Frequency as 40Hz on Serial Port 1
 asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
 asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
 # Write the frequency
@@ -80,8 +78,11 @@ while time.time() - start_time < duration:
     # print(f"Next: {nd.time_utc}" + '\n')
     # print(nd.pressure)
 
-    # gps = s.readRegister(gnss)
-    # print(gps)
+    gps = s.readRegister(gnss)
+    print(gps)
+    gnss = Registers.GNSS.GnssSolLla()
+
+
 
     cd = s.getMostRecentMeasurement()
     if not cd: continue
@@ -91,7 +92,8 @@ while time.time() - start_time < duration:
     print(f"Accel: {cd.imu.accel}"+ '\n')
     print(f"YPR: {cd.attitude.ypr}"+ '\n')
     print(f"Time: {cd.time.timeUtc}" + '\n')
-    print(f"Unc: {cd.gnss.gnss1PosUncertainty}" + '\n')
+    print(f"GNSS Time: {cd.gnss.gnss1TimeUtc}" + '\n')
+    print(f"Uncertainty: {cd.gnss.gnss1PosUncertainty}" + '\n')
     
 
 
