@@ -27,8 +27,10 @@ function [points3D, colors] = refinedTrim(points3D, colors, colors_tmp)
     inPolygon = inpolygon(X, Y, polygonVertices(:, 1), polygonVertices(:, 2));
 
     % Filter points3D and colors based on the polygon mask
-    points3D = points3D(inPolygon, :);
-    colors = colors(inPolygon, :);
+    % points3D = points3D(inPolygon, :);
+    % colors = colors(inPolygon, :);
+    points3D(~inPolygon, :) = NaN;
+    colors(~inPolygon, :) = NaN;
 
     % Close the figure
     close(gcf);
