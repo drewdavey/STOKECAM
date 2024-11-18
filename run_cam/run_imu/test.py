@@ -29,7 +29,6 @@ asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
 # Write the frequency
 s.writeRegister(asyncDataOutputFreq)
 
-
 # Record the start time
 start_time = time.time()
 duration = 600  # seconds
