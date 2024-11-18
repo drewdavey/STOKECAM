@@ -80,7 +80,7 @@ while time.time() - start_time < duration:
 
     # gps = s.readRegister(gnss)
     # print(gps)
-    gnss = Registers.GNSS.GnssSolLla()
+    gnss = Registers.GnssSolLla()
     print(f"GNSS: {gnss}"+ '\n')
 
 
