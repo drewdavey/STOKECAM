@@ -60,14 +60,11 @@ while time.time() - start_time < duration:
     # Read yaw, pitch, and roll values
     # ypr = s.read_yaw_pitch_roll()
     # print(f"Yaw: {ypr.x}, Pitch: {ypr.y}, Roll: {ypr.z}"+ '\n')
+    # gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
+    # print(f" {gps.num_sats}, {gps.time}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
+    # reg = s.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates()
+    # print(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}"+ '\n')
 
-    gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
-
-    reg = s.read_yaw_pitch_roll_magnetic_acceleration_and_angular_rates()
-    print(f"Acc_X: {reg.accel.x}, Acc_Y: {reg.accel.y}, Acc_Z: {reg.accel.z}"+ '\n')
-
-    print(f" {gps.num_sats}, {gps.time}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
-   
     # cd = CompositeData()
     # print(f"Time: {cd.time_utc}" + '\n')
     # print(f"position_gps_lla: {cd.position_gps_lla}" + '\n')
@@ -80,11 +77,18 @@ while time.time() - start_time < duration:
 
     # gps = s.readRegister(gnss)
     # print(gps)
+
     gnss = Registers.GnssSolLla()
     print("GNSS Information:")
     for attr in dir(gnss):
         if not attr.startswith("_"):  # Skip private or built-in attributes
             value = getattr(gnss, attr)
+            print(f"{attr}: {value}")
+    ins = Registers.InsSolLla()
+    print("INS Information:")
+    for attr in dir(ins):
+        if not attr.startswith("_"):  # Skip private or built-in attributes
+            value = getattr(ins, attr)
             print(f"{attr}: {value}")
 
     cd = s.getMostRecentMeasurement()
@@ -98,8 +102,6 @@ while time.time() - start_time < duration:
     print(f"GNSS Time: {cd.gnss.gnss1TimeUtc}" + '\n')
     print(f"Uncertainty: {cd.gnss.gnss1PosUncertainty}" + '\n')
     
-
-
     # Pause for a short time to avoid flooding the command window
     time.sleep(0.1)  
 
