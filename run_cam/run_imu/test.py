@@ -78,10 +78,10 @@ while time.time() - start_time < duration:
     # print(f"Next: {nd.time_utc}" + '\n')
     # print(nd.pressure)
 
-    gps = s.readRegister(gnss)
-    print(gps)
+    # gps = s.readRegister(gnss)
+    # print(gps)
     gnss = Registers.GNSS.GnssSolLla()
-
+    print(f"GNSS: {gnss}"+ '\n')
 
 
     cd = s.getMostRecentMeasurement()

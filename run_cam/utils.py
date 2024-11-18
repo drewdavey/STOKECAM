@@ -27,7 +27,7 @@ def setup_logging():
 ########################################################################################################################
                     # STereo camera system for Overturning wave KinEmatiCs and dynAMics #
                     #          Developed at Scripps Institution of Oceanography         #
-                    #                       Date: {}                                    #
+                    #                       Date: {}                    #
                     #####################################################################
 """.format(datetime.now(timezone.utc).strftime('%Y-%m-%d-%H-%M-%S'))
         with open(fname_log, 'w') as log:
