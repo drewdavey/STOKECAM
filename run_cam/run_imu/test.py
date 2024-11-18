@@ -83,12 +83,12 @@ while time.time() - start_time < duration:
         if not attr.startswith("_"):  # Skip private or built-in attributes
             value = getattr(gnss, attr)
             print(f"{attr}: {value}")
-    ins = Registers.InsSolLla()
-    print("INS Information:")
-    for attr in dir(ins):
-        if not attr.startswith("_"):  # Skip private or built-in attributes
-            value = getattr(ins, attr)
-            print(f"{attr}: {value}")
+    # ins = Registers.InsSolLla()
+    # print("INS Information:")
+    # for attr in dir(ins):
+    #     if not attr.startswith("_"):  # Skip private or built-in attributes
+    #         value = getattr(ins, attr)
+    #         print(f"{attr}: {value}")
 
     cd = s.getMostRecentMeasurement()
     if not cd: continue
