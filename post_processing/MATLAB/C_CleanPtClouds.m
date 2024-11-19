@@ -88,8 +88,6 @@ while cleanFlag
             % Save updates
             data.clean = 1;
             save(matFile, 'data', '-append'); 
-        case 'No'
-            return 
     end
 
     answer = questdlg('Clean another point cloud?', ...
