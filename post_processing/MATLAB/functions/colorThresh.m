@@ -70,7 +70,7 @@ function [points3D, colors] = colorThresh(points3D, colors, colors_orig)
     backgroundMeanRGB = mean(backgroundPixels,'omitnan');
     backgroundStdRGB = std(backgroundPixels,'omitnan');
 
-    N = 2; % Multiplier (N std from mean)
+    N = 2; % N std from mean
     
     % Define thresholds based on the combined foreground and background regions
     foregroundThresholds = [foregroundMeanRGB - N * foregroundStdRGB; foregroundMeanRGB + N * foregroundStdRGB];
