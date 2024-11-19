@@ -51,6 +51,8 @@ end
 for m = 1:length(paths)
     path = paths{m};
 
+    WasteMgmtAuto(path); % Run WasteMgmt on path
+
     dir1 = dir([path '/cam1/*.jpg']); % THESE ARE FLIPPED
     dir2 = dir([path '/cam0/*.jpg']); % THESE ARE FLIPPED
     

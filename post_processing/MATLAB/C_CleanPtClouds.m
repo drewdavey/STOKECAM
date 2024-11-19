@@ -19,6 +19,8 @@ bounds = [-10 10 -10 10 0 30];   % [xmin xmax ymin ymax zmin zmax] for trimming 
 
 path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session to clean ptClouds'); % load path to dir to clean ptClouds
 
+WasteMgmtAuto(path); % Run WasteMgmt on path
+
 matDir = [path '/mats'];
 if ~exist(matDir, 'dir')
     disp('No mats/ directory in this session.');
