@@ -58,7 +58,7 @@ while cleanFlag
         % Trim via color thresholds
         [data.points3D, data.colors] = colorThresh(data.points3D, data.colors, data.colors_orig);
     end
-    
+    break
     if trimFlag && ~data.clean
         % Trim to polygon
         [data.points3D, data.colors] = refinedTrim(data.points3D, data.colors, data.colors_orig);

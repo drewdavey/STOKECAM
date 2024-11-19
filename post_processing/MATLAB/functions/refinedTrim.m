@@ -2,9 +2,13 @@
 % Drew Davey
 % Last updated: 2024-11-13
 
-function [points3D, colors] = refinedTrim(points3D, colors, colors_tmp)
+function [points3D, colors] = refinedTrim(points3D, colors, colors_orig)
+
     % Get image dimensions
-    [imgHeight, imgWidth, ~] = size(colors_tmp);    
+    [imgHeight, imgWidth, ~] = size(colors_orig);    
+
+    % Reshape colors back to NxMx3 for viewing
+    colors_tmp = reshape(colors, imgHeight, imgWidth, 3);
 
     % Display the image
     figure; imshow(colors_tmp);
