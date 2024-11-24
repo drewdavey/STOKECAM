@@ -9,7 +9,7 @@ def auto():
     cam = Picamera2()
     config = cam.create_still_configuration()
     config['main']['size'] = (1440, 1080)
-    config['controls']['FrameDurationLimits'] = (100, 100)  
+    config['controls']['FrameDurationLimits'] = (0, 100)  
     cam.close()
     return config
 
@@ -18,7 +18,7 @@ def fast():
     config = cam.create_still_configuration()
     config['main']['size'] = (1440, 1080)
     config['main']['format'] = 'RGB888'
-    config['controls']['FrameDurationLimits'] = (500, 500)  
+    config['controls']['FrameDurationLimits'] = (0, 100)  
     config['controls']['ExposureTime'] = 1000
     cam.close()
     return config
@@ -28,8 +28,8 @@ def max():
     config = cam.create_still_configuration()
     config['main']['size'] = (1440, 1080)
     config['main']['format'] = 'RGB888'
-    config['controls']['FrameDurationLimits'] = (200, 200)  
-    config['controls']['ExposureTime'] = 100
+    config['controls']['FrameDurationLimits'] = (0, 100)  
+    config['controls']['ExposureTime'] = 500
     cam.close()
     return config
 
