@@ -16,11 +16,11 @@ specs = 0;       % default specs (0) or input specs (1)
 plys = 0;        % save .plys seperate in a 'ptCloud' directory?
 
 % Applied to BM & SGBM
-UniquenessThreshold = 15;      % only applied if specs
+UniquenessThreshold = 0;       % only applied if specs
 
 % Applied to BM only
 DisparityRange = [0 64];       % only applied if specs
-BlockSize = 11;                % only applied if specs
+BlockSize = 15;                % only applied if specs
 ContrastThreshold = 0.5;       % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
 TextureThreshold = 0.00002;    % only applied if specs

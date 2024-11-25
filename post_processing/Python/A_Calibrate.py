@@ -4,12 +4,14 @@ import os
 import yaml
 from tkinter import filedialog, Tk
 
+start_location="C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA"
+
 def select_directory(prompt_message):
     """Prompt the user to select a directory."""
     print(prompt_message)
     root = Tk()
     root.withdraw()  # Hide the root window
-    directory = filedialog.askdirectory()
+    directory = filedialog.askdirectory(initialdir=start_location)
     root.destroy()
     return directory
 
