@@ -13,7 +13,7 @@ def auto():
     cam.close()
     return config
 
-def fast():
+def moderate():
     cam = Picamera2()
     config = cam.create_still_configuration()
     config['main']['size'] = (1440, 1080)
@@ -23,7 +23,7 @@ def fast():
     cam.close()
     return config
 
-def max():
+def fast():
     cam = Picamera2()
     config = cam.create_still_configuration()
     config['main']['size'] = (1440, 1080)
@@ -33,23 +33,23 @@ def max():
     cam.close()
     return config
 
-def standard():
+def max():
+    cam = Picamera2()
+    config = cam.create_still_configuration()
+    config['main']['size'] = (1440, 1080)
+    config['main']['format'] = 'RGB888'
+    config['controls']['FrameDurationLimits'] = (0, 100)  
+    config['controls']['ExposureTime'] = 125
+    cam.close()
+    return config
+
+def slow():
     cam = Picamera2()
     config = cam.create_still_configuration()
     config['main']['size'] = (1440, 1080)
     config['main']['format'] = 'RGB888'
     config['controls']['FrameDurationLimits'] = (33333, 33333)  
     config['controls']['ExposureTime'] = 5000 
-    cam.close()
-    return config
-
-def bright():
-    cam = Picamera2()
-    config = cam.create_still_configuration()
-    config['main']['size'] = (1440, 1080)
-    config['main']['format'] = 'RGB888'
-    config['controls']['FrameDurationLimits'] = (33333, 33333)  
-    config['controls']['ExposureTime'] = 2000
     cam.close()
     return config
 
@@ -70,10 +70,10 @@ def get_config(mode):
         return fast()
     elif mode == 'max':
         return max()
-    elif mode == 'standard':
-        return standard()
-    elif mode == 'bright':
-        return bright()
+    elif mode == 'slow':
+        return slow()
+    elif mode == 'moderate':
+        return moderate()
     elif mode == 'dark':
         return dark()
     else:

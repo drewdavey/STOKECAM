@@ -165,7 +165,7 @@ ylabel('Time Difference (\mus)');
 title('Image Delay');
 % exportgraphics(f1, fullfile(figDir, 'TimeDifferencePlot.png'), 'Resolution', res);
 print(f1, fullfile(figDir, 'TimeDifferencePlot.png'), '-dpng', ['-r', num2str(res)]);
-close(gcf);  % Close the figure after saving
+% close(gcf);  % Close the figure after saving
 
 %% Plot X-Y cross sections
 shapesDir = fullfile(figDir, 'shapes');
