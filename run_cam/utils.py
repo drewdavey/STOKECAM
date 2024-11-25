@@ -6,7 +6,7 @@
 import os
 import time
 import yaml
-import vectornav as vn
+# import vectornav
 from vectornav import *
 # from vectornav.Plugins import ExporterCsv
 # from vectornav import Sensor, Registers
@@ -72,8 +72,12 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
     
     with open(fname_log, 'a') as log:
         log.write(f"Connected to {portName} at {s.connectedBaudRate()}")
-        model = vn.Registers.Model(), s.readRegister(model), model_num = model.model
-        serial = vn.Registers.Serial(), s.readRegister(serial), serial_num = serial.serialNum
+        model = Registers.Model()
+        s.readRegister(model)
+        model_num = model.model
+        serial = Registers.Serial()
+        s.readRegister(serial)
+        serial_num = serial.serialNum
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
