@@ -64,7 +64,7 @@ def create_dirs(fdir, mode):
 def sync_clock_and_imu(fname_log, gps_wait_time):
     
     portName = '/dev/ttyUSB0'
-    s = VnSensor()                      # Create sensor object and connect to the VN-200 
+    s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)             # at the baud rate of 115200 (115,200 bytes/s) 
     
     with open(fname_log, 'a') as log:
