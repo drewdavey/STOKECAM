@@ -30,7 +30,7 @@ from vectornav.Plugins import ExporterCsv
 
 def main(argv):
 
-    port = argv[0] if argv else "COM30"
+    port = argv[0] if argv else "/dev/ttyUSB0"
     path = argv[1] if len(argv)==2 else ""
     
     vs = Sensor()
