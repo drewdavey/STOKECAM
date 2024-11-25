@@ -6,7 +6,7 @@
 import os
 import time
 import yaml
-from vectornav import *
+from vnpy import *
 from datetime import datetime, timezone
 
 def setup_logging():

@@ -6,8 +6,8 @@
 import sys
 import time
 import signal
+from vnpy import *
 from utils import *
-from vectornav import *
 from datetime import datetime, timezone
 
 imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA\n"
