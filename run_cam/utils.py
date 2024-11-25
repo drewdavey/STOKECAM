@@ -62,42 +62,70 @@ def create_dirs(fdir, mode):
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def sync_clock_and_imu(fname_log, gps_wait_time):
-    # s = VnSensor()
-    # s.connect('/dev/ttyUSB0', 115200)
-    ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) # Create sensor object and connect to the VN-200 
-    s = ez.sensor                                    # at the baud rate of 115200 (115,200 bytes/s) 
+    
+    portName = '/dev/ttyUSB0'
+    s = VnSensor()                      # Create sensor object and connect to the VN-200 
+    s.autoConnect(portName)             # at the baud rate of 115200 (115,200 bytes/s) 
+    
     with open(fname_log, 'a') as log:
-        model_num = s.read_model_number()
-        serial_num = s.read_serial_number()
+        log.write(f"Connected to {portName} at {s.connectedBaudRate()}")
+        model = Registers.Model(), s.readRegister(model), model_num = model.model
+        serial = Registers.Serial(), s.readRegister(serial), serial_num = serial.serialNum
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
+
+        #### CONFIGURING ADOR AND AODF TO YPR @ 2Hz
+        asyncDataOutputType = Registers.AsyncOutputType()
+        asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
+        asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+        s.writeRegister(asyncDataOutputType)
+        print(f"ADOR Configured")
+        asyncDataOutputFreq= Registers.AsyncOutputFreq()
+        asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate20Hz
+        asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+        s.writeRegister(asyncDataOutputFreq)
+        print("ADOF Configured")
+
+        #### CONFIGURING THE FIRST BINARY OUTPUT
+        binaryOutput1Register = Registers.BinaryOutput1()
+        binaryOutput1Register.rateDivisor = 100
+        binaryOutput1Register.asyncMode.serial1 = 1
+        binaryOutput1Register.asyncMode.serial2 = 0
+        binaryOutput1Register.common.timeStartup = 1
+        binaryOutput1Register.common.accel = 1
+        binaryOutput1Register.common.angularRate = 1
+        s.writeRegister(binaryOutput1Register)
+        print("Binary output message configured")
+
         i = 0 
-        while ez.current_data.position_uncertainty_estimated > 10:
-            # num_sats = ez.current_data.num_sats
-            # log.write(f"Number of satellites: {num_sats}\n")
-            time.sleep(1)
-            i += 1
-            if i > gps_wait_time:
-                log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
-                break
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        if ez.current_data.has_any_position:
-            pos = ez.current_data.position_estimated_lla
-            log.write(f"{tstr}:     GPS Position (LLA): ({pos.x}, {pos.y}, {pos.z})\n")
-            posun = ez.current_data.any_position_uncertainty
-            log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
-            posunes = ez.current_data.position_uncertainty_estimated
-            log.write(f"{tstr}:     Position uncertainty estimated: {posunes}\n")
-        if ez.current_data.has_time_gps:
-            vn_time = ez.current_data.time_utc
-            log.write(f"{tstr}:     Time from VN-200: {vn_time}\n")
-        if ez.current_data.has_num_sats:
-            num_sats = ez.current_data.num_sats
-            log.write(f"{tstr}:     Number of satellites: {num_sats}\n")
-        gps_sol = s.read_gps_solution_lla()
-        log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n")
-        imu_out = s.read_imu_measurements() 
-        log.write(f"{tstr}:     Current Temperature: {imu_out.temp} and Pressure: {imu_out.pressure}\n\n")
+        gnss = Registers.GnssSolLla(), s.readRegister(gnss), gnssFix = gnss.Gnss1Fix
+        print(f"GNSS Fix:  {gnssFix}")
+        # while ez.current_data.position_uncertainty_estimated > 10:
+        #     # num_sats = ez.current_data.num_sats
+        #     # log.write(f"Number of satellites: {num_sats}\n")
+        #     time.sleep(1)
+        #     i += 1
+        #     if i > gps_wait_time:
+        #         log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
+        #         break
+        # tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        # if ez.current_data.has_any_position:
+        #     pos = ez.current_data.position_estimated_lla
+        #     log.write(f"{tstr}:     GPS Position (LLA): ({pos.x}, {pos.y}, {pos.z})\n")
+        #     posun = ez.current_data.any_position_uncertainty
+        #     log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
+        #     posunes = ez.current_data.position_uncertainty_estimated
+        #     log.write(f"{tstr}:     Position uncertainty estimated: {posunes}\n")
+        # if ez.current_data.has_time_gps:
+        #     vn_time = ez.current_data.time_utc
+        #     log.write(f"{tstr}:     Time from VN-200: {vn_time}\n")
+        # if ez.current_data.has_num_sats:
+        #     num_sats = ez.current_data.num_sats
+        #     log.write(f"{tstr}:     Number of satellites: {num_sats}\n")
+        # gps_sol = s.read_gps_solution_lla()
+        # log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n")
+        # imu_out = s.read_imu_measurements() 
+        # log.write(f"{tstr}:     Current Temperature: {imu_out.temp} and Pressure: {imu_out.pressure}\n\n")
     log.close()
     s.disconnect()
