@@ -49,7 +49,7 @@ def main(argv):
     #### 1. AUTOCONNECT TO THE SENSOR
 
     # Defining the port connection parameters    sensorPortName = argv[0] if argv else "COM30" # Change the sensor port name to the com port of your local machine
-    sensorPortName = argv[0] if argv else "COM30" # Change the sensor port name to the com port of your local machine
+    sensorPortName = argv[0] if argv else "/dev/ttyUSB0" # Change the sensor port name to the com port of your local machine
     
 
     # Instantiate a Sensor object to interact with the sensor
