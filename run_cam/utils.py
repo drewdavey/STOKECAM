@@ -104,9 +104,9 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
 
         i = 0 
         gnss = Registers.GnssSolLla()
-        s.readRegister(gnss),
-        gnssFix = gnss.Gnss1Fix
-        print(f"GNSS Fix:  {gnssFix}")
+        s.readRegister(gnss)
+        print(f"GNSS Fix:  {gnss.gnss1Fix}")
+        print(f"GNSS Fix:  {gnss.gnss1TimeUtc}")
         # while ez.current_data.position_uncertainty_estimated > 10:
         #     # num_sats = ez.current_data.num_sats
         #     # log.write(f"Number of satellites: {num_sats}\n")
