@@ -7,6 +7,9 @@ import os
 import time
 import yaml
 from vectornav import *
+import vectornav
+from vectornav.Plugins import ExporterCsv
+from vectornav import Sensor, Registers
 from datetime import datetime, timezone
 
 def setup_logging():
