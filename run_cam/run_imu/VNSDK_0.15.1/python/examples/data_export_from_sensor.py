@@ -39,17 +39,17 @@ def main(argv):
     
     vs.autoConnect(port)
 
-    vs.subscribeToMessage(
-        csvExporter.getQueuePtr(),
-        vectornav.Registers.BinaryOutputMeasurements(),
-        vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch
-    )
-    
     # vs.subscribeToMessage(
     #     csvExporter.getQueuePtr(),
-    #     "VN",
-    #     vectornav.AsciiPacketDispatcher.SubscriberFilterType.StartsWith
+    #     vectornav.Registers.BinaryOutputMeasurements(),
+    #     vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch
     # )
+    
+    vs.subscribeToMessage(
+        csvExporter.getQueuePtr(),
+        "VN",
+        vectornav.AsciiPacketDispatcher.SubscriberFilterType.StartsWith
+    )
 
     csvExporter.start()
     print("logging started")
