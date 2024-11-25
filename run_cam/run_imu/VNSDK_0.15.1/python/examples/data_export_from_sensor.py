@@ -45,11 +45,11 @@ def main(argv):
         vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch
     )
     
-    # vs.subscribeToMessage(
-    #     csvExporter.getQueuePtr(),
-    #     "VN",
-    #     vectornav.AsciiPacketDispatcher.SubscriberFilterType.StartsWith
-    # )
+    vs.subscribeToMessage(
+        csvExporter.getQueuePtr(),
+        "VN",
+        vectornav.AsciiPacketDispatcher.SubscriberFilterType.StartsWith
+    )
 
     csvExporter.start()
     print("logging started")

@@ -29,7 +29,7 @@ import time,sys
 
 def main(argv):
     print("Starting main")
-    sensorPortName = argv[0] if argv else "COM10"
+    sensorPortName = argv[0] if argv else "/dev/ttyUSB0"
 
     # Instantiate a Sensor object to interact with the sensor
     vs = Sensor()
