@@ -31,7 +31,6 @@
 #include "ExporterAscii.hpp"
 #include "ExporterCsv.hpp"
 #include "ExporterRinex.hpp"
-#include "ExporterImr.hpp"
 #include "FileExporter.hpp"
 #include "HAL/File.hpp"
 
@@ -58,10 +57,6 @@ void init_data_export(py::module& m) {
     .def(py::init<const Filesystem::FilePath&, const uint32_t>())
     .def("exportToFile", &ExporterRinex::exportToFile);
   
-  py::class_<ExporterImr, Exporter>(Plugins, "ExporterImr")
-    .def(py::init<const Filesystem::FilePath&>())
-    .def("exportToFile", &ExporterImr::exportToFile);
-          
   py::class_<ExporterAscii, Exporter>(Plugins, "ExporterAscii")
     .def(py::init<const Filesystem::FilePath&>())
     .def("exportToFile", &ExporterAscii::exportToFile);
@@ -79,10 +74,6 @@ void init_data_export(py::module& m) {
     )
     .def("addRinexExporter", [](FileExporter& f, const Filesystem::FilePath& path, const uint32_t gnssGroup){
         f.addExporter(std::make_unique<ExporterRinex>(path, gnssGroup));
-      }
-    )
-    .def("addImrExporter", [](FileExporter& f, const Filesystem::FilePath& path) {
-        f.addExporter(std::make_unique<ExporterImr>(path));
       }
     );
 
