@@ -70,9 +70,11 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
     with open(fname_log, 'a') as log:
         log.write(f"Connected to {portName} at {s.connectedBaudRate()}")
         model = Registers.Model()
-        s.readRegister(model), model_num = model.model
+        s.readRegister(model)
+        model_num = model.model
         serial = Registers.Serial()
-        s.readRegister(serial), serial_num = serial.serialNum
+        s.readRegister(serial)
+        serial_num = serial.serialNum
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
@@ -102,7 +104,8 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
 
         i = 0 
         gnss = Registers.GnssSolLla()
-        s.readRegister(gnss), gnssFix = gnss.Gnss1Fix
+        s.readRegister(gnss),
+        gnssFix = gnss.Gnss1Fix
         print(f"GNSS Fix:  {gnssFix}")
         # while ez.current_data.position_uncertainty_estimated > 10:
         #     # num_sats = ez.current_data.num_sats
