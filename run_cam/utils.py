@@ -154,16 +154,6 @@ def sync_clock(portName, clock_timeout):
                 print(f"{tstr}:     Setting RP clock to: {formatted_time}")
     s.disconnect()
 
-# def parse_time(time_str):
-#     year = int(time_str[:4])
-#     month = int(time_str[4:6])
-#     day = int(time_str[6:8])
-#     hours = int(time_str[8:10])
-#     minutes = int(time_str[10:12])
-#     seconds = int(time_str[12:14])
-#     milliseconds = int(time_str[14:])
-#     return datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000)
-
 def VN200_status(portName, fname_log, gps_timeout):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
@@ -204,12 +194,11 @@ def VN200_status(portName, fname_log, gps_timeout):
             t0 = time.time()
             while (time.time() - t0 < 5):
                 cd = s.getNextMeasurement()
-                rp_time = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')[:-3]
+                rp_time = datetime.now(timezone.utc)
                 if not cd: continue
                 if tUtc := cd.time.timeUtc:
                     # Format the time as 'HHMMSSfff'
                     vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
-                    print(vn_time)
                     year = int(vn_time[:4])
                     month = int(vn_time[4:6])
                     day = int(vn_time[6:8])
@@ -221,7 +210,7 @@ def VN200_status(portName, fname_log, gps_timeout):
                     diff_time = vn_time - rp_time
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     VN-200 Time: {vn_time}\n")
-            log.write(f"{tstr}:     RP Time: {rp_time}\n")
+            log.write(f"{tstr}:     RP Time: {rp_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
             log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_time}\n\n")
         if cd:
             cd = s.getMostRecentMeasurement(1)
