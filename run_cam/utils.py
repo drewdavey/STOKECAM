@@ -61,12 +61,51 @@ def create_dirs(fdir, mode):
     fname_imu = f'{fdir_out}IMU_{session}.txt'
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
-def sync_clock_and_imu(fname_log, gps_wait_time):
+def sync_clock(clock_timeout):
+    portName = '/dev/ttyUSB0'
+    s = Sensor()                      # Create sensor object and connect to the VN-200 
+    s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
+    binaryOutput1Register = Registers.BinaryOutput1()
+    binaryOutput1Register.time.timeUtc = 1
+    s.writeRegister(binaryOutput1Register)
     
+    # Wait for GPS
+    i = 0 
+    gnss = Registers.GnssSolLla()
+    s.readRegister(gnss)
+    gnssFix = gnss.gnss1Fix.name
+    while gnssFix == 'NoFix':
+        s.readRegister(gnss)
+        gnssFix = gnss.gnss1Fix.name
+        num_sats = gnss.gnss1NumSats
+        time.sleep(1)
+        i += 1
+        if i > clock_timeout:
+            break
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    print(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
+
+    # Sync the RP clock to the VN-200
+    if gnssFix != 'NoFix':
+        t0 = time.time()
+        while (time.time() - t0 < 5):
+            cd = s.getNextMeasurement()
+            if not cd: continue
+            if timeUtc := cd.time.timeUtc:
+                print(f"Time: {timeUtc}")
+                
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        print(f"{tstr}:     Syncing RP clock to VN-200...\n")
+        time.sleep(5)
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        print(f"{tstr}:     RP clock synced to VN-200.\n")
+
+    s.disconnect()
+
+def config_VN200(fname_log, gps_timeout):
     portName = '/dev/ttyUSB0'
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)             # at the baud rate of 115200 (115,200 bytes/s) 
-    
     with open(fname_log, 'a') as log:
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     Connected to {portName} at {s.connectedBaudRate().name}\n")
@@ -80,19 +119,19 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
         log.write(f"{tstr}:     Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
 
-        #### CONFIGURING ADOR AND AODF TO YPR @ 2Hz
+        #### CONFIGURE ADOR AND AODF 
         asyncDataOutputType = Registers.AsyncOutputType()
         asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
         asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
         s.writeRegister(asyncDataOutputType)
-        print(f"ADOR Configured")
+        log.write(f"{tstr}:     ADOR Configured\n")
         asyncDataOutputFreq= Registers.AsyncOutputFreq()
         asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate20Hz
         asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
         s.writeRegister(asyncDataOutputFreq)
-        print("ADOF Configured")
+        log.write(f"{tstr}:     ADOF Configured\n")
 
-        #### CONFIGURING THE FIRST BINARY OUTPUT
+        #### CONFIGURE THE BINARY OUTPUT
         binaryOutput1Register = Registers.BinaryOutput1()
         binaryOutput1Register.rateDivisor = 100
         binaryOutput1Register.asyncMode.serial1 = 1
@@ -102,7 +141,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
         binaryOutput1Register.common.angularRate = 1
         binaryOutput1Register.time.timeUtc = 1
         s.writeRegister(binaryOutput1Register)
-        print("Binary output message configured")
+        log.write(f"{tstr}:     Binary output message configured\n")
 
         # Wait for GPS
         i = 0 
@@ -115,27 +154,11 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
             num_sats = gnss.gnss1NumSats
             time.sleep(1)
             i += 1
-            if i > gps_wait_time:
+            if i > gps_timeout:
                 log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
                 break
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
-
-        # Sync the RP clock to the VN-200
-        if gnssFix != 'NoFix':
-            log.write(f"{tstr}:     Syncing RP clock to VN-200...\n")
-            time.sleep(5)
-            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-            log.write(f"{tstr}:     RP clock synced to VN-200.\n")
-
-        t0 = time.time()
-        while (time.time() - t0 < 5):
-            cd = s.getNextMeasurement()
-            if not cd: continue
-            if timeUtc := cd.time.timeUtc:
-                print(f"Binary Packet")
-                print(f"Time: {timeUtc}")
-                print(f"Accel: {cd.imu.accel}")
 
         # if ez.current_data.has_any_position:
         #     pos = ez.current_data.position_estimated_lla

@@ -157,14 +157,22 @@ red = LED(24)                           # Red LED
 right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
 
+try:
+    clock_timeout = yaml.safe_load('../inputs.yaml')['clock_timeout']
+finally:
+    if clock_timeout is None: clock_timeout = 10
+
+sync_clock(clock_timeout)                       # Sync the clock
+
 fdir, fname_log = setup_logging()               # Setup logging
+
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 dt = inputs['dt']
 calib_dt = inputs['calib_dt']
 calib_frames = inputs['calib_frames']
-gps_wait_time = inputs['gps_wait_time']
+gps_timeout = inputs['gps_timeout']
 
-sync_clock_and_imu(fname_log, gps_wait_time)    # Connect to VecNav and sync clock 
+config_VN200(fname_log, gps_timeout)            # Config VN-200 output and get GPS status 
 
 global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
