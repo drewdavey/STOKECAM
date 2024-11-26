@@ -65,16 +65,17 @@ def sync_clock(clock_timeout):
     portName = '/dev/ttyUSB0'
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
-    # binaryOutput1Register = Registers.BinaryOutput1()
-    # binaryOutput1Register.asyncMode.serial1 = 1
-    # binaryOutput1Register.time.timeUtc = 1
-    # s.writeRegister(binaryOutput1Register)
+    binaryOutput1Register = Registers.BinaryOutput1()
+    binaryOutput1Register.asyncMode.serial1 = 1
+    binaryOutput1Register.time.timeUtc = 1
+    s.writeRegister(binaryOutput1Register)
     
     # Wait for GPS
     i = 0 
     gnss = Registers.GnssSolLla()
     s.readRegister(gnss)
     gnssFix = gnss.gnss1Fix.name
+    num_sats = gnss.gnss1NumSats
     while gnssFix == 'NoFix':
         s.readRegister(gnss)
         gnssFix = gnss.gnss1Fix.name
@@ -83,30 +84,25 @@ def sync_clock(clock_timeout):
         i += 1
         if i > clock_timeout:
             break
-    
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    print(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
+
     # Sync the RP clock to the VN-200
     if gnssFix != 'NoFix':
-        s.readRegister(gnss)
-        timeUtc = gnss.gnss1TimeUtc
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        print(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
-        print(f"Time: {timeUtc}")
+        t0 = time.time()
+        while (time.time() - t0 < 5):
+            cd = s.getNextMeasurement()
+            if not cd: continue
+            if timeUtc := cd.time.timeUtc:
+                print(f"Time: {timeUtc}")
+                print(f"Time: {timeUtc.name}")
+                print(f"Time: {cd.gnss.gnss1TimeUtc}")
+
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         print(f"{tstr}:     Syncing RP clock to VN-200...\n")
         time.sleep(5)
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         print(f"{tstr}:     RP clock synced to VN-200.\n")
-
-    # # Sync the RP clock to the VN-200
-    # if gnssFix != 'NoFix':
-    #     t0 = time.time()
-    #     while (time.time() - t0 < 5):
-    #         cd = s.getNextMeasurement()
-    #         if not cd: continue
-    #         if timeUtc := cd.time.timeUtc:
-    #             print(f"Time: {timeUtc}")
-    #             print(f"Time: {timeUtc.name}")
-    #             print(f"Time: {timeUtc}")
 
     s.disconnect()
 
