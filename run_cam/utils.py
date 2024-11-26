@@ -7,7 +7,7 @@ import os
 import time
 import yaml
 from vectornav import *
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
@@ -147,11 +147,26 @@ def sync_clock(portName, clock_timeout):
             if not cd: continue
             if tUtc := cd.time.timeUtc:
                 # Format the time as 'YYYY-MM-DD HH:MM:SS'
-                # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}.{tUtc.fracSec}"
-                formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
-                os.system(f"sudo date -s '{formatted_time}'") # Set the system time
-                tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-                print(f"{tstr}:     Setting RP clock to: {formatted_time}")
+                    vn_time = datetime(
+                    year=2000 + tUtc.year,  # Adjust year since it's likely offset
+                    month=tUtc.month,
+                    day=tUtc.day,
+                    hour=tUtc.hour,
+                    minute=tUtc.minute,
+                    second=tUtc.second,
+                    microsecond=tUtc.fracSec * 1000,
+                    tzinfo=timezone.utc)
+
+                    # Add 3.97 seconds to VN-200 time
+                    vn_time_adjusted = vn_time + timedelta(seconds=3.97)
+                    
+                    # Format adjusted time for `date` command
+                    formatted_time = vn_time_adjusted.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                    # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}.{tUtc.fracSec}"
+                    # formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
+                    os.system(f"sudo date -s '{formatted_time}'") # Set the system time
+                    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+                    print(f"{tstr}:     Setting RP clock to: {formatted_time}")
     s.disconnect()
 
 def VN200_status(portName, fname_log, gps_timeout):
@@ -209,7 +224,7 @@ def VN200_status(portName, fname_log, gps_timeout):
                     vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000, tzinfo=timezone.utc)
                     diff_time = vn_time - rp_time
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-            log.write(f"{tstr}:     VN-200 Time: {vn_time}\n")
+            log.write(f"{tstr}:     VN-200 Time: {vn_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
             log.write(f"{tstr}:     RP Time: {rp_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
             log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_time}\n\n")
         if cd:
