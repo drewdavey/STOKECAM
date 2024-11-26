@@ -68,7 +68,8 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
     s.autoConnect(portName)             # at the baud rate of 115200 (115,200 bytes/s) 
     
     with open(fname_log, 'a') as log:
-        log.write(f"Connected to {portName} at {s.connectedBaudRate().name}\n")
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        log.write(f"{tstr}:     Connected to {portName} at {s.connectedBaudRate().name}\n")
         model = Registers.Model()
         s.readRegister(model)
         model_num = model.model
