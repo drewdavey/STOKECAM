@@ -128,14 +128,14 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     RP clock synced to VN-200.\n")
 
-            t0 = time.time()
-            while (time.time() - t0 < 5):
-                cd = s.getNextMeasurement()
-                if not cd: continue
-                if timeUtc := cd.time.timeUtc:
-                    print(f"Binary Packet")
-                    print(f"Time: {timeUtc.nanoseconds()}")
-                    print(f"Accel: {cd.imu.accel}")
+        t0 = time.time()
+        while (time.time() - t0 < 5):
+            cd = s.getNextMeasurement()
+            if not cd: continue
+            if timeUtc := cd.time.timeUtc:
+                print(f"Binary Packet")
+                print(f"Time: {timeUtc.nanoseconds()}")
+                print(f"Accel: {cd.imu.accel}")
 
         # if ez.current_data.has_any_position:
         #     pos = ez.current_data.position_estimated_lla
