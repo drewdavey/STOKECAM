@@ -10,6 +10,7 @@ import vectornav
 from utils import *
 from vectornav import *
 from datetime import datetime, timezone
+from vectornav.Plugins import ExporterCsv
 
 running = True
 
