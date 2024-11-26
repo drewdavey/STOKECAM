@@ -89,7 +89,6 @@ def config_VN200_output(portName):
     binaryOutput1Register.time.timeUtc = 1
     s.writeRegister(binaryOutput1Register)
     print(f"{tstr}:     Binary output message configured\n")
-    
     s.disconnect()
 
 def sync_clock(portName, clock_timeout):
@@ -125,11 +124,9 @@ def sync_clock(portName, clock_timeout):
                 formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
         # Set the system time (requires root privileges)
         os.system(f"sudo date -s '{formatted_time}'")
-        # os.system(f"sudo date --set '20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}' ")
         print(f"{tstr}:     Setting system time to: {formatted_time}")
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         print(f"{tstr}:     RP clock synced to VN-200.\n")
-
     s.disconnect()
 
 def sync_gps(portName, fname_log, gps_timeout):
