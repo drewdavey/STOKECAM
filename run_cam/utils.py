@@ -66,6 +66,7 @@ def sync_clock(clock_timeout):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
     binaryOutput1Register = Registers.BinaryOutput1()
+    binaryOutput1Register.asyncMode.serial1 = 1
     binaryOutput1Register.time.timeUtc = 1
     s.writeRegister(binaryOutput1Register)
     
@@ -93,7 +94,7 @@ def sync_clock(clock_timeout):
             if not cd: continue
             if timeUtc := cd.time.timeUtc:
                 print(f"Time: {timeUtc}")
-                
+
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         print(f"{tstr}:     Syncing RP clock to VN-200...\n")
         time.sleep(5)
@@ -148,6 +149,7 @@ def config_VN200(fname_log, gps_timeout):
         gnss = Registers.GnssSolLla()
         s.readRegister(gnss)
         gnssFix = gnss.gnss1Fix.name
+        num_sats = gnss.gnss1NumSats
         while gnssFix == 'NoFix':
             s.readRegister(gnss)
             gnssFix = gnss.gnss1Fix.name
