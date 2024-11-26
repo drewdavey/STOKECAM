@@ -193,7 +193,7 @@ def VN200_status(portName, fname_log, gps_timeout):
         if gnssFix != 'NoFix':
             t0 = time.time()
             while (time.time() - t0 < 5):
-                cd = s.getNextMeasurement()
+                cd = s.getNextMeasurement(1)
                 rp_time = datetime.now(timezone.utc)
                 if not cd: continue
                 if tUtc := cd.time.timeUtc:
