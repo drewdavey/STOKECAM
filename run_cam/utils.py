@@ -97,9 +97,9 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
         binaryOutput1Register.asyncMode.serial1 = 1
         binaryOutput1Register.asyncMode.serial2 = 0
         binaryOutput1Register.common.timeStartup = 1
-        binaryOutput1Register.common.timeUtc = 1
         binaryOutput1Register.common.accel = 1
         binaryOutput1Register.common.angularRate = 1
+        binaryOutput1Register.time.timeUtc = 1
         s.writeRegister(binaryOutput1Register)
         print("Binary output message configured")
 
