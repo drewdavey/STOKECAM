@@ -134,7 +134,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
             if not cd: continue
             if timeUtc := cd.time.timeUtc:
                 print(f"Binary Packet")
-                print(f"Time: {timeUtc.nanoseconds()}")
+                print(f"Time: {timeUtc}")
                 print(f"Accel: {cd.imu.accel}")
 
         # if ez.current_data.has_any_position:
