@@ -122,9 +122,10 @@ def sync_clock(portName, clock_timeout):
             if tUtc := cd.time.timeUtc:
                 # Format the time as 'YYYY-MM-DD HH:MM:SS'
                 # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}-{tUtc.fracSec}"
-                formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}"
+                formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
         # Set the system time (requires root privileges)
-        os.system(f"sudo date -s '{formatted_time}'")
+        # os.system(f"sudo date -s '{formatted_time}'")
+        os.system(f"sudo date --set '20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}' ")
         print(f"{tstr}:     Setting system time to: {formatted_time}")
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         print(f"{tstr}:     RP clock synced to VN-200.\n")
