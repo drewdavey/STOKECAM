@@ -119,10 +119,12 @@ def config_VN200_output(portName):
     binaryOutput1Register.common.timeStartup = 1
     binaryOutput1Register.common.accel = 1
     binaryOutput1Register.common.angularRate = 1
-    # Execute the configuration lines dynamically
+    
+    # Create a configurator instance
+    configurator = BinaryOutputConfigurator(binaryOutput1Register)
+    # Apply configurations dynamically
     for category, parameter in vn_parameters:
-        category_obj = getattr(binaryOutput1Register, category)
-        setattr(category_obj, parameter, 1)
+        configurator.set_attribute(category, parameter, 1)
 
     s.writeRegister(binaryOutput1Register)
     print(f"{tstr}:     Binary output message configured\n")
