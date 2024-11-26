@@ -119,7 +119,6 @@ def config_VN200_output(portName):
     binaryOutput1Register.common.timeStartup = 1
     binaryOutput1Register.common.accel = 1
     binaryOutput1Register.common.angularRate = 1
-    binaryOutput1Register.time.timeUtc = 1
     # Execute the configuration lines dynamically
     for category, parameter in vn_parameters:
         category_obj = getattr(binaryOutput1Register, category)
@@ -218,7 +217,7 @@ def VN200_status(portName, fname_log, gps_timeout):
                 if tUtc := cd.time.timeUtc:
                     # Format the time as 'HHMMSSfff'
                     vn_time = f"{tUtc.hour}{tUtc.minute}{tUtc.second}{tUtc.fracSec}"
-                    rp_time = datetime.now(timezone.utc).strftime('%H%M%S%f')[-3]
+                    rp_time = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
             vn_time = parse_time(vn_time)
             rp_time = parse_time(rp_time)
             diff_time = rp_time - vn_time
