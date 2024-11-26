@@ -74,6 +74,7 @@ def monitor_gps():
     else:
         green.blink(0.25, 0.25) 
     s.disconnect()
+    tlast = time.time()
 
 def toggle_modes():
     global cam0, cam1, config, mode, shooting_modes
@@ -177,6 +178,7 @@ configure_cameras(fname_log, mode)              # Configure the cameras
 standby = False
 tnow = time.time()
 monitor_gps()
+tlast = time.time()
 #######################################################################
 
 ############################# Main loop ###############################
@@ -186,7 +188,7 @@ monitor_gps()
 #                         - release both to toggle modes
 #                         - release left ONLY to exit script                              
 while True: 
-    if time.time() - tnow > 10 and not standby:
+    if time.time() - tlast > 10 and not standby:
         monitor_gps()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
@@ -203,7 +205,6 @@ while True:
         else:
             toggle_modes()
             monitor_gps()
-    tnow = time.time()
     time.sleep(0.2)
 #######################################################################
 
