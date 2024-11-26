@@ -120,16 +120,15 @@ def sync_clock(portName, clock_timeout):
             cd = s.getNextMeasurement()
             if not cd: continue
             if tUtc := cd.time.timeUtc:
-                print(f"Time: {tUtc}")
-                print(f"Time: {dir(tUtc)}")
-                print(f"Time: {tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}-{tUtc.fracSec}")
-
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        print(f"{tstr}:     Syncing RP clock to VN-200...\n")
-        time.sleep(5)
+                # Format the time as 'YYYY-MM-DD HH:MM:SS'
+                formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}-{tUtc.fracSec}"
+        
+        # Set the system time (requires root privileges)
+        os.system(f"sudo date -s '{formatted_time}'")
+        print(f"{tstr}:     Setting system time to: {formatted_time}")
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         print(f"{tstr}:     RP clock synced to VN-200.\n")
-
+        
     s.disconnect()
 
 def sync_gps(portName, fname_log, gps_timeout):
