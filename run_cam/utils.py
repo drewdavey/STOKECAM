@@ -154,13 +154,16 @@ def sync_clock(portName, clock_timeout):
     # Sync the RP clock to the VN-200
     if gnssFix != 'NoFix':
         t0 = time.time()
-        while (time.time() - t0 < 5):
-            cd = s.getNextMeasurement()
-            if not cd: continue
-            if tUtc := cd.time.timeUtc:
-                # Format the time as 'YYYY-MM-DD HH:MM:SS'
-                # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}-{tUtc.fracSec}"
-                formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
+        # while (time.time() - t0 < 5):
+        #     cd = s.getNextMeasurement()
+        #     if not cd: continue
+        #     if tUtc := cd.time.timeUtc:
+        #         # Format the time as 'YYYY-MM-DD HH:MM:SS'
+        #         # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}-{tUtc.fracSec}"
+        #         formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
+        cd = s.getNextMeasurement(1)
+        tUtc = cd.time.timeUtc
+        formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
         # Set the system time (requires root privileges)
         os.system(f"sudo date -s '{formatted_time}'")
         print(f"{tstr}:     Setting system time to: {formatted_time}")
