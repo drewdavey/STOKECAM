@@ -6,43 +6,32 @@
 import sys
 import time
 import signal
+import vectornav
 from utils import *
 from vectornav import *
 from datetime import datetime, timezone
 
-imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA\n"
-# imu_headerLine = "Timestamp (UTC: HHMMSSsss), VN-200 Timestamp (UTC), Temperature (deg C), Pressure (Pa), Yaw (deg), Pitch (deg), Roll (deg), Accel_x, Accel_y, Accel_z, Gyro_x, Gyro_y, Gyro_z, Mag_x, Mag_y, Mag_z, GPS_LLA, INS_LLA\n"
-
-# Connect to the VN-200 
-s = VnSensor()
-s.connect('/dev/ttyUSB0', 115200)
-# ez = EzAsyncData.connect('/dev/ttyUSB0', 115200)
-# s = ez.sensor
-
 running = True
 
-def imu_run(fname_imu,fname_log,imu_dt):
+def imu_run(fname_imu,fname_log,portName):
     global running
-    imu = open(fname_imu, 'a')
+    s = Sensor()                      # Create sensor object and connect to the VN-200 
+    s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
+    csvExporter = ExporterCsv(fname_imu, True)
+    s.subscribeToMessage(
+            csvExporter.getQueuePtr(),
+            vectornav.Registers.BinaryOutputMeasurements(),
+            vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
+    csvExporter.start()
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     IMU started.\n")
-    imu.write(imu_headerLine)
     while running:
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        ypr = s.read_yaw_pitch_roll() # Read yaw, pitch, and roll values
-        gps = s.read_gps_solution_lla() # Read the GPS solution in LLA format
-        # ins = s.read_ins_solution_lla() # Read the INS solution
-        imu_out = s.read_imu_measurements() # Read the IMU measurements
-        # cd = ez.current_data # Read current data as CompositeData class from EzAsyncData
-        imu.write(f"{tstr}, {gps.time}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z})" + '\n')
-        # imu.write(f"{tstr}, {cd.time_utc}, {cd.temperature} or {imu_out.temp}, {cd.pressure} or {imu_out.pressure}, {ypr.x}, {ypr.y}, {ypr.z}, {imu_out.accel.x}, {imu_out.accel.y}, {imu_out.accel.z}, {imu_out.gyro.x}, {imu_out.gyro.y}, {imu_out.gyro.z}, {imu_out.mag.x}, {imu_out.mag.y}, {imu_out.mag.z}, ({gps.lla.x}, {gps.lla.y}, {gps.lla.z}), ({ins.position.x}, {ins.position.y}, {ins.position.z})" + '\n')
-        # imu.write(f"{tstr}, {ypr.x}, {ypr.y}, {ypr.z}" + '\n')
-        time.sleep(imu_dt)
+        time.sleep(0.001)
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     IMU stopped.\n\n")
     log.close()
-    imu.close()
+    csvExporter.stop()
     s.disconnect()
     sys.exit(0)
 
@@ -55,6 +44,4 @@ signal.signal(signal.SIGINT, imu_disconnect)
 
 if __name__ == '__main__':
     fdir, fname_log = setup_logging()             
-    inputs = read_inputs_yaml(fname_log)
-    imu_dt = inputs['imu_dt']
-    imu_run(sys.argv[1],sys.argv[2], imu_dt)
+    imu_run(sys.argv[1],sys.argv[2],sys.argv[3])

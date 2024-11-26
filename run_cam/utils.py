@@ -58,7 +58,7 @@ def create_dirs(fdir, mode):
     fdir_cam1 = os.path.join(fdir_out, 'cam1/')
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
-    fname_imu = f'{fdir_out}IMU_{session}.txt'
+    fname_imu = f'{fdir_out}IMU_{session}.csv'
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def config_VN200_output(portName):
@@ -73,7 +73,7 @@ def config_VN200_output(portName):
     s.writeRegister(asyncDataOutputType)
     print(f"{tstr}:     ADOR Configured\n")
     asyncDataOutputFreq= Registers.AsyncOutputFreq()
-    asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate20Hz
+    asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
     asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
     s.writeRegister(asyncDataOutputFreq)
     print(f"{tstr}:     ADOF Configured\n")
@@ -160,9 +160,8 @@ def sync_clock(portName, clock_timeout):
                 microsecond=tUtc.fracSec * 1000,
                 tzinfo=timezone.utc)
 
-                # Add [delay] seconds to VN-200 time
-                delay = 0
-                vn_time_adjusted = vn_time + timedelta(seconds=delay)
+                # Add [delay] seconds to VN-200 time if systematic offset
+                vn_time_adjusted = vn_time + timedelta(seconds=0)
                 
                 # Format adjusted time for `date` command
                 formatted_time = vn_time_adjusted.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
@@ -210,7 +209,7 @@ def VN200_status(portName, fname_log, gps_timeout):
         if gnssFix != 'NoFix':
             t0 = time.time()
             while (time.time() - t0 < 5):
-                cd = s.getNextMeasurement(1)
+                cd = s.getNextMeasurement()
                 rp_time = datetime.now(timezone.utc)
                 if not cd: continue
                 if tUtc := cd.time.timeUtc:
@@ -231,42 +230,43 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_time}\n\n")
         
         t0 = time.time()
-        while (time.time() - t0 < 5):
-            cd = s.getMostRecentMeasurement(1)
-            if not cd: continue
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        log.write(f"{tstr}:     VN-200 timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
-        log.write(f"{tstr}:     VN-200 timeGps (μs): {cd.time.timeGps.microseconds()}\n")
-        log.write(f"{tstr}:     VN-200 timeGpsTow (μs): {cd.time.timeGpsTow.microseconds()}\n")
-        log.write(f"{tstr}:     VN-200 timeGpsWeek: {cd.time.timeGpsWeek}\n")
-        log.write(f"{tstr}:     VN-200 timeSyncIn (μs): {cd.time.timeSyncIn.microseconds()}\n")
-        log.write(f"{tstr}:     VN-200 timeGpsPps (μs): {cd.time.timeGpsPps.microseconds()}\n")
-        tUtc = cd.time.timeUtc
-        tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
-        log.write(f"{tstr}:     VN-200 timeUtc: {tUtc}\n")
-        log.write(f"{tstr}:     VN-200 imuStatus: Accel: {cd.imu.imuStatus.accelStatus}, Gyro: {cd.imu.imuStatus.gyroStatus}, Mag: {cd.imu.imuStatus.magStatus}, PresTemp: {cd.imu.imuStatus.presTempStatus}\n")
-        log.write(f"{tstr}:     VN-200 uncompMag: {cd.imu.uncompMag}\n")
-        log.write(f"{tstr}:     VN-200 uncompAccel: {cd.imu.uncompAccel}\n")
-        log.write(f"{tstr}:     VN-200 temperature: {cd.imu.temperature}\n")
-        log.write(f"{tstr}:     VN-200 pressure: {cd.imu.pressure}\n")
-        log.write(f"{tstr}:     VN-200 mag: {cd.imu.mag}\n")
-        log.write(f"{tstr}:     VN-200 accel: {cd.imu.accel}\n")
-        tUtc = cd.gnss.gnss1TimeUtc
-        tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
-        log.write(f"{tstr}:     VN-200 gnss1TimeUtc: {tUtc}\n")
-        log.write(f"{tstr}:     VN-200 gnss1NumSats: {cd.gnss.gnss1NumSats}\n")
-        log.write(f"{tstr}:     VN-200 gnss1Fix: {cd.gnss.gnss1Fix}\n")
-        log.write(f"{tstr}:     VN-200 gnss1PosLla: Lat: {cd.gnss.gnss1PosLla.lat}, Lon: {cd.gnss.gnss1PosLla.lon}, Alt: {cd.gnss.gnss1PosLla.alt}\n")
-        log.write(f"{tstr}:     VN-200 gnss1PosEcef: {cd.gnss.gnss1PosEcef}\n")
-        log.write(f"{tstr}:     VN-200 gnss1PosUncertainty: {cd.gnss.gnss1PosUncertainty}\n")
-        log.write(f"{tstr}:     VN-200 gnss1TimeUncertainty: {cd.gnss.gnss1TimeUncertainty}\n")
-        log.write(f"{tstr}:     VN-200 ypr: {cd.attitude.ypr}\n")
-        log.write(f"{tstr}:     VN-200 quaternion: Scalar: {cd.attitude.quaternion.scalar}, Vector: {cd.attitude.quaternion.vector}\n")
-        log.write(f"{tstr}:     VN-200 magNed: {cd.attitude.magNed}\n")
-        log.write(f"{tstr}:     VN-200 insStatus: GnssCompassFix: {cd.ins.insStatus.gnssCompassFix}, GnssErr: {cd.ins.insStatus.gnssErr}, GnssFix: {cd.ins.insStatus.gnssFix}\n")
-        log.write(f"{tstr}:     VN-200 posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n")
-        log.write(f"{tstr}:     VN-200 posEcef: {cd.ins.posEcef}\n")
-        log.write(f"{tstr}:     VN-200 posU: {cd.ins.posU}\n")
-        log.write(f"{tstr}:     VN-200 gnss2PosLla: Lat: {cd.gnss2.gnss2PosLla.lat}, Lon: {cd.gnss2.gnss2PosLla.lon}, Alt: {cd.gnss2.gnss2PosLla.alt}\n\n")
+        cd = s.getMostRecentMeasurement()
+        while not cd and (time.time() - t0 < 10):
+            cd = s.getMostRecentMeasurement()
+        if cd:
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
+            log.write(f"{tstr}:     VN-200 timeGps (μs): {cd.time.timeGps.microseconds()}\n")
+            log.write(f"{tstr}:     VN-200 timeGpsTow (μs): {cd.time.timeGpsTow.microseconds()}\n")
+            log.write(f"{tstr}:     VN-200 timeGpsWeek: {cd.time.timeGpsWeek}\n")
+            log.write(f"{tstr}:     VN-200 timeSyncIn (μs): {cd.time.timeSyncIn.microseconds()}\n")
+            log.write(f"{tstr}:     VN-200 timeGpsPps (μs): {cd.time.timeGpsPps.microseconds()}\n")
+            tUtc = cd.time.timeUtc
+            tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
+            log.write(f"{tstr}:     VN-200 timeUtc: {tUtc}\n")
+            log.write(f"{tstr}:     VN-200 imuStatus: Accel: {cd.imu.imuStatus.accelStatus}, Gyro: {cd.imu.imuStatus.gyroStatus}, Mag: {cd.imu.imuStatus.magStatus}, PresTemp: {cd.imu.imuStatus.presTempStatus}\n")
+            log.write(f"{tstr}:     VN-200 uncompMag: {cd.imu.uncompMag}\n")
+            log.write(f"{tstr}:     VN-200 uncompAccel: {cd.imu.uncompAccel}\n")
+            log.write(f"{tstr}:     VN-200 temperature: {cd.imu.temperature}\n")
+            log.write(f"{tstr}:     VN-200 pressure: {cd.imu.pressure}\n")
+            log.write(f"{tstr}:     VN-200 mag: {cd.imu.mag}\n")
+            log.write(f"{tstr}:     VN-200 accel: {cd.imu.accel}\n")
+            tUtc = cd.gnss.gnss1TimeUtc
+            tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
+            log.write(f"{tstr}:     VN-200 gnss1TimeUtc: {tUtc}\n")
+            log.write(f"{tstr}:     VN-200 gnss1NumSats: {cd.gnss.gnss1NumSats}\n")
+            log.write(f"{tstr}:     VN-200 gnss1Fix: {cd.gnss.gnss1Fix}\n")
+            log.write(f"{tstr}:     VN-200 gnss1PosLla: Lat: {cd.gnss.gnss1PosLla.lat}, Lon: {cd.gnss.gnss1PosLla.lon}, Alt: {cd.gnss.gnss1PosLla.alt}\n")
+            log.write(f"{tstr}:     VN-200 gnss1PosEcef: {cd.gnss.gnss1PosEcef}\n")
+            log.write(f"{tstr}:     VN-200 gnss1PosUncertainty: {cd.gnss.gnss1PosUncertainty}\n")
+            log.write(f"{tstr}:     VN-200 gnss1TimeUncertainty: {cd.gnss.gnss1TimeUncertainty}\n")
+            log.write(f"{tstr}:     VN-200 ypr: {cd.attitude.ypr}\n")
+            log.write(f"{tstr}:     VN-200 quaternion: Scalar: {cd.attitude.quaternion.scalar}, Vector: {cd.attitude.quaternion.vector}\n")
+            log.write(f"{tstr}:     VN-200 magNed: {cd.attitude.magNed}\n")
+            log.write(f"{tstr}:     VN-200 insStatus: GnssCompassFix: {cd.ins.insStatus.gnssCompassFix}, GnssErr: {cd.ins.insStatus.gnssErr}, GnssFix: {cd.ins.insStatus.gnssFix}\n")
+            log.write(f"{tstr}:     VN-200 posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n")
+            log.write(f"{tstr}:     VN-200 posEcef: {cd.ins.posEcef}\n")
+            log.write(f"{tstr}:     VN-200 posU: {cd.ins.posU}\n")
+            log.write(f"{tstr}:     VN-200 gnss2PosLla: Lat: {cd.gnss2.gnss2PosLla.lat}, Lon: {cd.gnss2.gnss2PosLla.lon}, Alt: {cd.gnss2.gnss2PosLla.alt}\n\n")
     log.close()
     s.disconnect()

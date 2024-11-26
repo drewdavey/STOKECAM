@@ -7,9 +7,9 @@ import sys
 import time
 import threading
 import subprocess
-from vnpy import *
 from utils import *
 from settings import *
+from vectornav import *
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone, timedelta
@@ -26,7 +26,7 @@ def configure_cameras(fname_log, mode):
         log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
 
-def calib(fdir, fname_log, calib_dt, calib_frames, mode):
+def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName):
     [led.on() for led in (red, green, yellow)]
     time.sleep(5)
     [led.off() for led in (red, green, yellow)]
@@ -35,7 +35,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     tnow = datetime.now(timezone.utc)
     tstr = tnow.strftime('%H%M%S%f')
     log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n"), log.close()
-    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
+    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log, portName])
     for i in range(int(calib_frames)):
         green.on(), time.sleep(0.5)
         yellow.on(), time.sleep(0.5)
@@ -50,8 +50,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
         time.sleep(calib_dt)
     imu_process.terminate()
 
-def monitor_gps():
-    portName = '/dev/ttyUSB0'
+def monitor_gps(portName):
     s = Sensor()             # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)  # at the baud rate of 115200 (115,200 bytes/s)
     gnss = Registers.GnssSolLla()
@@ -125,13 +124,13 @@ def exit_standby(fname_log):
     log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
     standby = False
 
-def enter_standby(fdir, fname_log, dt, mode):
+def enter_standby(fdir, fname_log, dt, mode, portName):
     yellow.on()
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
-    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log])
+    imu_process = subprocess.Popen(['python3', 'imu.py', fname_imu, fname_log, portName])
     time.sleep(1)
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
@@ -183,7 +182,7 @@ configure_cameras(fname_log, mode)              # Configure the cameras
 
 standby = False
 tnow = time.time()
-monitor_gps()
+monitor_gps(portName)
 tlast = time.time()
 #######################################################################
 
@@ -195,14 +194,14 @@ tlast = time.time()
 #                         - release left ONLY to exit script                              
 while True: 
     if (time.time() - tlast > 30) and not standby:
-        monitor_gps()
+        monitor_gps(portName)
         tlast = time.time()
     if right_button.is_held and not standby and not left_button.is_pressed:
         standby = True
-        enter_standby(fdir, fname_log, dt, mode)    
+        enter_standby(fdir, fname_log, dt, mode, portName)    
     if left_button.is_held and not standby and not right_button.is_pressed:
-        calib(fdir, fname_log, calib_dt, calib_frames, mode)
-        monitor_gps()
+        calib(fdir, fname_log, calib_dt, calib_frames, mode, portName)
+        monitor_gps(portName)
     if (right_button.is_held and left_button.is_held) and not standby:
         [led.on() for led in (red, green, yellow)]
         left_button.wait_for_release()
@@ -211,7 +210,7 @@ while True:
             break
         else:
             toggle_modes()
-            monitor_gps()
+            monitor_gps(portName)
     time.sleep(0.2)
 #######################################################################
 
