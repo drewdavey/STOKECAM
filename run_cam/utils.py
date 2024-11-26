@@ -9,39 +9,6 @@ import yaml
 from vectornav import *
 from datetime import datetime, timezone
 
-# List of VN-200 groups and parameters
-vn_parameters = [
-    ('time', 'timeUtc'),
-    ('time', 'timeStartup'),
-    ('time', 'timeGps'),
-    ('time', 'timeGpsTow'),
-    ('time', 'timeGpsWeek'),
-    ('time', 'timeSyncIn'),
-    ('time', 'timeGpsPps'),
-    ('imu', 'imuStatus'),
-    ('imu', 'uncompMag'),
-    ('imu', 'uncompAccel'),
-    ('imu', 'temperature'),
-    ('imu', 'pressure'),
-    ('imu', 'mag'),
-    ('imu', 'accel'),
-    ('gnss', 'gnss1TimeUtc'),
-    ('gnss', 'gnss1NumSats'),
-    ('gnss', 'gnss1Fix'),
-    ('gnss', 'gnss1PosLla'),
-    ('gnss', 'gnss1PosEcef'),
-    ('gnss', 'gnss1PosUncertainty'),
-    ('gnss', 'gnss1TimeUncertainty'),
-    ('attitude', 'ypr'),
-    ('attitude', 'quaternion'),
-    ('attitude', 'magNed'),
-    ('ins', 'insStatus'),
-    ('ins', 'posLla'),
-    ('ins', 'posEcef'),
-    ('ins', 'posU'),
-    ('gnss2', 'gnss2PosLla')
-]
-
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
@@ -118,14 +85,35 @@ def config_VN200_output(portName):
     binaryOutput1Register.asyncMode.serial2 = 0
     binaryOutput1Register.common.timeStartup = 1
     binaryOutput1Register.common.accel = 1
-    binaryOutput1Register.common.angularRate = 1
-    
-    # Create a configurator instance
-    configurator = BinaryOutputConfigurator(binaryOutput1Register)
-    # Apply configurations dynamically
-    for category, parameter in vn_parameters:
-        configurator.set_attribute(category, parameter, 1)
-
+    binaryOutput1Register.time.timeUtc = 1
+    binaryOutput1Register.time.timeStartup = 1
+    binaryOutput1Register.time.timeGps = 1
+    binaryOutput1Register.time.timeGpsTow = 1
+    binaryOutput1Register.time.timeGpsWeek = 1
+    binaryOutput1Register.time.timeSyncIn = 1
+    binaryOutput1Register.time.timeGpsPps = 1
+    binaryOutput1Register.imu.imuStatus = 1
+    binaryOutput1Register.imu.uncompMag = 1
+    binaryOutput1Register.imu.uncompAccel = 1
+    binaryOutput1Register.imu.temperature = 1
+    binaryOutput1Register.imu.pressure = 1
+    binaryOutput1Register.imu.mag = 1
+    binaryOutput1Register.imu.accel = 1
+    binaryOutput1Register.gnss.gnss1TimeUtc = 1
+    binaryOutput1Register.gnss.gnss1NumSats = 1
+    binaryOutput1Register.gnss.gnss1Fix = 1
+    binaryOutput1Register.gnss.gnss1PosLla = 1
+    binaryOutput1Register.gnss.gnss1PosEcef = 1
+    binaryOutput1Register.gnss.gnss1PosUncertainty = 1
+    binaryOutput1Register.gnss.gnss1TimeUncertainty = 1
+    binaryOutput1Register.attitude.ypr = 1
+    binaryOutput1Register.attitude.quaternion = 1
+    binaryOutput1Register.attitude.magNed = 1
+    binaryOutput1Register.ins.insStatus = 1
+    binaryOutput1Register.ins.posLla = 1
+    binaryOutput1Register.ins.posEcef = 1
+    binaryOutput1Register.ins.posU = 1
+    binaryOutput1Register.gnss2.gnss2PosLla = 1
     s.writeRegister(binaryOutput1Register)
     print(f"{tstr}:     Binary output message configured\n")
     s.disconnect()
