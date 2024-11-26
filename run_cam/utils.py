@@ -68,7 +68,7 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
     s.autoConnect(portName)             # at the baud rate of 115200 (115,200 bytes/s) 
     
     with open(fname_log, 'a') as log:
-        log.write(f"Connected to {portName} at {s.connectedBaudRate()}")
+        log.write(f"Connected to {portName} at {s.connectedBaudRate().name}\n")
         model = Registers.Model()
         s.readRegister(model)
         model_num = model.model
@@ -105,33 +105,34 @@ def sync_clock_and_imu(fname_log, gps_wait_time):
         i = 0 
         gnss = Registers.GnssSolLla()
         s.readRegister(gnss)
-        print(f"GNSS Fix:  {gnss.gnss1Fix.name}")
-        print(f"GNSS Num Sats:  {gnss.gnss1NumSats}")
-        # while ez.current_data.position_uncertainty_estimated > 10:
-        #     # num_sats = ez.current_data.num_sats
-        #     # log.write(f"Number of satellites: {num_sats}\n")
-        #     time.sleep(1)
-        #     i += 1
-        #     if i > gps_wait_time:
-        #         log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
-        #         break
-        # tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        # if ez.current_data.has_any_position:
-        #     pos = ez.current_data.position_estimated_lla
-        #     log.write(f"{tstr}:     GPS Position (LLA): ({pos.x}, {pos.y}, {pos.z})\n")
-        #     posun = ez.current_data.any_position_uncertainty
-        #     log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
-        #     posunes = ez.current_data.position_uncertainty_estimated
-        #     log.write(f"{tstr}:     Position uncertainty estimated: {posunes}\n")
-        # if ez.current_data.has_time_gps:
-        #     vn_time = ez.current_data.time_utc
-        #     log.write(f"{tstr}:     Time from VN-200: {vn_time}\n")
-        # if ez.current_data.has_num_sats:
-        #     num_sats = ez.current_data.num_sats
-        #     log.write(f"{tstr}:     Number of satellites: {num_sats}\n")
-        # gps_sol = s.read_gps_solution_lla()
-        # log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n")
-        # imu_out = s.read_imu_measurements() 
-        # log.write(f"{tstr}:     Current Temperature: {imu_out.temp} and Pressure: {imu_out.pressure}\n\n")
+        gnssFix = gnss.gnss1Fix.name
+        while gnssFix == 'NoFix':
+            s.readRegister(gnss)
+            gnssFix = gnss.gnss1Fix.name
+            num_sats = gnss.gnss1NumSats
+            time.sleep(1)
+            i += 1
+            if i > gps_wait_time:
+                log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
+                break
+        log.write(f"GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        if ez.current_data.has_any_position:
+            pos = ez.current_data.position_estimated_lla
+            log.write(f"{tstr}:     GPS Position (LLA): ({pos.x}, {pos.y}, {pos.z})\n")
+            posun = ez.current_data.any_position_uncertainty
+            log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
+            posunes = ez.current_data.position_uncertainty_estimated
+            log.write(f"{tstr}:     Position uncertainty estimated: {posunes}\n")
+        if ez.current_data.has_time_gps:
+            vn_time = ez.current_data.time_utc
+            log.write(f"{tstr}:     Time from VN-200: {vn_time}\n")
+        if ez.current_data.has_num_sats:
+            num_sats = ez.current_data.num_sats
+            log.write(f"{tstr}:     Number of satellites: {num_sats}\n")
+        gps_sol = s.read_gps_solution_lla()
+        log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n")
+        imu_out = s.read_imu_measurements() 
+        log.write(f"{tstr}:     Current Temperature: {imu_out.temp} and Pressure: {imu_out.pressure}\n\n")
     log.close()
     s.disconnect()

@@ -51,15 +51,28 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode):
     imu_process.terminate()
 
 def monitor_gps():
-    ez = EzAsyncData.connect('/dev/ttyUSB0', 115200) 
-    s = ez.sensor
-    if ez.current_data.has_any_position:                              
-        if ez.current_data.position_uncertainty_estimated > 10:
-            green.blink(0.25, 0.25)
-        elif ez.current_data.position_uncertainty_estimated <= 10:
-            green.on()
+    portName = '/dev/ttyUSB0'
+    s = Sensor()             # Create sensor object and connect to the VN-200 
+    s.autoConnect(portName)  # at the baud rate of 115200 (115,200 bytes/s)
+    gnss = Registers.GnssSolLla()
+    s.readRegister(gnss)
+    gnssFix = gnss.gnss1Fix.name
+    if gnssFix == 'NoFix':                              
+        green.blink(0.25, 0.25)
+    elif gnssFix == 'TimeFix':
+        green.blink(0.5, 0.5)
+    elif gnssFix == 'Fix2D':
+        green.blink(1, 1)
+    elif gnssFix == 'Fix3D':
+        green.on()
+    elif gnssFix == 'SBAS':
+        green.on()
+    elif gnssFix == 'RtkFloat':
+        green.on()
+    elif gnssFix == 'RtkFix':
+        green.on()
     else:
-        green.blink(0.5, 0.5) 
+        green.blink(0.25, 0.25) 
     s.disconnect()
 
 def toggle_modes():
