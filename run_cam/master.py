@@ -162,17 +162,16 @@ try:
 except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
     clock_timeout = 10
 
-sync_clock(clock_timeout)                       # Sync the clock
-
+portName = '/dev/ttyUSB0'                       # Default port for VN-200
+config_VN200_output(portName)                   # Config VN-200 output
+sync_clock(portName, clock_timeout)             # Sync the clock
 fdir, fname_log = setup_logging()               # Setup logging
-
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 dt = inputs['dt']
 calib_dt = inputs['calib_dt']
 calib_frames = inputs['calib_frames']
 gps_timeout = inputs['gps_timeout']
-
-config_VN200(fname_log, gps_timeout)            # Config VN-200 output and get GPS status 
+sync_gps(portName, fname_log, gps_timeout)      # Config VN-200 output and get GPS status 
 
 global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]

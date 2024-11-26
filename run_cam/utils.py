@@ -61,15 +61,41 @@ def create_dirs(fdir, mode):
     fname_imu = f'{fdir_out}IMU_{session}.txt'
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
-def sync_clock(clock_timeout):
-    portName = '/dev/ttyUSB0'
+def config_VN200_output(portName):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
+    
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    #### CONFIGURE ADOR AND AODF 
+    asyncDataOutputType = Registers.AsyncOutputType()
+    asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
+    asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+    s.writeRegister(asyncDataOutputType)
+    print(f"{tstr}:     ADOR Configured\n")
+    asyncDataOutputFreq= Registers.AsyncOutputFreq()
+    asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate20Hz
+    asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+    s.writeRegister(asyncDataOutputFreq)
+    print(f"{tstr}:     ADOF Configured\n")
+    
+    #### CONFIGURE THE BINARY OUTPUT
     binaryOutput1Register = Registers.BinaryOutput1()
+    binaryOutput1Register.rateDivisor = 100
     binaryOutput1Register.asyncMode.serial1 = 1
+    binaryOutput1Register.asyncMode.serial2 = 0
+    binaryOutput1Register.common.timeStartup = 1
+    binaryOutput1Register.common.accel = 1
+    binaryOutput1Register.common.angularRate = 1
     binaryOutput1Register.time.timeUtc = 1
     s.writeRegister(binaryOutput1Register)
+    print(f"{tstr}:     Binary output message configured\n")
     
+    s.disconnect()
+
+def sync_clock(portName, clock_timeout):
+    s = Sensor()                      # Create sensor object and connect to the VN-200 
+    s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
+
     # Wait for GPS
     i = 0 
     gnss = Registers.GnssSolLla()
@@ -106,10 +132,10 @@ def sync_clock(clock_timeout):
 
     s.disconnect()
 
-def config_VN200(fname_log, gps_timeout):
-    portName = '/dev/ttyUSB0'
+def sync_gps(portName, fname_log, gps_timeout):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
-    s.autoConnect(portName)             # at the baud rate of 115200 (115,200 bytes/s) 
+    s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
+
     with open(fname_log, 'a') as log:
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     Connected to {portName} at {s.connectedBaudRate().name}\n")
@@ -122,30 +148,6 @@ def config_VN200(fname_log, gps_timeout):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
-
-        #### CONFIGURE ADOR AND AODF 
-        asyncDataOutputType = Registers.AsyncOutputType()
-        asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
-        asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
-        s.writeRegister(asyncDataOutputType)
-        log.write(f"{tstr}:     ADOR Configured\n")
-        asyncDataOutputFreq= Registers.AsyncOutputFreq()
-        asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate20Hz
-        asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
-        s.writeRegister(asyncDataOutputFreq)
-        log.write(f"{tstr}:     ADOF Configured\n")
-
-        #### CONFIGURE THE BINARY OUTPUT
-        binaryOutput1Register = Registers.BinaryOutput1()
-        binaryOutput1Register.rateDivisor = 100
-        binaryOutput1Register.asyncMode.serial1 = 1
-        binaryOutput1Register.asyncMode.serial2 = 0
-        binaryOutput1Register.common.timeStartup = 1
-        binaryOutput1Register.common.accel = 1
-        binaryOutput1Register.common.angularRate = 1
-        binaryOutput1Register.time.timeUtc = 1
-        s.writeRegister(binaryOutput1Register)
-        log.write(f"{tstr}:     Binary output message configured\n")
 
         # Wait for GPS
         i = 0 
