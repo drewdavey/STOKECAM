@@ -142,21 +142,18 @@ def sync_clock(portName, clock_timeout):
     # Sync the RP clock to the VN-200
     if gnssFix != 'NoFix':
         t0 = time.time()
-        # while (time.time() - t0 < 5):
-        #     cd = s.getNextMeasurement()
-        #     if not cd: continue
-        #     if tUtc := cd.time.timeUtc:
-        #         # Format the time as 'YYYY-MM-DD HH:MM:SS'
-        #         # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}-{tUtc.fracSec}"
-        #         formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
-        cd = s.getNextMeasurement(1)
-        tUtc = cd.time.timeUtc
-        formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
-        # Set the system time (requires root privileges)
-        os.system(f"sudo date -s '{formatted_time}'")
-        print(f"{tstr}:     Setting system time to: {formatted_time}")
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        print(f"{tstr}:     RP clock synced to VN-200.\n")
+        while (time.time() - t0 < 5):
+            cd = s.getNextMeasurement()
+            if not cd: continue
+            if tUtc := cd.time.timeUtc:
+                # Format the time as 'YYYY-MM-DD HH:MM:SS'
+                # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}-{tUtc.fracSec}"
+                formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
+                # Set the system time (requires root privileges)
+                os.system(f"sudo date -s '{formatted_time}'")
+                tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+                print(f"{tstr}:     Setting system time to: {formatted_time}")
+                print(f"{tstr}:     RP clock synced to VN-200.\n")
     s.disconnect()
 
 def parse_time(time_str):
@@ -213,11 +210,11 @@ def VN200_status(portName, fname_log, gps_timeout):
                     rp_time = datetime.now(timezone.utc).strftime('%H%M%S%f')[:-3]
             vn_time = parse_time(vn_time)
             rp_time = parse_time(rp_time)
-            diff_time = rp_time - vn_time
+            diff_time = vn_time - rp_time
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     VN-200 Time: {vn_time}\n")
             log.write(f"{tstr}:     RP Time: {rp_time}\n")
-            log.write(f"{tstr}:     Clock Offset (RP - VN200): {diff_time}\n")
+            log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_time}\n")
         if cd:
             cd = s.getMostRecentMeasurement(1)
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
