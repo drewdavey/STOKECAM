@@ -121,7 +121,7 @@ def sync_clock(portName, clock_timeout):
             if not cd: continue
             if timeUtc := cd.time.timeUtc:
                 print(f"Time: {timeUtc}")
-                print(f"Time: {timeUtc.name}")
+                print(f"Time: {dir(timeUtc)}")
                 print(f"Time: {cd.gnss.gnss1TimeUtc}")
 
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
