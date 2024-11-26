@@ -2,7 +2,7 @@
 ##################################
 # Inputs for STOKE
 ##################################
-gps_wait_time: 5        # Time to wait for GPS lock in seconds (during startup)
+gps_wait_time: 60        # Time to wait for GPS lock in seconds (during startup)
 
 shooting_mode0: 'auto'  # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
 shooting_mode1: 'fast'  # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
