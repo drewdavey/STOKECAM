@@ -148,11 +148,10 @@ def sync_clock(portName, clock_timeout):
             if tUtc := cd.time.timeUtc:
                 # Format the time as 'YYYY-MM-DD HH:MM:SS'
                 # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}.{tUtc.fracSec}"
-                formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}"
+                formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
                 os.system(f"sudo date -s '{formatted_time}'") # Set the system time
                 tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-                print(f"{tstr}:     Setting system time to: {formatted_time}")
-                print(f"{tstr}:     RP clock synced to VN-200.\n")
+                print(f"{tstr}:     Setting RP clock to: {formatted_time}")
     s.disconnect()
 
 def parse_time(time_str):
@@ -209,7 +208,7 @@ def VN200_status(portName, fname_log, gps_timeout):
                 if not cd: continue
                 if tUtc := cd.time.timeUtc:
                     # Format the time as 'HHMMSSfff'
-                    vn_time = f"20{tUtc.year}{tUtc.month}{tUtc.day}{tUtc.hour}{tUtc.minute}{tUtc.second}{tUtc.fracSec}"
+                    vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec}"
                     vn_time = parse_time(vn_time)
                     rp_time = parse_time(rp_time)
                     diff_time = vn_time - rp_time
