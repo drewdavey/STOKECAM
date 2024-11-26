@@ -158,7 +158,7 @@ right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
 
 try:
-    clock_timeout = yaml.safe_load('../inputs.yaml')['clock_timeout']
+    clock_timeout = yaml.safe_load(open('../inputs.yaml', 'r'))['clock_timeout']
 except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
     clock_timeout = 10
 
