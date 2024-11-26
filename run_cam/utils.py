@@ -79,19 +79,23 @@ def sync_clock(clock_timeout):
         s.readRegister(gnss)
         gnssFix = gnss.gnss1Fix.name
         num_sats = gnss.gnss1NumSats
-        timeUtc = gnss.gnss1TimeUtc
         time.sleep(1)
         i += 1
         if i > clock_timeout:
             break
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    print(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
-    print(f"Time: {timeUtc}")
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    print(f"{tstr}:     Syncing RP clock to VN-200...\n")
-    time.sleep(5)
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    print(f"{tstr}:     RP clock synced to VN-200.\n")
+    
+    # Sync the RP clock to the VN-200
+    if gnssFix != 'NoFix':
+        s.readRegister(gnss)
+        timeUtc = gnss.gnss1TimeUtc
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        print(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
+        print(f"Time: {timeUtc}")
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        print(f"{tstr}:     Syncing RP clock to VN-200...\n")
+        time.sleep(5)
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        print(f"{tstr}:     RP clock synced to VN-200.\n")
 
     # # Sync the RP clock to the VN-200
     # if gnssFix != 'NoFix':
