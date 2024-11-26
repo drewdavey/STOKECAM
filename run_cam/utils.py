@@ -231,10 +231,10 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n\n")
         
         t0 = time.time()
-        cd = s.getMostRecentMeasurement()
-        while cd is None and (time.time() - t0 < 10):
-            cd = s.getMostRecentMeasurement()
-        if cd is not None:
+        while (time.time() - t0 < 5):
+            cd = s.getNextMeasurement()
+            if not cd: continue
+        try:
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     VN-200 timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
             log.write(f"{tstr}:     VN-200 timeGps (μs): {cd.time.timeGps.microseconds()}\n")
@@ -269,5 +269,8 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     VN-200 posEcef: {cd.ins.posEcef}\n")
             log.write(f"{tstr}:     VN-200 posU: {cd.ins.posU}\n")
             log.write(f"{tstr}:     VN-200 gnss2PosLla: Lat: {cd.gnss2.gnss2PosLla.lat}, Lon: {cd.gnss2.gnss2PosLla.lon}, Alt: {cd.gnss2.gnss2PosLla.alt}\n\n")
+        except:
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     Error reading VN-200 data\n\n")
     log.close()
     s.disconnect()
