@@ -161,7 +161,7 @@ def sync_clock(portName, clock_timeout):
                 tzinfo=timezone.utc)
 
                 # Add [delay] seconds to VN-200 time
-                delay = 9
+                delay = 0
                 vn_time_adjusted = vn_time + timedelta(seconds=delay)
                 
                 # Format adjusted time for `date` command
