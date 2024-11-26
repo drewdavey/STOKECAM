@@ -159,8 +159,8 @@ left_button = Button(17, hold_time=3)   # Left button
 
 try:
     clock_timeout = yaml.safe_load('../inputs.yaml')['clock_timeout']
-finally:
-    if clock_timeout is None: clock_timeout = 10
+except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
+    clock_timeout = 10
 
 sync_clock(clock_timeout)                       # Sync the clock
 
