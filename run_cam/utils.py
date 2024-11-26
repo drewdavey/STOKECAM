@@ -206,7 +206,7 @@ def VN200_status(portName, fname_log, gps_timeout):
                     minutes = int(vn_time[10:12])
                     seconds = int(vn_time[12:14])
                     milliseconds = int(vn_time[14:])
-                    vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000)
+                    vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000, tzinfo=timezone.utc)
                     diff_time = vn_time - rp_time
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     VN-200 Time: {vn_time}\n")
