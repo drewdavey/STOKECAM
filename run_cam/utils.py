@@ -119,10 +119,10 @@ def sync_clock(portName, clock_timeout):
         while (time.time() - t0 < 5):
             cd = s.getNextMeasurement()
             if not cd: continue
-            if timeUtc := cd.time.timeUtc:
-                print(f"Time: {timeUtc}")
-                print(f"Time: {dir(timeUtc)}")
-                print(f"Time: {cd.gnss.gnss1TimeUtc}")
+            if tUtc := cd.time.timeUtc:
+                print(f"Time: {tUtc}")
+                print(f"Time: {dir(tUtc)}")
+                print(f"Time: {tUtc.year}-{tUtc.month}-{tUtc.day}-{tUtc.hour}-{tUtc.minute}-{tUtc.second}-{tUtc.fracSec}")
 
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         print(f"{tstr}:     Syncing RP clock to VN-200...\n")
