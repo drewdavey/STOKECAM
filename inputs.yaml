@@ -3,8 +3,8 @@
 # Inputs for STOKE
 ##################################
 
-gps_timeout: 10          # Time to wait for GPS lock in seconds (during startup)
-clock_timeout: 120        # Time to wait for clock sync in seconds (during startup)
+gps_timeout: 5          # Time to wait for GPS lock in seconds (during startup)
+clock_timeout: 120      # Time to wait for clock sync in seconds (during startup)
 
 shooting_mode0: 'auto'  # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
 shooting_mode1: 'fast'  # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'

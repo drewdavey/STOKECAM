@@ -66,11 +66,11 @@ def monitor_gps():
     elif gnssFix == 'Fix3D':
         green.on()
     elif gnssFix == 'SBAS':
-        green.on()
+        green.blink(2, 2)
     elif gnssFix == 'RtkFloat':
-        green.on()
+        green.blink(3, 3)
     elif gnssFix == 'RtkFix':
-        green.on()
+        green.blink(4, 4)
     else:
         green.blink(0.25, 0.25) 
     s.disconnect()
@@ -171,7 +171,7 @@ dt = inputs['dt']
 calib_dt = inputs['calib_dt']
 calib_frames = inputs['calib_frames']
 gps_timeout = inputs['gps_timeout']
-sync_gps(portName, fname_log, gps_timeout)      # Config VN-200 output and get GPS status 
+VN200_status(portName, fname_log, gps_timeout)  # Get IMU/GPS status 
 
 global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
@@ -194,7 +194,7 @@ tlast = time.time()
 #                         - release both to toggle modes
 #                         - release left ONLY to exit script                              
 while True: 
-    if (time.time() - tlast > 10) and not standby:
+    if (time.time() - tlast > 30) and not standby:
         monitor_gps()
         tlast = time.time()
     if right_button.is_held and not standby and not left_button.is_pressed:

@@ -9,6 +9,39 @@ import yaml
 from vectornav import *
 from datetime import datetime, timezone
 
+# List of VN-200 groups and parameters
+vn_parameters = [
+    ('time', 'timeUtc'),
+    ('time', 'timeStartup'),
+    ('time', 'timeGps'),
+    ('time', 'timeGpsTow'),
+    ('time', 'timeGpsWeek'),
+    ('time', 'timeSyncIn'),
+    ('time', 'timeGpsPps'),
+    ('imu', 'imuStatus'),
+    ('imu', 'uncompMag'),
+    ('imu', 'uncompAccel'),
+    ('imu', 'temperature'),
+    ('imu', 'pressure'),
+    ('imu', 'mag'),
+    ('imu', 'accel'),
+    ('gnss', 'gnss1TimeUtc'),
+    ('gnss', 'gnss1NumSats'),
+    ('gnss', 'gnss1Fix'),
+    ('gnss', 'gnss1PosLla'),
+    ('gnss', 'gnss1PosEcef'),
+    ('gnss', 'gnss1PosUncertainty'),
+    ('gnss', 'gnss1TimeUncertainty'),
+    ('attitude', 'ypr'),
+    ('attitude', 'quaternion'),
+    ('attitude', 'magNed'),
+    ('ins', 'insStatus'),
+    ('ins', 'posLla'),
+    ('ins', 'posEcef'),
+    ('ins', 'posU'),
+    ('gnss2', 'gnss2PosLla')
+]
+
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
@@ -87,6 +120,11 @@ def config_VN200_output(portName):
     binaryOutput1Register.common.accel = 1
     binaryOutput1Register.common.angularRate = 1
     binaryOutput1Register.time.timeUtc = 1
+    # Execute the configuration lines dynamically
+    for category, parameter in vn_parameters:
+        category_obj = getattr(binaryOutput1Register, category)
+        setattr(category_obj, parameter, 1)
+
     s.writeRegister(binaryOutput1Register)
     print(f"{tstr}:     Binary output message configured\n")
     s.disconnect()
@@ -129,7 +167,14 @@ def sync_clock(portName, clock_timeout):
         print(f"{tstr}:     RP clock synced to VN-200.\n")
     s.disconnect()
 
-def sync_gps(portName, fname_log, gps_timeout):
+def parse_time(time_str):
+    hours = int(time_str[:2])
+    minutes = int(time_str[2:4])
+    seconds = int(time_str[4:6])
+    milliseconds = int(time_str[6:])
+    return datetime(2000, 1, 1, hours, minutes, seconds, milliseconds * 1000)
+
+def VN200_status(portName, fname_log, gps_timeout):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
@@ -164,22 +209,110 @@ def sync_gps(portName, fname_log, gps_timeout):
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
 
-        # if ez.current_data.has_any_position:
-        #     pos = ez.current_data.position_estimated_lla
-        #     log.write(f"{tstr}:     GPS Position (LLA): ({pos.x}, {pos.y}, {pos.z})\n")
-        #     posun = ez.current_data.any_position_uncertainty
-        #     log.write(f"{tstr}:     Position uncertainty: ({posun.x}, {posun.y}, {posun.z})\n")
-        #     posunes = ez.current_data.position_uncertainty_estimated
-        #     log.write(f"{tstr}:     Position uncertainty estimated: {posunes}\n")
-        # if ez.current_data.has_time_gps:
-        #     vn_time = ez.current_data.time_utc
-        #     log.write(f"{tstr}:     Time from VN-200: {vn_time}\n")
-        # if ez.current_data.has_num_sats:
-        #     num_sats = ez.current_data.num_sats
-        #     log.write(f"{tstr}:     Number of satellites: {num_sats}\n")
-        # gps_sol = s.read_gps_solution_lla()
-        # log.write(f"{tstr}:     GPS Solution (LLA): ({gps_sol.lla.x}, {gps_sol.lla.y}, {gps_sol.lla.z})\n")
-        # imu_out = s.read_imu_measurements() 
-        # log.write(f"{tstr}:     Current Temperature: {imu_out.temp} and Pressure: {imu_out.pressure}\n\n")
+        # Log any time offset between RP and VN200 before starting session
+        if gnssFix != 'NoFix':
+            t0 = time.time()
+            while (time.time() - t0 < 5):
+                cd = s.getNextMeasurement()
+                if not cd: continue
+                if tUtc := cd.time.timeUtc:
+                    # Format the time as 'HHMMSSfff'
+                    vn_time = f"{tUtc.hour}{tUtc.minute}{tUtc.second}{tUtc.fracSec}"
+                    rp_time = datetime.now(timezone.utc).strftime('%H%M%S%f')[-3]
+            vn_time = parse_time(vn_time)
+            rp_time = parse_time(rp_time)
+            diff_time = rp_time - vn_time
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 Time: {vn_time}\n")
+            log.write(f"{tstr}:     RP Time: {rp_time}\n")
+            log.write(f"{tstr}:     Clock Offset (RP - VN200): {diff_time}\n")
+        if cd:
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 timeStartup: ({cd.time.timeStartup})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 timeGps: ({cd.time.timeGps})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 timeGpsTow: ({cd.time.timeGpsTow})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 timeGpsWeek: ({cd.time.timeGpsWeek})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 timeSyncIn: ({cd.time.timeSyncIn})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 timeGpsPps: ({cd.time.timeGpsPps})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 timeUtc: ({cd.time.timeUtc})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 imuStatus: ({cd.imu.imuStatus})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 uncompMag: ({cd.imu.uncompMag})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 uncompAccel: ({cd.imu.uncompAccel})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 temperature: ({cd.imu.temperature})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 pressure: ({cd.imu.pressure})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 mag: ({cd.imu.mag})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 accel: ({cd.imu.accel})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 gnss1TimeUtc: ({cd.gnss.gnss1TimeUtc})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 gnss1NumSats: ({cd.gnss.gnss1NumSats})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 gnss1Fix: ({cd.gnss.gnss1Fix})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 gnss1PosLla: ({cd.gnss.gnss1PosLla})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 gnss1PosEcef: ({cd.gnss.gnss1PosEcef})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 gnss1PosUncertainty: ({cd.gnss.gnss1PosUncertainty})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 gnss1TimeUncertainty: ({cd.gnss.gnss1TimeUncertainty})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 ypr: ({cd.attitude.ypr})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 quaternion: ({cd.attitude.quaternion})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 magNed: ({cd.attitude.magNed})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 insStatus: ({cd.ins.insStatus})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 posLla: ({cd.ins.posLla})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 posEcef: ({cd.ins.posEcef})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 posU: ({cd.ins.posU})\n")
+            cd = s.getNextMeasurement(1)
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            log.write(f"{tstr}:     VN-200 gnss2PosLla: ({cd.gnss2.gnss2PosLla})\n")
     log.close()
     s.disconnect()
