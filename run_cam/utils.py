@@ -7,7 +7,9 @@ import os
 import time
 import yaml
 from vectornav import *
+from vectornav.Registers import VpeBasicControl
 from datetime import datetime, timezone, timedelta
+from vectornav.Commands import Command, KnownMagneticDisturbance
 
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
@@ -64,7 +66,7 @@ def create_dirs(fdir, mode):
 def config_VN200_output(portName):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
-    
+
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     #### CONFIGURE ADOR AND AODF 
     asyncDataOutputType = Registers.AsyncOutputType()
@@ -80,7 +82,7 @@ def config_VN200_output(portName):
     
     #### CONFIGURE THE BINARY OUTPUT
     binaryOutput1Register = Registers.BinaryOutput1()
-    binaryOutput1Register.rateDivisor = 100
+    binaryOutput1Register.rateDivisor = 20
     binaryOutput1Register.asyncMode.serial1 = 1
     binaryOutput1Register.asyncMode.serial2 = 0
     binaryOutput1Register.time.timeUtc = 1
@@ -119,8 +121,8 @@ def config_VN200_output(portName):
     s.disconnect()
 
 def sync_clock(portName, clock_timeout):
-    s = Sensor()                      # Create sensor object and connect to the VN-200 
-    s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
+    s = Sensor() # Create sensor object and connect to the VN-200 
+    s.autoConnect(portName)
 
     # Wait for GPS
     i = 0 
@@ -185,9 +187,33 @@ def VN200_status(portName, fname_log, gps_timeout):
         serial_num = serial.serialNum
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     Connected to VN-200: Model {model_num}, Serial: {serial_num}\n")
-        log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
-
+        
+        # Write KnownMagneticDisturbance and VpeBasicControl
+        kmd = KnownMagneticDisturbance(KnownMagneticDisturbance.State.Present)  
+        vpeBasicControl = VpeBasicControl()
+        vpeBasicControl.headingMode = VpeBasicControl.HeadingMode.Absolute
+        vpeBasicControl.filteringMode =  VpeBasicControl.FilteringMode.AdaptivelyFiltered
+        vpeBasicControl.tuningMode =  VpeBasicControl.TuningMode.Adaptive
+        vpeBasicControlCmd = Command(vpeBasicControl.toWriteCommand())
+        if not kmd.isAwaitingResponse():
+            error = kmd.getError()
+            if (error):
+                log.write(f"{tstr}:     KMD received error {error.what()}")
+            else:
+                log.write(f"{tstr}:     KMD response: {str(kmd.getResponse())}")
+        else:
+            log.write(f"{tstr}:     KMD received no response")
+        if not vpeBasicControlCmd.isAwaitingResponse():
+            error = vpeBasicControlCmd.getError()
+            if (error):
+                log.write(f"{tstr}:     WRG received error {error.what()}")
+            else:
+                log.write(f"{tstr}:     WRG response: {vpeBasicControlCmd.getResponse()}")
+        else:
+            log.write(f"{tstr}:     WRG received no response")
+        
         # Wait for GPS
+        log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
         i = 0 
         gnss = Registers.GnssSolLla()
         s.readRegister(gnss)
