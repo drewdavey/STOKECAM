@@ -58,7 +58,7 @@ def create_dirs(fdir, mode):
     fdir_cam1 = os.path.join(fdir_out, 'cam1/')
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
-    fname_imu = f'{fdir_out}IMU_{session}'
+    fname_imu = f'{fdir_out}IMU_{session}.txt'
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def config_VN200_output(portName):
