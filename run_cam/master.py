@@ -158,8 +158,8 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
         time.sleep(0.2)
     csvExporter.stop()
     s.disconnect()
-    monitor_gps(portName)
     exit_standby(fname_log)
+    monitor_gps(portName)
 
 ############################ Initialization ############################
 green = LED(12)                         # Green LED

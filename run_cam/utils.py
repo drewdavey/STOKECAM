@@ -250,20 +250,21 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     pressure: {cd.imu.pressure}\n")
             log.write(f"{tstr}:     mag: {cd.imu.mag}\n")
             log.write(f"{tstr}:     accel: {cd.imu.accel}\n")
-            log.write(f"{tstr}:     gnss1PosLla: Lat: {cd.gnss.gnss1PosLla.lat}, Lon: {cd.gnss.gnss1PosLla.lon}, Alt: {cd.gnss.gnss1PosLla.alt}\n")
             log.write(f"{tstr}:     ypr: {cd.attitude.ypr}\n")
             log.write(f"{tstr}:     quaternion: Scalar: {cd.attitude.quaternion.scalar}, Vector: {cd.attitude.quaternion.vector}\n")
-            log.write(f"{tstr}:     gnss1PosUncertainty: {cd.gnss.gnss1PosUncertainty}\n")
             log.write(f"{tstr}:     gnss1Fix: {cd.gnss.gnss1Fix}\n")
             log.write(f"{tstr}:     gnss1NumSats: {cd.gnss.gnss1NumSats}\n")
             tUtc = cd.gnss.gnss1TimeUtc
             tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
             log.write(f"{tstr}:     gnss1TimeUtc: {tUtc}\n")
+            log.write(f"{tstr}:     gnss1PosLla: Lat: {cd.gnss.gnss1PosLla.lat}, Lon: {cd.gnss.gnss1PosLla.lon}, Alt: {cd.gnss.gnss1PosLla.alt}\n")
             log.write(f"{tstr}:     gnss1PosEcef: {cd.gnss.gnss1PosEcef}\n")
+            log.write(f"{tstr}:     gnss1PosUncertainty: {cd.gnss.gnss1PosUncertainty}\n")
             log.write(f"{tstr}:     insStatus: GnssCompassFix: {cd.ins.insStatus.gnssCompassFix}, GnssErr: {cd.ins.insStatus.gnssErr}, GnssFix: {cd.ins.insStatus.gnssFix}\n")
-            log.write(f"{tstr}:     posEcef: {cd.ins.posEcef}\n")
-            log.write(f"{tstr}:     posU: {cd.ins.posU}\n")
-            log.write(f"{tstr}:     posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n\n")
+            log.write(f"{tstr}:     INS posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n")
+            log.write(f"{tstr}:     INS posEcef: {cd.ins.posEcef}\n")
+            log.write(f"{tstr}:     INS posU: {cd.ins.posU}\n\n")
+            
         except:
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     Error reading VN-200 data\n\n")
