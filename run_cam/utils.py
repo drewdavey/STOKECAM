@@ -58,7 +58,7 @@ def create_dirs(fdir, mode):
     fdir_cam1 = os.path.join(fdir_out, 'cam1/')
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
-    fname_imu = f'{fdir_out}IMU_{session}.csv'
+    fname_imu = f'{fdir_out}IMU_{session}'
     return fdir_out, fdir_cam0, fdir_cam1, fname_imu
 
 def config_VN200_output(portName):
@@ -80,12 +80,15 @@ def config_VN200_output(portName):
     
     #### CONFIGURE THE BINARY OUTPUT
     binaryOutput1Register = Registers.BinaryOutput1()
-    binaryOutput1Register.rateDivisor = 100
+    binaryOutput1Register.rateDivisor = 1
     binaryOutput1Register.asyncMode.serial1 = 1
     binaryOutput1Register.asyncMode.serial2 = 0
-    binaryOutput1Register.common.timeStartup = 1
-    binaryOutput1Register.common.accel = 1
     binaryOutput1Register.time.timeUtc = 1
+    binaryOutput1Register.attitude.ypr = 1
+    binaryOutput1Register.common.accel = 1
+    binaryOutput1Register.gnss.gnss1PosLla = 1
+    binaryOutput1Register.ins.posLla = 1
+    binaryOutput1Register.common.timeStartup = 1
     binaryOutput1Register.time.timeStartup = 1
     binaryOutput1Register.time.timeGps = 1
     binaryOutput1Register.time.timeGpsTow = 1
@@ -102,15 +105,12 @@ def config_VN200_output(portName):
     binaryOutput1Register.gnss.gnss1TimeUtc = 1
     binaryOutput1Register.gnss.gnss1NumSats = 1
     binaryOutput1Register.gnss.gnss1Fix = 1
-    binaryOutput1Register.gnss.gnss1PosLla = 1
     binaryOutput1Register.gnss.gnss1PosEcef = 1
     binaryOutput1Register.gnss.gnss1PosUncertainty = 1
     binaryOutput1Register.gnss.gnss1TimeUncertainty = 1
-    binaryOutput1Register.attitude.ypr = 1
     binaryOutput1Register.attitude.quaternion = 1
     binaryOutput1Register.attitude.magNed = 1
     binaryOutput1Register.ins.insStatus = 1
-    binaryOutput1Register.ins.posLla = 1
     binaryOutput1Register.ins.posEcef = 1
     binaryOutput1Register.ins.posU = 1
     binaryOutput1Register.gnss2.gnss2PosLla = 1
@@ -234,7 +234,7 @@ def VN200_status(portName, fname_log, gps_timeout):
         while (time.time() - t0 < 5):
             cd = s.getNextMeasurement()
             if not cd: continue
-            
+
         try:
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     VN-200 timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
