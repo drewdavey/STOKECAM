@@ -1,4 +1,4 @@
-# Last updated: 2024-10-03
+# Last updated: 2024-11-26
 ##################################
 # This script allows the user to toggle through camera settings, launch standby mode, and capture images syncronously by holding right button.
 # The user can also calibrate the cameras by holding the left button for more than 5 seconds.
@@ -158,8 +158,8 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
         time.sleep(0.2)
     csvExporter.stop()
     s.disconnect()
-    exit_standby(fname_log)
     monitor_gps(portName)
+    exit_standby(fname_log)
 
 ############################ Initialization ############################
 green = LED(12)                         # Green LED

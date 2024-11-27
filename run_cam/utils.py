@@ -1,4 +1,4 @@
-# Last updated: 2024-10-03
+# Last updated: 2024-11-26
 ##################################
 # Housekeeping funcs for the stereo camera system
 ##################################
@@ -143,7 +143,7 @@ def sync_clock(portName, clock_timeout):
                 # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
                 formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
                 os.system(f"sudo date -s '{formatted_time}'") # Set the system time
-        os.system("sudo hwclock --systohc")           # Sync the hardware clock
+        os.system("sudo hwclock --systohc")                   # Sync the hardware clock
     s.disconnect()
 
 def VN200_status(portName, fname_log, gps_timeout):
