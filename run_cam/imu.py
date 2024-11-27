@@ -14,11 +14,11 @@ from vectornav.Plugins import ExporterCsv
 
 running = True
 
-def imu_run(fname_imu,fname_log,portName):
+def imu_run(fdir_out,fname_log,portName):
     global running
     s = Sensor()                      # Create sensor object and connect to the VN-200 
+    csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
-    csvExporter = ExporterCsv(fname_imu, True)
     s.subscribeToMessage(
             csvExporter.getQueuePtr(),
             vectornav.Registers.BinaryOutputMeasurements(),

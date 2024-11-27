@@ -234,6 +234,7 @@ def VN200_status(portName, fname_log, gps_timeout):
         while (time.time() - t0 < 5):
             cd = s.getNextMeasurement()
             if not cd: continue
+            
         try:
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     VN-200 timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
