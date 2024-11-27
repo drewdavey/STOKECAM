@@ -86,36 +86,27 @@ def config_VN200_output(portName):
     binaryOutput1Register.asyncMode.serial1 = 1
     binaryOutput1Register.asyncMode.serial2 = 0
     binaryOutput1Register.time.timeUtc = 1
-    binaryOutput1Register.common.timeStartup = 1
-    binaryOutput1Register.attitude.ypr = 1
-    binaryOutput1Register.common.accel = 1
-    binaryOutput1Register.gnss.gnss1PosLla = 1
-    binaryOutput1Register.ins.posLla = 1
     binaryOutput1Register.time.timeStartup = 1
     binaryOutput1Register.time.timeGps = 1
-    binaryOutput1Register.time.timeGpsTow = 1
-    binaryOutput1Register.time.timeGpsWeek = 1
     binaryOutput1Register.time.timeSyncIn = 1
     binaryOutput1Register.time.timeGpsPps = 1
     binaryOutput1Register.imu.imuStatus = 1
     binaryOutput1Register.imu.temperature = 1
     binaryOutput1Register.imu.pressure = 1
-    binaryOutput1Register.imu.mag = 1
-    binaryOutput1Register.attitude.quaternion = 1
     binaryOutput1Register.imu.accel = 1
-    binaryOutput1Register.gnss.gnss1PosUncertainty = 1
-    binaryOutput1Register.gnss.gnss1Fix = 1
-    binaryOutput1Register.imu.uncompMag = 1
-    binaryOutput1Register.imu.uncompAccel = 1
-    binaryOutput1Register.gnss.gnss1TimeUtc = 1
-    binaryOutput1Register.gnss.gnss1NumSats = 1
-    binaryOutput1Register.gnss.gnss1PosEcef = 1
-    binaryOutput1Register.gnss.gnss1TimeUncertainty = 1
-    binaryOutput1Register.attitude.magNed = 1
-    binaryOutput1Register.ins.insStatus = 1
+    binaryOutput1Register.imu.mag = 1
+    binaryOutput1Register.attitude.ypr = 1
+    binaryOutput1Register.attitude.quaternion = 1
+    binaryOutput1Register.ins.posLla = 1
     binaryOutput1Register.ins.posEcef = 1
     binaryOutput1Register.ins.posU = 1
-    binaryOutput1Register.gnss2.gnss2PosLla = 0
+    binaryOutput1Register.ins.insStatus = 1
+    binaryOutput1Register.gnss.gnss1PosLla = 1
+    binaryOutput1Register.gnss.gnss1PosEcef = 1
+    binaryOutput1Register.gnss.gnss1PosUncertainty = 1
+    binaryOutput1Register.gnss.gnss1Fix = 1
+    binaryOutput1Register.gnss.gnss1NumSats = 1
+    binaryOutput1Register.gnss.gnss1TimeUtc = 1
 
     s.writeRegister(binaryOutput1Register)
     print(f"{tstr}:     Binary output message configured\n")
@@ -252,8 +243,6 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     timeUtc: {tUtc}\n")
             log.write(f"{tstr}:     timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
             log.write(f"{tstr}:     timeGps (μs): {cd.time.timeGps.microseconds()}\n")
-            log.write(f"{tstr}:     timeGpsTow (μs): {cd.time.timeGpsTow.microseconds()}\n")
-            log.write(f"{tstr}:     timeGpsWeek: {cd.time.timeGpsWeek}\n")
             log.write(f"{tstr}:     timeSyncIn (μs): {cd.time.timeSyncIn.microseconds()}\n")
             log.write(f"{tstr}:     timeGpsPps (μs): {cd.time.timeGpsPps.microseconds()}\n")
             log.write(f"{tstr}:     imuStatus: Accel: {cd.imu.imuStatus.accelStatus}, Gyro: {cd.imu.imuStatus.gyroStatus}, Mag: {cd.imu.imuStatus.magStatus}, PresTemp: {cd.imu.imuStatus.presTempStatus}\n")
@@ -270,17 +259,11 @@ def VN200_status(portName, fname_log, gps_timeout):
             tUtc = cd.gnss.gnss1TimeUtc
             tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
             log.write(f"{tstr}:     gnss1TimeUtc: {tUtc}\n")
-            log.write(f"{tstr}:     uncompMag: {cd.imu.uncompMag}\n")
-            log.write(f"{tstr}:     uncompAccel: {cd.imu.uncompAccel}\n")
             log.write(f"{tstr}:     gnss1PosEcef: {cd.gnss.gnss1PosEcef}\n")
-            log.write(f"{tstr}:     gnss1TimeUncertainty: {cd.gnss.gnss1TimeUncertainty}\n")
-            log.write(f"{tstr}:     magNed: {cd.attitude.magNed}\n")
             log.write(f"{tstr}:     insStatus: GnssCompassFix: {cd.ins.insStatus.gnssCompassFix}, GnssErr: {cd.ins.insStatus.gnssErr}, GnssFix: {cd.ins.insStatus.gnssFix}\n")
             log.write(f"{tstr}:     posEcef: {cd.ins.posEcef}\n")
             log.write(f"{tstr}:     posU: {cd.ins.posU}\n")
             log.write(f"{tstr}:     posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n\n")
-            # log.write(f"{tstr}:     gnss2PosLla: Lat: {cd.gnss2.gnss2PosLla.lat}, Lon: {cd.gnss2.gnss2PosLla.lon}, Alt: {cd.gnss2.gnss2PosLla.alt}\n\n")
-        
         except:
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     Error reading VN-200 data\n\n")
