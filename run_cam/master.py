@@ -65,19 +65,19 @@ def monitor_gps(portName):
     if gnssFix == 'NoFix':                              
         green.blink(0.25, 0.25)
     elif gnssFix == 'TimeFix':
-        green.blink(0.5, 0.5)
-    elif gnssFix == 'Fix2D':
         green.blink(1, 1)
+    elif gnssFix == 'Fix2D':
+        green.blink(2, 1)
     elif gnssFix == 'Fix3D':
-        green.on()
+        green.blink(3, 1)
     elif gnssFix == 'SBAS':
-        green.blink(2, 2)
+        green.on()
     elif gnssFix == 'RtkFloat':
-        green.blink(3, 3)
+        green.on()
     elif gnssFix == 'RtkFix':
-        green.blink(4, 4)
+        green.on()
     else:
-        green.blink(0.25, 0.25) 
+        green.blink(1, 10) 
     s.disconnect()
 
 def toggle_modes():
