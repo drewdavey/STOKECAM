@@ -149,29 +149,26 @@ def sync_clock(portName, clock_timeout):
         while (time.time() - t0 < 3):
             cd = s.getNextMeasurement()
             if not cd: continue
-            if tUtc := cd.time.timeUtc:
-                # Format the time as 'YYYY-MM-DD HH:MM:SS'
-                # formatted_time = f"20{tUtc.year}-{tUtc.month}-{tUtc.day} {tUtc.hour}:{tUtc.minute}:{tUtc.second}.{tUtc.fracSec}"
-                # formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
-                
-                vn_time = datetime(
-                year=2000 + tUtc.year,  # VN-200 year is 2000+YY
-                month=tUtc.month,
-                day=tUtc.day,
-                hour=tUtc.hour,
-                minute=tUtc.minute,
-                second=tUtc.second,
-                microsecond=tUtc.fracSec * 1000,
-                tzinfo=timezone.utc)
+        if tUtc := cd.time.timeUtc:
+            # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
+            formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
+            
+            # vn_time = datetime(
+            # year=2000 + tUtc.year,  # VN-200 year is 2000+YY
+            # month=tUtc.month,
+            # day=tUtc.day,
+            # hour=tUtc.hour,
+            # minute=tUtc.minute,
+            # second=tUtc.second,
+            # microsecond=tUtc.fracSec * 1000,
+            # tzinfo=timezone.utc)
+            # # Add [delay] seconds to VN-200 time if systematic offset
+            # vn_time_adjusted = vn_time + timedelta(seconds=0)
+            # # Format adjusted time for `date` command
+            # formatted_time = vn_time_adjusted.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
-                # Add [delay] seconds to VN-200 time if systematic offset
-                vn_time_adjusted = vn_time + timedelta(seconds=0)
-                
-                # Format adjusted time for `date` command
-                formatted_time = vn_time_adjusted.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-                os.system(f"sudo date -s '{formatted_time}'") # Set the system time
-                tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-                print(f"{tstr}:     Setting RP clock to: {formatted_time}")
+            os.system(f"sudo date -s '{formatted_time}'") # Set the system time
+            os.system("sudo hwclock --systohc")           # Sync the hardware clock
     s.disconnect()
 
 def VN200_status(portName, fname_log, gps_timeout):
