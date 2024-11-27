@@ -82,7 +82,7 @@ def config_VN200_output(portName):
     
     #### CONFIGURE THE BINARY OUTPUT
     binaryOutput1Register = Registers.BinaryOutput1()
-    binaryOutput1Register.rateDivisor = 20
+    binaryOutput1Register.rateDivisor = 20           ### 40 Hz (~800/rateDivisor) ###
     binaryOutput1Register.asyncMode.serial1 = 1
     binaryOutput1Register.asyncMode.serial2 = 0
     binaryOutput1Register.time.timeUtc = 1
@@ -103,6 +103,7 @@ def config_VN200_output(portName):
     binaryOutput1Register.imu.mag = 1
     binaryOutput1Register.attitude.quaternion = 1
     binaryOutput1Register.imu.accel = 1
+
     binaryOutput1Register.imu.uncompMag = 0
     binaryOutput1Register.imu.uncompAccel = 0
     binaryOutput1Register.gnss.gnss1TimeUtc = 0
@@ -116,6 +117,7 @@ def config_VN200_output(portName):
     binaryOutput1Register.ins.posEcef = 0
     binaryOutput1Register.ins.posU = 0
     binaryOutput1Register.gnss2.gnss2PosLla = 0
+
     s.writeRegister(binaryOutput1Register)
     print(f"{tstr}:     Binary output message configured\n")
     s.disconnect()
@@ -144,7 +146,7 @@ def sync_clock(portName, clock_timeout):
     # Sync the RP clock to the VN-200
     if gnssFix != 'NoFix':
         t0 = time.time()
-        while (time.time() - t0 < 5):
+        while (time.time() - t0 < 3):
             cd = s.getNextMeasurement()
             if not cd: continue
             if tUtc := cd.time.timeUtc:
@@ -153,7 +155,7 @@ def sync_clock(portName, clock_timeout):
                 # formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
                 
                 vn_time = datetime(
-                year=2000 + tUtc.year,  # Adjust year since it's likely offset
+                year=2000 + tUtc.year,  # VN-200 year is 2000+YY
                 month=tUtc.month,
                 day=tUtc.day,
                 hour=tUtc.hour,
@@ -198,19 +200,19 @@ def VN200_status(portName, fname_log, gps_timeout):
         if not kmd.isAwaitingResponse():
             error = kmd.getError()
             if (error):
-                log.write(f"{tstr}:     KMD received error {error.what()}")
+                log.write(f"{tstr}:     KMD received error {error.what()}\n")
             else:
-                log.write(f"{tstr}:     KMD response: {str(kmd.getResponse())}")
+                log.write(f"{tstr}:     KMD response: {str(kmd.getResponse())}\n")
         else:
-            log.write(f"{tstr}:     KMD received no response")
+            log.write(f"{tstr}:     KMD received no response\n")
         if not vpeBasicControlCmd.isAwaitingResponse():
             error = vpeBasicControlCmd.getError()
             if (error):
-                log.write(f"{tstr}:     WRG received error {error.what()}")
+                log.write(f"{tstr}:     WRG received error {error.what()}\n")
             else:
-                log.write(f"{tstr}:     WRG response: {vpeBasicControlCmd.getResponse()}")
+                log.write(f"{tstr}:     WRG response: {vpeBasicControlCmd.getResponse()}\n")
         else:
-            log.write(f"{tstr}:     WRG received no response")
+            log.write(f"{tstr}:     WRG received no response\n")
         
         # Wait for GPS
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
@@ -234,7 +236,7 @@ def VN200_status(portName, fname_log, gps_timeout):
         # Log any time offset between RP and VN200 before starting session
         if gnssFix != 'NoFix':
             t0 = time.time()
-            while (time.time() - t0 < 5):
+            while (time.time() - t0 < 3):
                 cd = s.getNextMeasurement()
                 rp_time = datetime.now(timezone.utc)
                 if not cd: continue
@@ -257,7 +259,7 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n\n")
         
         t0 = time.time()
-        while (time.time() - t0 < 5):
+        while (time.time() - t0 < 3):
             cd = s.getNextMeasurement()
             if not cd: continue
 
@@ -280,7 +282,8 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     VN-200 gnss1PosLla: Lat: {cd.gnss.gnss1PosLla.lat}, Lon: {cd.gnss.gnss1PosLla.lon}, Alt: {cd.gnss.gnss1PosLla.alt}\n")
             log.write(f"{tstr}:     VN-200 ypr: {cd.attitude.ypr}\n")
             log.write(f"{tstr}:     VN-200 quaternion: Scalar: {cd.attitude.quaternion.scalar}, Vector: {cd.attitude.quaternion.vector}\n")
-            log.write(f"{tstr}:     VN-200 posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n")
+            log.write(f"{tstr}:     VN-200 posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n\n")
+            
             # tUtc = cd.gnss.gnss1TimeUtc
             # tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
             # log.write(f"{tstr}:     VN-200 gnss1TimeUtc: {tUtc}\n")
@@ -296,6 +299,7 @@ def VN200_status(portName, fname_log, gps_timeout):
             # log.write(f"{tstr}:     VN-200 posEcef: {cd.ins.posEcef}\n")
             # log.write(f"{tstr}:     VN-200 posU: {cd.ins.posU}\n")
             # log.write(f"{tstr}:     VN-200 gnss2PosLla: Lat: {cd.gnss2.gnss2PosLla.lat}, Lon: {cd.gnss2.gnss2PosLla.lon}, Alt: {cd.gnss2.gnss2PosLla.alt}\n\n")
+        
         except:
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     Error reading VN-200 data\n\n")
