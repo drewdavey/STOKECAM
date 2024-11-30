@@ -139,6 +139,7 @@ def sync_clock(portName, clock_timeout):
         # Check time lag between RP and VN-200
         cd = s.getNextMeasurement()
         rp_time = datetime.now(timezone.utc)
+        if not cd: continue
         if tUtc := cd.time.timeUtc:
             vn_time = datetime(
                 year=2000 + tUtc.year,  # VN-200 time is 2000 + YY
@@ -152,10 +153,10 @@ def sync_clock(portName, clock_timeout):
             diff_time = vn_time - rp_time
             diff_seconds = abs(diff_time.total_seconds())
             # Check if the time difference is < 1ms
-            if diff_seconds < 0.01:
+            if diff_seconds < 0.1:
                 s.disconnect()
                 return True  # Sync successful
-        time.sleep(0.01)  # Small delay before retrying
+        time.sleep(0.1)  
     s.disconnect()
     return False  # Sync failed
 
