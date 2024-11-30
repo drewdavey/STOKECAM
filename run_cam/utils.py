@@ -154,7 +154,7 @@ def sync_clock(portName, clock_timeout):
             diff_time = vn_time - rp_time
             diff_seconds = abs(diff_time.total_seconds())
             # Check if the time difference is < 1ms
-            if diff_seconds < 1:
+            if diff_seconds < 0.1:
                 s.disconnect()
                 return True  # Sync successful
         time.sleep(0.1)  
