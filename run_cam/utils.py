@@ -160,7 +160,7 @@ def sync_clock(portName, clock_timeout):
         if abs(diff_seconds) < 0.005:
             s.disconnect()
             return True  # Sync successful
-        time.sleep(0.1)  
+        time.sleep(1)  
     s.disconnect()
     return False  # Sync failed
 
