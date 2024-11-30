@@ -120,26 +120,44 @@ def sync_clock(portName, clock_timeout):
     while (time.time() - t0 < clock_timeout):
         s.readRegister(gnss)
         gnssFix = gnss.gnss1Fix.name
-        time.sleep(0.1)
         if gnssFix in valid_fixes:
             break
+        time.sleep(0.01)
+    else:
+        s.disconnect()
+        return False    # Sync failed
     # Sync the RP clock to the VN-200
-    if gnssFix in valid_fixes:
-        t0 = time.time()
-        while (time.time() - t0 < clock_timeout):
-            cd = s.getNextMeasurement(1)
-            # if not cd: continue
-            if tUtc := cd.time.timeUtc:
-                # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
-                # formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
-                os.system(f"sudo date -s '20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}'") # Set the system time
-                break
-        os.system("sudo hwclock --systohc")                   # Sync the hardware clock
-        s.disconnect()
-        return True  # Sync successful
-    elif gnssFix not in valid_fixes:
-        s.disconnect()
-        return False  # Sync failed
+    t0 = time.time()
+    while (time.time() - t0 < clock_timeout):
+        cd = s.getNextMeasurement()
+        if not cd: continue
+        if tUtc := cd.time.timeUtc:
+            # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
+            vn_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
+            os.system(f"sudo date -s '{vn_time}'") # Set the system time
+            os.system("sudo hwclock --systohc")    # Sync the hardware clock
+        # Check time lag between RP and VN-200
+        cd = s.getNextMeasurement()
+        rp_time = datetime.now(timezone.utc)
+        if tUtc := cd.time.timeUtc:
+            vn_time = datetime(
+                year=2000 + tUtc.year,  # VN-200 time is 2000 + YY
+                month=tUtc.month,
+                day=tUtc.day,
+                hour=tUtc.hour,
+                minute=tUtc.minute,
+                second=tUtc.second,
+                microsecond=tUtc.fracSec * 1000,
+                tzinfo=timezone.utc)
+            diff_time = vn_time - rp_time
+            diff_seconds = abs(diff_time.total_seconds())
+            # Check if the time difference is < 1ms
+            if diff_seconds < 0.01:
+                s.disconnect()
+                return True  # Sync successful
+        time.sleep(0.01)  # Small delay before retrying
+    s.disconnect()
+    return False  # Sync failed
 
 def VN200_status(portName, fname_log, gps_timeout):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
@@ -205,15 +223,15 @@ def VN200_status(portName, fname_log, gps_timeout):
                 if not cd: continue
                 if tUtc := cd.time.timeUtc:
                     # Format the time as 'HHMMSSfff'
-                    vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
-                    year = int(vn_time[:4])
-                    month = int(vn_time[4:6])
-                    day = int(vn_time[6:8])
-                    hours = int(vn_time[8:10])
-                    minutes = int(vn_time[10:12])
-                    seconds = int(vn_time[12:14])
-                    milliseconds = int(vn_time[14:])
-                    vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000, tzinfo=timezone.utc)
+                    vn_time = datetime(
+                    year=2000 + tUtc.year,  # VN-200 time is 2000 + YY
+                    month=tUtc.month,
+                    day=tUtc.day,
+                    hour=tUtc.hour,
+                    minute=tUtc.minute,
+                    second=tUtc.second,
+                    microsecond=tUtc.fracSec * 1000,
+                    tzinfo=timezone.utc)
                     diff_time = vn_time - rp_time
                     diff_seconds = diff_time.total_seconds()
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
