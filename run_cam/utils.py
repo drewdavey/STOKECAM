@@ -122,7 +122,7 @@ def sync_clock(portName, clock_timeout):
         gnssFix = gnss.gnss1Fix.name
         if gnssFix in valid_fixes:
             break
-        time.sleep(0.01)
+        time.sleep(0.1)
     else:
         s.disconnect()
         return False    # Sync failed
@@ -135,7 +135,8 @@ def sync_clock(portName, clock_timeout):
             # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
             vn_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
             os.system(f"sudo date -s '{vn_time}'") # Set the system time
-            os.system("sudo hwclock --systohc")    # Sync the hardware clock
+            # os.system("sudo hwclock --systohc")    # Sync the hardware clock
+        time.sleep(0.1)
         # Check time lag between RP and VN-200
         cd = s.getNextMeasurement()
         rp_time = datetime.now(timezone.utc)
