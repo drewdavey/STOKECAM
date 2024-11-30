@@ -190,7 +190,7 @@ calib_dt = inputs['calib_dt']
 calib_frames = inputs['calib_frames']
 gps_timeout = inputs['gps_timeout']
 
-# Get IMU/GPS status. Print initial vals to log.
+# Get IMU/GPS status. Print initial values to log.
 VN200_status(portName, fname_log, gps_timeout)  
 
 global cam0, cam1, config, mode, standby, shooting_modes
