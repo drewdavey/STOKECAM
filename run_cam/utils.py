@@ -67,18 +67,15 @@ def config_VN200_output(portName):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     #### CONFIGURE ADOR AND AODF 
     asyncDataOutputType = Registers.AsyncOutputType()
     asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
     asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
     s.writeRegister(asyncDataOutputType)
-    print(f"{tstr}:     ADOR Configured\n")
     asyncDataOutputFreq= Registers.AsyncOutputFreq()
     asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
     asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
     s.writeRegister(asyncDataOutputFreq)
-    print(f"{tstr}:     ADOF Configured\n")
     
     #### CONFIGURE THE BINARY OUTPUT
     binaryOutput1Register = Registers.BinaryOutput1()
@@ -109,32 +106,25 @@ def config_VN200_output(portName):
     binaryOutput1Register.gnss.gnss1TimeUtc = 1
 
     s.writeRegister(binaryOutput1Register)
-    print(f"{tstr}:     Binary output message configured\n")
     s.disconnect()
 
 def sync_clock(portName, clock_timeout):
     s = Sensor() # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)
-
     # Wait for GPS
-    i = 0 
     gnss = Registers.GnssSolLla()
     s.readRegister(gnss)
     gnssFix = gnss.gnss1Fix.name
-    num_sats = gnss.gnss1NumSats
-    while gnssFix == 'NoFix':
+    valid_fixes = {'TimeFix', 'Fix2D', 'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
+    t0 = time.time()
+    while (time.time() - t0 < clock_timeout):
         s.readRegister(gnss)
         gnssFix = gnss.gnss1Fix.name
-        num_sats = gnss.gnss1NumSats
-        time.sleep(1)
-        i += 1
-        if i > clock_timeout:
+        time.sleep(0.1)
+        if gnssFix in valid_fixes:
             break
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    print(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
-
     # Sync the RP clock to the VN-200
-    if gnssFix != 'NoFix':
+    if gnssFix in valid_fixes:
         t0 = time.time()
         while (time.time() - t0 < 3):
             cd = s.getNextMeasurement()
@@ -144,6 +134,9 @@ def sync_clock(portName, clock_timeout):
                 formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
                 os.system(f"sudo date -s '{formatted_time}'") # Set the system time
         os.system("sudo hwclock --systohc")                   # Sync the hardware clock
+        return True  # Sync successful
+    elif gnssFix not in valid_fixes:
+        return False  # Sync failed
     s.disconnect()
 
 def VN200_status(portName, fname_log, gps_timeout):
@@ -188,25 +181,21 @@ def VN200_status(portName, fname_log, gps_timeout):
         
         # Wait for GPS
         log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
-        i = 0 
         gnss = Registers.GnssSolLla()
         s.readRegister(gnss)
         gnssFix = gnss.gnss1Fix.name
         num_sats = gnss.gnss1NumSats
-        while gnssFix == 'NoFix':
+        valid_fixes = {'TimeFix', 'Fix2D', 'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
+        t0 = time.time()
+        while gnssFix not in valid_fixes and (time.time() - t0 < gps_timeout):
             s.readRegister(gnss)
             gnssFix = gnss.gnss1Fix.name
             num_sats = gnss.gnss1NumSats
-            time.sleep(1)
-            i += 1
-            if i > gps_timeout:
-                log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
-                break
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        log.write(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
-
+            time.sleep(0.1)
         # Log any time offset between RP and VN200 before starting session
-        if gnssFix != 'NoFix':
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        if gnssFix in valid_fixes:
+            log.write(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
             t0 = time.time()
             while (time.time() - t0 < 3):
                 cd = s.getNextMeasurement()
@@ -229,44 +218,44 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     VN-200 Time: {vn_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
             log.write(f"{tstr}:     RP Time: {rp_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
             log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n\n")
-        
+        else:
+            log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
+
         t0 = time.time()
-        while (time.time() - t0 < 3):
+        while (time.time() - t0 < gps_timeout):
             cd = s.getNextMeasurement()
             if not cd: continue
-
-        try:
-            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-            log.write(f"{tstr}:     VN-200 Initial Measurements...\n")
-            tUtc = cd.time.timeUtc
-            tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
-            log.write(f"{tstr}:     timeUtc: {tUtc}\n")
-            log.write(f"{tstr}:     timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
-            log.write(f"{tstr}:     timeGps (μs): {cd.time.timeGps.microseconds()}\n")
-            log.write(f"{tstr}:     timeSyncIn (μs): {cd.time.timeSyncIn.microseconds()}\n")
-            log.write(f"{tstr}:     timeGpsPps (μs): {cd.time.timeGpsPps.microseconds()}\n")
-            log.write(f"{tstr}:     imuStatus: Accel: {cd.imu.imuStatus.accelStatus}, Gyro: {cd.imu.imuStatus.gyroStatus}, Mag: {cd.imu.imuStatus.magStatus}, PresTemp: {cd.imu.imuStatus.presTempStatus}\n")
-            log.write(f"{tstr}:     temperature: {cd.imu.temperature}\n")
-            log.write(f"{tstr}:     pressure: {cd.imu.pressure}\n")
-            log.write(f"{tstr}:     mag: {cd.imu.mag}\n")
-            log.write(f"{tstr}:     accel: {cd.imu.accel}\n")
-            log.write(f"{tstr}:     ypr: {cd.attitude.ypr}\n")
-            log.write(f"{tstr}:     quaternion: Scalar: {cd.attitude.quaternion.scalar}, Vector: {cd.attitude.quaternion.vector}\n")
-            log.write(f"{tstr}:     gnss1Fix: {cd.gnss.gnss1Fix}\n")
-            log.write(f"{tstr}:     gnss1NumSats: {cd.gnss.gnss1NumSats}\n")
-            tUtc = cd.gnss.gnss1TimeUtc
-            tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
-            log.write(f"{tstr}:     gnss1TimeUtc: {tUtc}\n")
-            log.write(f"{tstr}:     gnss1PosLla: Lat: {cd.gnss.gnss1PosLla.lat}, Lon: {cd.gnss.gnss1PosLla.lon}, Alt: {cd.gnss.gnss1PosLla.alt}\n")
-            log.write(f"{tstr}:     gnss1PosEcef: {cd.gnss.gnss1PosEcef}\n")
-            log.write(f"{tstr}:     gnss1PosUncertainty: {cd.gnss.gnss1PosUncertainty}\n")
-            log.write(f"{tstr}:     insStatus: GnssCompassFix: {cd.ins.insStatus.gnssCompassFix}, GnssErr: {cd.ins.insStatus.gnssErr}, GnssFix: {cd.ins.insStatus.gnssFix}\n")
-            log.write(f"{tstr}:     INS posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n")
-            log.write(f"{tstr}:     INS posEcef: {cd.ins.posEcef}\n")
-            log.write(f"{tstr}:     INS posU: {cd.ins.posU}\n\n")
-            
-        except:
-            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-            log.write(f"{tstr}:     Error reading VN-200 data\n\n")
+            if tUtc := cd.time.timeUtc:
+                tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+                log.write(f"{tstr}:     VN-200 Initial Measurements...\n")
+                tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
+                log.write(f"{tstr}:     timeUtc: {tUtc}\n")
+                log.write(f"{tstr}:     timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
+                log.write(f"{tstr}:     timeGps (μs): {cd.time.timeGps.microseconds()}\n")
+                log.write(f"{tstr}:     timeSyncIn (μs): {cd.time.timeSyncIn.microseconds()}\n")
+                log.write(f"{tstr}:     timeGpsPps (μs): {cd.time.timeGpsPps.microseconds()}\n")
+                log.write(f"{tstr}:     imuStatus: Accel: {cd.imu.imuStatus.accelStatus}, Gyro: {cd.imu.imuStatus.gyroStatus}, Mag: {cd.imu.imuStatus.magStatus}, PresTemp: {cd.imu.imuStatus.presTempStatus}\n")
+                log.write(f"{tstr}:     temperature: {cd.imu.temperature}\n")
+                log.write(f"{tstr}:     pressure: {cd.imu.pressure}\n")
+                log.write(f"{tstr}:     mag: {cd.imu.mag}\n")
+                log.write(f"{tstr}:     accel: {cd.imu.accel}\n")
+                log.write(f"{tstr}:     ypr: {cd.attitude.ypr}\n")
+                log.write(f"{tstr}:     quaternion: Scalar: {cd.attitude.quaternion.scalar}, Vector: {cd.attitude.quaternion.vector}\n")
+                log.write(f"{tstr}:     gnss1Fix: {cd.gnss.gnss1Fix}\n")
+                log.write(f"{tstr}:     gnss1NumSats: {cd.gnss.gnss1NumSats}\n")
+                tUtc = cd.gnss.gnss1TimeUtc
+                tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
+                log.write(f"{tstr}:     gnss1TimeUtc: {tUtc}\n")
+                log.write(f"{tstr}:     gnss1PosLla: Lat: {cd.gnss.gnss1PosLla.lat}, Lon: {cd.gnss.gnss1PosLla.lon}, Alt: {cd.gnss.gnss1PosLla.alt}\n")
+                log.write(f"{tstr}:     gnss1PosEcef: {cd.gnss.gnss1PosEcef}\n")
+                log.write(f"{tstr}:     gnss1PosUncertainty: {cd.gnss.gnss1PosUncertainty}\n")
+                log.write(f"{tstr}:     insStatus: GnssCompassFix: {cd.ins.insStatus.gnssCompassFix}, GnssErr: {cd.ins.insStatus.gnssErr}, GnssFix: {cd.ins.insStatus.gnssFix}\n")
+                log.write(f"{tstr}:     INS posLla: Lat: {cd.ins.posLla.lat}, Lon: {cd.ins.posLla.lon}, Alt: {cd.ins.posLla.alt}\n")
+                log.write(f"{tstr}:     INS posEcef: {cd.ins.posEcef}\n")
+                log.write(f"{tstr}:     INS posU: {cd.ins.posU}\n\n")
+                break
+            else:
+                tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+                log.write(f"{tstr}:     Error reading VN-200 data\n\n")
     log.close()
     s.disconnect()

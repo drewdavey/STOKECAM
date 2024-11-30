@@ -7,6 +7,7 @@ import sys
 import time
 import vectornav
 import threading
+import traceback
 from utils import *
 from settings import *
 from vectornav import *
@@ -124,7 +125,6 @@ def cap1(fdir_cam1, tnext, i):
 def exit_standby(fname_log):
     global standby
     yellow.off(), red.off() # Close the lights
-    time.sleep(2)
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
@@ -174,15 +174,24 @@ except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
     clock_timeout = 10
 
 portName = '/dev/ttyUSB0'                       # Default port for VN-200
-config_VN200_output(portName)                   # Config VN-200 output
-sync_clock(portName, clock_timeout)             # Sync the clock
+config_VN200_output(portName)                   # Config VN-200 output           
+
+# Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
+while not sync_clock(portName, clock_timeout):  
+    [led.on() for led in (red, green, yellow)]  
+    while not (right_button.is_held and left_button.is_held):
+        time.sleep(0.1)
+    [led.off() for led in (red, green, yellow)]
+
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 dt = inputs['dt']
 calib_dt = inputs['calib_dt']
 calib_frames = inputs['calib_frames']
 gps_timeout = inputs['gps_timeout']
-VN200_status(portName, fname_log, gps_timeout)  # Get IMU/GPS status 
+
+# Get IMU/GPS status. Print initial vals to log.
+VN200_status(portName, fname_log, gps_timeout)  
 
 global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
@@ -198,38 +207,45 @@ monitor_gps(portName)
 tlast = time.time()
 #######################################################################
 
-############################# Main loop ###############################
-# Hold right button ONLY for 3 seconds to enter standby mode    
-# Hold left button ONLY for 3 seconds to calibrate the cameras
-# Hold both buttons for 3 seconds to toggle modes, then:
-#                         - release both to toggle modes
-#                         - release left ONLY to exit script                              
-while True: 
-    if (time.time() - tlast > 30) and not standby:
-        monitor_gps(portName)
-        tlast = time.time()
-    if right_button.is_held and not standby and not left_button.is_pressed:
-        standby = True
-        enter_standby(fdir, fname_log, dt, mode, portName)    
-    if left_button.is_held and not standby and not right_button.is_pressed:
-        calib(fdir, fname_log, calib_dt, calib_frames, mode, portName)
-        monitor_gps(portName)
-    if (right_button.is_held and left_button.is_held) and not standby:
-        [led.on() for led in (red, green, yellow)]
-        left_button.wait_for_release()
-        time.sleep(1)
-        if right_button.is_held:
-            break
-        else:
-            toggle_modes()
+try: 
+    ############################# Main loop ###############################
+    # Hold right button ONLY for 3 seconds to enter standby mode    
+    # Hold left button ONLY for 3 seconds to calibrate the cameras
+    # Hold both buttons for 3 seconds to toggle modes, then:
+    #                         - release both to toggle modes
+    #                         - release left ONLY to exit script                   
+    while True: 
+        if (time.time() - tlast > 30) and not standby:
             monitor_gps(portName)
-    time.sleep(0.2)
-#######################################################################
-
-############################## Cleanup ###############################
-cam0.stop(), cam1.stop()                   # Stop the cameras
-cam0.close(), cam1.close()                 # Close the cameras
-green.close(), yellow.close(), red.close() # Close the LEDs
-right_button.close(), left_button.close()  # Close the buttons
-sys.exit(0)
-#######################################################################
+            tlast = time.time()
+        if right_button.is_held and not standby and not left_button.is_pressed:
+            standby = True
+            enter_standby(fdir, fname_log, dt, mode, portName)    
+        if left_button.is_held and not standby and not right_button.is_pressed:
+            calib(fdir, fname_log, calib_dt, calib_frames, mode, portName)
+            monitor_gps(portName)
+        if (right_button.is_held and left_button.is_held) and not standby:
+            [led.on() for led in (red, green, yellow)]
+            left_button.wait_for_release()
+            time.sleep(1)
+            if right_button.is_held:
+                break
+            else:
+                toggle_modes()
+                monitor_gps(portName)
+        time.sleep(0.2)
+except Exception as e:
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    with open(fname_log, 'a') as log:
+        log.write(f"{tstr}: ERROR: {str(e)}\n")
+        log.write("Traceback:\n")
+        log.write(traceback.format_exc() + "\n")  # Log the traceback
+    #######################################################################
+finally:
+    ############################## Cleanup ###############################
+    cam0.stop(), cam1.stop()                   # Stop the cameras
+    cam0.close(), cam1.close()                 # Close the cameras
+    green.close(), yellow.close(), red.close() # Close the LEDs
+    right_button.close(), left_button.close()  # Close the buttons
+    sys.exit(0)
+    #######################################################################
