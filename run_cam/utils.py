@@ -141,10 +141,10 @@ def sync_clock(portName, clock_timeout):
         time.sleep(1)
         # Check time lag between RP and VN-200
         # cd = s.getNextMeasurement()
-        rp_time = datetime.now(timezone.utc)
+        # rp_time = datetime.now(timezone.utc)
         # if not cd: continue
         # if tUtc := cd.time.timeUtc:
-        #     vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
+        vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
         year = int(vn_time[:4])
         month = int(vn_time[4:6])
         day = int(vn_time[6:8])
