@@ -219,7 +219,7 @@ def VN200_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
             t0 = time.time()
             while (time.time() - t0 < gps_timeout):
-                cd = s.getNextMeasurement()
+                cd = s.getNextMeasurement(1)
                 rp_time = datetime.now(timezone.utc)
                 if not cd: continue
                 if tUtc := cd.time.timeUtc:
