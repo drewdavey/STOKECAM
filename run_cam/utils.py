@@ -129,7 +129,7 @@ def sync_clock(portName, clock_timeout):
     # Sync the RP clock to the VN-200
     t0 = time.time()
     while (time.time() - t0 < clock_timeout):
-        cd = s.getNextMeasurement()
+        cd = s.getNextMeasurement(1)
         if not cd: continue
         if tUtc := cd.time.timeUtc:
             # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
@@ -137,7 +137,7 @@ def sync_clock(portName, clock_timeout):
             os.system(f"sudo date -s '{vn_time}'") # Set the system time
             os.system("sudo hwclock --systohc")    # Sync the hardware clock
         # Check time lag between RP and VN-200
-        cd = s.getNextMeasurement()
+        cd = s.getNextMeasurement(1)
         rp_time = datetime.now(timezone.utc)
         if not cd: continue
         if tUtc := cd.time.timeUtc:
@@ -153,7 +153,7 @@ def sync_clock(portName, clock_timeout):
             diff_time = vn_time - rp_time
             diff_seconds = abs(diff_time.total_seconds())
             # Check if the time difference is < 1ms
-            if diff_seconds < 0.1:
+            if diff_seconds < 0.01:
                 s.disconnect()
                 return True  # Sync successful
         time.sleep(0.1)  
@@ -218,7 +218,7 @@ def VN200_status(portName, fname_log, gps_timeout):
         if gnssFix in valid_fixes:
             log.write(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
             t0 = time.time()
-            while (time.time() - t0 < 3):
+            while (time.time() - t0 < gps_timeout):
                 cd = s.getNextMeasurement()
                 rp_time = datetime.now(timezone.utc)
                 if not cd: continue
