@@ -134,10 +134,11 @@ def sync_clock(portName, clock_timeout):
                 formatted_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
                 os.system(f"sudo date -s '{formatted_time}'") # Set the system time
         os.system("sudo hwclock --systohc")                   # Sync the hardware clock
+        s.disconnect()
         return True  # Sync successful
     elif gnssFix not in valid_fixes:
+        s.disconnect()
         return False  # Sync failed
-    s.disconnect()
 
 def VN200_status(portName, fname_log, gps_timeout):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
