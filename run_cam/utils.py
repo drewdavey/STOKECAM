@@ -73,14 +73,14 @@ def config_VN200_output(portName):
     s.writeRegister(sync_control)
 
     #### CONFIGURE ADOR AND AODF 
-    asyncDataOutputType = Registers.AsyncOutputType()
-    asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
-    asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
-    s.writeRegister(asyncDataOutputType)
-    asyncDataOutputFreq= Registers.AsyncOutputFreq()
-    asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
-    asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
-    s.writeRegister(asyncDataOutputFreq)
+    # asyncDataOutputType = Registers.AsyncOutputType()
+    # asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
+    # asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+    # s.writeRegister(asyncDataOutputType)
+    # asyncDataOutputFreq= Registers.AsyncOutputFreq()
+    # asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
+    # asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+    # s.writeRegister(asyncDataOutputFreq)
     
     #### CONFIGURE THE BINARY OUTPUT
     binaryOutput1Register = Registers.BinaryOutput1()
