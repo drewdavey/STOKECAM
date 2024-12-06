@@ -67,6 +67,11 @@ def config_VN200_output(portName):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
+    #### CONFIGURE THE SYNC OUTPUT
+    sync_control = Registers.SyncControl()
+    sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
+    s.writeRegister(sync_control)
+
     #### CONFIGURE ADOR AND AODF 
     asyncDataOutputType = Registers.AsyncOutputType()
     asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
