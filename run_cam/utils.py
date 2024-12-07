@@ -117,22 +117,22 @@ def sync_clock(portName, clock_timeout):
     s = Sensor() # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)
     
-    # ### Wait for GPS
-    # gnss = Registers.GnssSolLla()
-    # s.readRegister(gnss)
-    # gnssFix = gnss.gnss1Fix.name
-    # valid_fixes = {'TimeFix', 'Fix2D', 'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
-    # t0 = time.time()
-    # while (time.time() - t0 < clock_timeout):
-    #     s.readRegister(gnss)
-    #     gnssFix = gnss.gnss1Fix.name
-    #     if gnssFix in valid_fixes:
-    #         break
-    #     time.sleep(0.1)
-    # else:
-    #     print("Timeout waiting for GNSS fix.")
-    #     s.disconnect()
-    #     return False    # Sync failed
+    ### Wait for GPS
+    gnss = Registers.GnssSolLla()
+    s.readRegister(gnss)
+    gnssFix = gnss.gnss1Fix.name
+    valid_fixes = {'TimeFix', 'Fix2D', 'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
+    t0 = time.time()
+    while (time.time() - t0 < clock_timeout):
+        s.readRegister(gnss)
+        gnssFix = gnss.gnss1Fix.name
+        if gnssFix in valid_fixes:
+            break
+        time.sleep(0.1)
+    else:
+        print("Timeout waiting for GNSS fix.")
+        s.disconnect()
+        return False    # Sync failed
     
     t0 = time.time()
     while (time.time() - t0 < clock_timeout):
