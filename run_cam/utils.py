@@ -73,19 +73,19 @@ def config_VN200_output(portName):
     s.writeRegister(sync_control)
 
     #### CONFIGURE ADOR AND AODF 
-    # asyncDataOutputType = Registers.AsyncOutputType()
-    # asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
-    # asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
-    # s.writeRegister(asyncDataOutputType)
-    # asyncDataOutputFreq= Registers.AsyncOutputFreq()
-    # asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
-    # asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
-    # s.writeRegister(asyncDataOutputFreq)
+    asyncDataOutputType = Registers.AsyncOutputType()
+    asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
+    asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+    s.writeRegister(asyncDataOutputType)
+    asyncDataOutputFreq= Registers.AsyncOutputFreq()
+    asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
+    asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+    s.writeRegister(asyncDataOutputFreq)
     
     #### CONFIGURE THE BINARY OUTPUT
     binaryOutput1Register = Registers.BinaryOutput1()
     binaryOutput1Register.rateDivisor = 20           ### 40 Hz (~800/rateDivisor) ###
-    binaryOutput1Register.asyncMode.serial1 = 0
+    binaryOutput1Register.asyncMode.serial1 = 1
     binaryOutput1Register.asyncMode.serial2 = 0
     binaryOutput1Register.time.timeUtc = 1
     binaryOutput1Register.time.timeStartup = 1
