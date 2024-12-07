@@ -140,32 +140,22 @@ def sync_clock(portName, clock_timeout):
         rp_time = datetime.now(timezone.utc)
         if not cd: continue
         if tUtc := cd.time.timeUtc:
-            # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
-            vn_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
-            os.system(f"sudo date -s '{vn_time}'") # Set the system time
-            # os.system("sudo hwclock --systohc")    # Sync the hardware clock
-            
             # Check time lag between RP and VN-200
             vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
-            year = int(vn_time[:4])
-            month = int(vn_time[4:6])
-            day = int(vn_time[6:8])
-            hours = int(vn_time[8:10])
-            minutes = int(vn_time[10:12])
-            seconds = int(vn_time[12:14])
-            milliseconds = int(vn_time[14:])
+            year = int(vn_time[:4]), month = int(vn_time[4:6]), day = int(vn_time[6:8])
+            hours = int(vn_time[8:10]), minutes = int(vn_time[10:12]), seconds = int(vn_time[12:14]), milliseconds = int(vn_time[14:])
             vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000, tzinfo=timezone.utc)
             diff_time = vn_time - rp_time
             diff_seconds = diff_time.total_seconds()
-            if abs(diff_seconds) >= 1:
-                adjusted_time = rp_time + timedelta(seconds=diff_seconds)
+            if abs(diff_seconds) >= 0.1:
+                adjusted_time = datetime.now(timezone.utc) + timedelta(seconds=diff_seconds)
                 formatted_time = adjusted_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                 os.system(f"sudo date -s '{formatted_time}'")  # Set system time
                 # os.system("sudo hwclock --systohc")  # Sync hardware clock
-            elif abs(diff_seconds) < 1:
+            elif abs(diff_seconds) < 0.1:
                 s.disconnect()
                 return True  # Sync successful
-        time.sleep(1) 
+        time.sleep(0.1) 
     s.disconnect()
     return False  # Sync failed
 

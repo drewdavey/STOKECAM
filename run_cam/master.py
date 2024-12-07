@@ -132,10 +132,10 @@ def exit_standby(fname_log):
 
 def enter_standby(fdir, fname_log, dt, mode, portName):
     yellow.on()
-    log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    log.write(f"{tstr}:     Entering standby... \n\n") 
+    log = open(fname_log, 'a'), log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
+    imu = open(fname_imu, 'a'), imu.write(f"start/stop,RP_time,VN_timeUtc,VN_timeGps\n")
     s = Sensor() # Create sensor object and connect to the VN-200
     csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)
@@ -145,12 +145,11 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 0
-            log.write(f"{tstr}:     Entering standby. \n\n") 
             while not (cd := s.getNextMeasurement()):
                 time.sleep(0.1)
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-            if tUtc := cd.time.timeUtc: log.write(f"{tstr}:     Start (timeUtc): {tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03} \n")
-            if ts := cd.time.timeGps: log.write(f"{tstr}:     Start (timeGps): {ts} \n\n")
+            if tUtc := cd.time.timeUtc: imu.write(f"start,{tstr},{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03},")
+            if tGps := cd.time.timeGps.microseconds(): imu.write(f"{tGps} \n")
             red.on()
             while right_button.is_pressed:
                 tnow = datetime.now(timezone.utc)
@@ -163,15 +162,15 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             while not (cd := s.getNextMeasurement()):
                 time.sleep(0.1)
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-            if tUtc := cd.time.timeUtc: log.write(f"{tstr}:     Stop (timeUtc): {tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03} \n")
-            if ts := cd.time.timeGps: log.write(f"{tstr}:     Stop (timeGps): {ts} \n\n")
+            if tUtc := cd.time.timeUtc: imu.write(f"stop,{tstr},{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03},")
+            if tGps := cd.time.timeGps.microseconds(): imu.write(f"{tGps} \n")
             red.off()
         time.sleep(0.2)
     csvExporter.stop()
-    log.close()
+    imu.close()
     s.disconnect()
     exit_standby(fname_log)
-    monitor_gps(portName)
+    # monitor_gps(portName)
 
 ############################ Initialization ############################
 green = LED(12)                         # Green LED
@@ -227,7 +226,7 @@ try:
     #                         - release both to toggle modes
     #                         - release left ONLY to exit script                   
     while True: 
-        if (time.time() - tlast > 30) and not standby:
+        if (time.time() - tlast > 10) and not standby:
             monitor_gps(portName)
             tlast = time.time()
         if right_button.is_held and not standby and not left_button.is_pressed:
