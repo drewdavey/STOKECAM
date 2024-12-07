@@ -154,7 +154,7 @@ def sync_clock(portName, clock_timeout):
             diff_seconds = diff_time.total_seconds()
             if abs(diff_seconds) >= 0.1:
                 adjusted_time = datetime.now(timezone.utc) + timedelta(seconds=diff_seconds)
-                formatted_time = adjusted_time.strftime('%Y-%m-%d %H:%M:%S.%f')#[:-3]
+                formatted_time = adjusted_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                 os.system(f"sudo date -s '{formatted_time}'")  # Set system time
                 # os.system("sudo hwclock --systohc")  # Sync hardware clock
             elif abs(diff_seconds) < 0.1:
