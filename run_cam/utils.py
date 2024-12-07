@@ -7,7 +7,7 @@ import os
 import time
 import yaml
 from vectornav import *
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from vectornav.Registers import VpeBasicControl
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
@@ -109,14 +109,15 @@ def config_VN200_output(portName):
     binaryOutput1Register.gnss.gnss1Fix = 1
     binaryOutput1Register.gnss.gnss1NumSats = 1
     binaryOutput1Register.gnss.gnss1TimeUtc = 1
-
     s.writeRegister(binaryOutput1Register)
+    
     s.disconnect()
 
 def sync_clock(portName, clock_timeout):
     s = Sensor() # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)
-    # Wait for GPS
+    
+    ### Wait for GPS
     gnss = Registers.GnssSolLla()
     s.readRegister(gnss)
     gnssFix = gnss.gnss1Fix.name
@@ -132,18 +133,35 @@ def sync_clock(portName, clock_timeout):
         print("Timeout waiting for GNSS fix.")
         s.disconnect()
         return False    # Sync failed
-    # Sync the RP clock to the VN-200
+    
+    # ### Sync the RP clock to the VN-200
+    # # GPS Epoch (midnight, January 6, 1980)
+    # GPS_EPOCH = datetime(1980, 1, 6, tzinfo=timezone.utc)
+    # # Current GPS-UTC offset in seconds (18 as of 2024; update if necessary)
+    # GPS_UTC_OFFSET = 18
+
     t0 = time.time()
     while (time.time() - t0 < clock_timeout):
-        cd = s.getNextMeasurement()
+        # s.readRegister(gnss)
+        # # gpsTow = gnss.gpsTow
+        # # gpsWeek = gnss.gps1Week
+        # gps_time = GPS_EPOCH + timedelta(weeks=gnss.gps1Week, seconds=gnss.gpsTow)
+        # utc_time = gps_time - timedelta(seconds=GPS_UTC_OFFSET)
+        # formatted_time = utc_time.strftime('%Y-%m-%d %H:%M:%S')
+        # os.system(f"sudo date -s '{formatted_time}'")
+
+        # s.readRegister(gnss)
         # rp_time = datetime.now(timezone.utc)
-            # if not cd: continue
+        # gps_time = GPS_EPOCH + timedelta(weeks=gnss.gps1Week, seconds=gnss.gpsTow)
+
+        cd = s.getNextMeasurement()
+        rp_time = datetime.now(timezone.utc)
+        if not cd: continue
         if tUtc := cd.time.timeUtc:
             # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
             vn_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
             os.system(f"sudo date -s '{vn_time}'") # Set the system time
-            # os.system("sudo hwclock --systohc")    # Sync the hardware clock
-        # time.sleep(1)
+            os.system("sudo hwclock --systohc")    # Sync the hardware clock
         # Check time lag between RP and VN-200
         cd = s.getNextMeasurement()
         rp_time = datetime.now(timezone.utc)
@@ -161,11 +179,17 @@ def sync_clock(portName, clock_timeout):
             diff_time = vn_time - rp_time
             diff_seconds = diff_time.total_seconds()
             print(diff_seconds)
-            # Check if the time difference is < 1ms
-        if abs(diff_seconds) < 0.005:
+        if abs(diff_seconds) >= 0.01:
+            adjusted_time = rp_time + timedelta(seconds=diff_seconds)
+            formatted_time = adjusted_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            os.system(f"sudo date -s '{formatted_time}'")  # Set system time
+            os.system("sudo hwclock --systohc")  # Sync hardware clock
+            print(f"System clock adjusted to: {formatted_time}")
+        elif abs(diff_seconds) < 0.01:
             s.disconnect()
             return True  # Sync successful
-        time.sleep(1)  
+        time.sleep(0.01) 
+ 
     s.disconnect()
     return False  # Sync failed
 
