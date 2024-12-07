@@ -142,12 +142,12 @@ def sync_clock(portName, clock_timeout):
             vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000, tzinfo=timezone.utc)
             diff_time = vn_time - rp_time
             diff_seconds = diff_time.total_seconds()
-        if abs(diff_seconds) >= 1:
+        if abs(diff_seconds) >= 0.1:
             adjusted_time = rp_time + timedelta(seconds=diff_seconds)
             formatted_time = adjusted_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
             os.system(f"sudo date -s '{formatted_time}'")  # Set system time
             os.system("sudo hwclock --systohc")  # Sync hardware clock
-        elif abs(diff_seconds) < 1:
+        elif abs(diff_seconds) < 0.1:
             s.disconnect()
             return True  # Sync successful
         time.sleep(0.01) 
@@ -243,7 +243,7 @@ def VN200_status(portName, fname_log, gps_timeout):
             if tUtc := cd.time.timeUtc:
                 tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
                 log.write(f"{tstr}:     VN-200 Initial Measurements...\n")
-                tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}"
+                tUtc = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
                 log.write(f"{tstr}:     timeUtc: {tUtc}\n")
                 log.write(f"{tstr}:     timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
                 log.write(f"{tstr}:     timeGps (μs): {cd.time.timeGps.microseconds()}\n")
