@@ -142,8 +142,13 @@ def sync_clock(portName, clock_timeout):
         if tUtc := cd.time.timeUtc:
             # Check time lag between RP and VN-200
             vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
-            year = int(vn_time[:4]), month = int(vn_time[4:6]), day = int(vn_time[6:8])
-            hours = int(vn_time[8:10]), minutes = int(vn_time[10:12]), seconds = int(vn_time[12:14]), milliseconds = int(vn_time[14:])
+            year = int(vn_time[:4])
+            month = int(vn_time[4:6])
+            day = int(vn_time[6:8])
+            hours = int(vn_time[8:10])
+            minutes = int(vn_time[10:12])
+            seconds = int(vn_time[12:14])
+            milliseconds = int(vn_time[14:])
             vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000, tzinfo=timezone.utc)
             diff_time = vn_time - rp_time
             diff_seconds = diff_time.total_seconds()
