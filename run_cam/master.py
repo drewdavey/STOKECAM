@@ -137,7 +137,7 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
     log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
     imu = open(fname_imu, 'a')
-    imu.write(f"start/stop,RP_time,VN_timeUtc,VN_timeGps\n")
+    imu.write(f"burst,RP_time,VN_timeUtc,VN_timeGps\n")
     s = Sensor() # Create sensor object and connect to the VN-200
     csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)
