@@ -116,6 +116,24 @@ def config_VN200_output(portName):
 def sync_clock(portName, clock_timeout):
     s = Sensor() # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)
+    
+    ### Wait for GPS
+    gnss = Registers.GnssSolLla()
+    s.readRegister(gnss)
+    gnssFix = gnss.gnss1Fix.name
+    valid_fixes = {'TimeFix', 'Fix2D', 'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
+    t0 = time.time()
+    while (time.time() - t0 < clock_timeout):
+        s.readRegister(gnss)
+        gnssFix = gnss.gnss1Fix.name
+        if gnssFix in valid_fixes:
+            break
+        time.sleep(0.1)
+    else:
+        print("Timeout waiting for GNSS fix.")
+        s.disconnect()
+        return False    # Sync failed
+    
     t0 = time.time()
     while (time.time() - t0 < clock_timeout):
         cd = s.getNextMeasurement()
@@ -139,12 +157,12 @@ def sync_clock(portName, clock_timeout):
             vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000, tzinfo=timezone.utc)
             diff_time = vn_time - rp_time
             diff_seconds = diff_time.total_seconds()
-            if abs(diff_seconds) >= 0.1:
+            if abs(diff_seconds) >= 1:
                 adjusted_time = rp_time + timedelta(seconds=diff_seconds)
                 formatted_time = adjusted_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                 os.system(f"sudo date -s '{formatted_time}'")  # Set system time
                 # os.system("sudo hwclock --systohc")  # Sync hardware clock
-            elif abs(diff_seconds) < 0.1:
+            elif abs(diff_seconds) < 1:
                 s.disconnect()
                 return True  # Sync successful
         time.sleep(1) 
