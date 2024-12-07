@@ -134,11 +134,11 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
     yellow.on()
     log = open(fname_log, 'a')
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
+    log.write(f"{tstr}:     Entering standby... \n\n") 
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
     s = Sensor() # Create sensor object and connect to the VN-200
     csvExporter = ExporterCsv(fdir_out, True)
-    s.autoConnect(portName)          
+    s.autoConnect(portName)
     s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
     csvExporter.start()
     time.sleep(1)
@@ -146,6 +146,11 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 0
             red.on()
+            log.write(f"{tstr}:     Entering standby. \n\n") 
+            cd = s.getNextMeasurement()
+            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+            if tUtc := cd.time.timeUtc: log.write(f"{tstr}:     timeUtc: {tUtc} \n")
+            if ts := cd.time.timeStartup: log.write(f"{tstr}:     timeStartup: {ts} \n")
             while right_button.is_pressed:
                 tnow = datetime.now(timezone.utc)
                 tnext = tnow + timedelta(seconds=dt)
@@ -157,6 +162,7 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             red.off()
         time.sleep(0.2)
     csvExporter.stop()
+    log.close()
     s.disconnect()
     exit_standby(fname_log)
     monitor_gps(portName)
