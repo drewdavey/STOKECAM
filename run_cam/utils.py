@@ -125,12 +125,9 @@ def sync_clock(portName, clock_timeout):
             # Format the time as 'YYYY-MM-DD HH:MM:SS.fff'
             vn_time = f"20{tUtc.year:02}-{tUtc.month:02}-{tUtc.day:02} {tUtc.hour:02}:{tUtc.minute:02}:{tUtc.second:02}.{tUtc.fracSec:03}"
             os.system(f"sudo date -s '{vn_time}'") # Set the system time
-            os.system("sudo hwclock --systohc")    # Sync the hardware clock
-        # Check time lag between RP and VN-200
-        cd = s.getNextMeasurement()
-        rp_time = datetime.now(timezone.utc)
-        if not cd: continue
-        if tUtc := cd.time.timeUtc:
+            # os.system("sudo hwclock --systohc")    # Sync the hardware clock
+            
+            # Check time lag between RP and VN-200
             vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
             year = int(vn_time[:4])
             month = int(vn_time[4:6])
@@ -146,11 +143,11 @@ def sync_clock(portName, clock_timeout):
                 adjusted_time = rp_time + timedelta(seconds=diff_seconds)
                 formatted_time = adjusted_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                 os.system(f"sudo date -s '{formatted_time}'")  # Set system time
-                os.system("sudo hwclock --systohc")  # Sync hardware clock
+                # os.system("sudo hwclock --systohc")  # Sync hardware clock
             elif abs(diff_seconds) < 0.1:
                 s.disconnect()
                 return True  # Sync successful
-        time.sleep(0.01) 
+        time.sleep(1) 
     s.disconnect()
     return False  # Sync failed
 
