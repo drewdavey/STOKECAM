@@ -128,6 +128,7 @@ def exit_standby(fname_log):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
+    time.sleep(1)
     standby = False
 
 def enter_standby(fdir, fname_log, dt, mode, portName):
