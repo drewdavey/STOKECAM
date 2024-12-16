@@ -84,7 +84,7 @@ function imu = parse_imu(mainDir, waveFolder)
     diffs = milliseconds(diffs); % Convert duration to milliseconds
     
     % Find start time associated with first image. 
-    [~, idx] = min(abs(RP_time - tstamps0(1)));
+    [~, idx] = min(abs(RP_time - (tstamps0(1) + diffs(1))));
     
     % Apply corresponding diff to sequence
     diff = diffs(idx);
