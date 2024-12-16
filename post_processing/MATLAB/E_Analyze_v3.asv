@@ -14,17 +14,11 @@ res = 300;          % resolution for figures (.pngs)
 
 path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
 
-% Load IMU/GPS
-vn_tstamps = dir(fullfile(path, '*.txt'));
-vn_name = dir(fullfile(path, '*.csv'));
-vn = readtable([path '\' vn_name.name]);
-tstamps = readtable([path '\' vn_tstamps.name]);
+load([path '/imu.mat']);
 
 %% Organize dirs
 cam0Dir = fullfile(path, 'cam0');
 cam1Dir = fullfile(path, 'cam1');
-cam0Files = dir(fullfile(cam0Dir, '0_*.jpg'));
-cam1Files = dir(fullfile(cam1Dir, '1_*.jpg'));
 matDir = fullfile(path, 'mats');
 ptCloudDir = fullfile(path, 'ptClouds');
 rectifiedImagesDir = fullfile(path, 'Rectified_Images');
@@ -56,25 +50,17 @@ else
 end
 
 %% Parse filenames to extract timestamps
-tstamps0 = datetime.empty;
-tstamps1 = datetime.empty;
 
 for i = 1:length(selectedFiles0) 
     [cameraID0, tshort0, imageNum0, tlong0] = parse_filename(selectedFiles0(i).name);
-    hours0 = tlong0(1:2);
-    minutes0 = tlong0(3:4);
-    seconds0 = tlong0(5:6);
-    microseconds0 = tlong0(7:end);
+    hours0 = tlong0(1:2); minutes0 = tlong0(3:4); seconds0 = tlong0(5:6); microseconds0 = tlong0(7:end);
     fullTimestamp0 = [hours0, ':', minutes0, ':', seconds0, '.', microseconds0];
     tstamps0(i) = datetime(fullTimestamp0, 'InputFormat', 'HH:mm:ss.SSSSSS', 'Format', 'HH:mm:ss.SSSSSS');
 end
 
 for i = 1:length(selectedFiles1)
     [cameraID1, tshort1, imageNum1, tlong1] = parse_filename(selectedFiles1(i).name);
-    hours1 = tlong1(1:2);
-    minutes1 = tlong1(3:4);
-    seconds1 = tlong1(5:6);
-    microseconds1 = tlong1(7:end); 
+    hours1 = tlong1(1:2); minutes1 = tlong1(3:4); seconds1 = tlong1(5:6); microseconds1 = tlong1(7:end); 
     fullTimestamp1 = [hours1, ':', minutes1, ':', seconds1, '.', microseconds1];
     tstamps1(i) = datetime(fullTimestamp1, 'InputFormat', 'HH:mm:ss.SSSSSS', 'Format', 'HH:mm:ss.SSSSSS');
 end
@@ -122,7 +108,6 @@ sgtitle('XYZ accel');
 print(f2, fullfile(figDir, 'accel.png'), '-dpng', ['-r', num2str(res)]);
 
 %% Position
-
 xm = vn.posEcefX - vn.posEcefX(1);
 ym = vn.posEcefY - vn.posEcefY(1);
 zm = vn.posEcefZ - vn.posEcefZ(1);

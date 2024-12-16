@@ -122,7 +122,6 @@ sgtitle('XYZ accel');
 print(f2, fullfile(figDir, 'accel.png'), '-dpng', ['-r', num2str(res)]);
 
 %% Position
-
 xm = vn.posEcefX - vn.posEcefX(1);
 ym = vn.posEcefY - vn.posEcefY(1);
 zm = vn.posEcefZ - vn.posEcefZ(1);
