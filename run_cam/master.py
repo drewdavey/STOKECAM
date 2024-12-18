@@ -153,6 +153,7 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             if tUtc := cd.time.timeUtc: imu.write(f"start,{tstr},{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03},")
             if tGps := cd.time.timeGps.microseconds(): imu.write(f"{tGps} \n")
+            ## ^^ think this is printing old tstamps
             red.on()
             while right_button.is_pressed:
                 tnow = datetime.now(timezone.utc)

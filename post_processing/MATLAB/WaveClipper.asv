@@ -18,6 +18,8 @@ while clipWaves
     waveFolder = organize_images(mainDir); % wave* directory containing 'cam0' and 'cam1' folders
     % vn = parse_imu(mainDir, waveFolder);
     % 
+    % % Save parsed VN-200 data to waveDir
+    % save(fullfile(waveFolder, 'imu.mat'), 'vn');
 
     % Load IMU/GPS
     vn_tmp = dir(fullfile(mainDir, '*.csv'));
@@ -44,10 +46,8 @@ while clipWaves
     % vn.utcTimes = datetime(vn.utcYear, vn.utcMonth, vn.utcDay, ...
     %                    vn.utcHour, vn.utcMinute, vn.utcSecond + vn.utcFracsec / 1000, ...
     %                    'Format', 'HH:mm:ss.SSS');
-    % vn.utcTimes = datetime(vn.utcHour, vn.utcMinute, vn.utcSecond + vn.utcFracsec / 1000, 'InputFormat', 'HH:mm:ss.SSSSSS',...
-    %                    'Format', 'HH:mm:ss.SSS');
-    vn.utcTimes = datetime(0,0,0, vn.utcHour, vn.utcMinute, vn.utcSecond + vn.utcFracsec / 1000, ...
-                       'Format', 'HH:mm:ss.SSS', 'InputFormat', 'HH:mm:ss.SSS');
+    vn.utcTimes = datetime(vn.utcHour, vn.utcMinute, vn.utcSecond + vn.utcFracsec / 1000, 'InputFormat', 'HH:mm:ss.SSSSSS',...
+                       'Format', 'HH:mm:ss.SSS');
     
     % Get cam0 and cam1 dirs
     cam0Dir = fullfile(waveFolder, 'cam0');
@@ -122,9 +122,7 @@ while clipWaves
     % Create new downsampled VN-200 struct
     imu = vn(closest_idx,:);
 
-    vn=imu;
-    % Save parsed VN-200 data to waveDir
-    save(fullfile(waveFolder, 'imu.mat'), 'vn');
+
 
 
 
