@@ -105,16 +105,13 @@ sgtitle('XYZ accel');
 print(f2, fullfile(figDir, 'accel.png'), '-dpng', ['-r', num2str(res)]);
 
 %% Position
-
-% UTM
-% xm = vn.posEcefX;
-% ym = vn.posEcefY;
-% zm = vn.posEcefZ;
-
-% UTM (local)
 xm = vn.posEcefX - vn.posEcefX(1);
 ym = vn.posEcefY - vn.posEcefY(1);
 zm = vn.posEcefZ - vn.posEcefZ(1);
+
+% xm = vn.posEcefX;
+% ym = vn.posEcefY;
+% zm = vn.posEcefZ;
 
 %% Compute rotation matrix from quaternion
 numFrames = numel(vn.quatX);
@@ -132,13 +129,13 @@ end
 
 % planeCorners = [1 0 0; 1 1 0; 1 1 1; 1 0 1]; % Define a unit square in the XY plane
 % planeColors = {'r', 'g', 'b', 'y'}; % Corner colors
-% faces = [1 2 3 4]; % Connect points 
+% faces = [1 2 3 4]; % Connect corners 
 
 depth = 1;
-points = [depth, depth, depth, depth;  % X-coordinates 
-          0.5, -0.5, -0.5,  0.5;       % Y-coordinates
-          0.5,  0.5, -0.5, -0.5];      % Z-coordinates
-pointColors = {'r', 'g', 'b', 'y'}; % Corner colors
+planeRelativeCorners = [0.5, -0.5, -0.5, 0.5;  % X-coordinates
+                        0.5,  0.5, -0.5, -0.5;  % Y-coordinates
+                        depth,    depth,    depth,    depth];   % Z-coordinates (flat plane)
+cornerColors = {'r', 'g', 'b', 'y'}; % Corner colors
 
 % Set axis limits
 % axisLimits = [-1, 1, -1, 1, -1, 1];
@@ -159,10 +156,10 @@ for i = 1:numFrames
     cla;
     R = rotationMatrices(:, :, i);
     
-    % Rotate the points
-    rotated = R * points;
+    % Rotate the corners
+    rotated = R * planeRelativeCorners;
     
-    % Translate the points 
+    % Translate the corners 
     translated = rotated + [xm(i); ym(i); zm(i)];
     
     % Plot the axes using quiver
@@ -177,10 +174,10 @@ for i = 1:numFrames
     fill3(translated(1, :), translated(2, :), translated(3, :), ...
           'cyan', 'FaceAlpha', 0.5, 'EdgeColor', 'none');
     
-    % Plot the points
+    % Plot the corners
     for j = 1:4
         scatter3(translated(1, j), translated(2, j), translated(3, j), ...
-                 100, pointColors{j}, 'filled');
+                 100, cornerColors{j}, 'filled');
     end
     
     axis equal;
