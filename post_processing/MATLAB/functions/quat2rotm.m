@@ -2,7 +2,6 @@
 % Drew Davey
 % Last updated: 2024-12-13
 
-
 function R = quat2rotm(q)
     qw = q(1);
     qx = q(2);

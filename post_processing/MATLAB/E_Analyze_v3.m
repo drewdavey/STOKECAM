@@ -128,21 +128,29 @@ for i = 1:numFrames
     rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
 end
 
-%% Create the plane
+%% Create points
+
+depth = 2;
+numPoints = 10;
 
 % planeCorners = [1 0 0; 1 1 0; 1 1 1; 1 0 1]; % Define a unit square in the XY plane
 % planeColors = {'r', 'g', 'b', 'y'}; % Corner colors
 % faces = [1 2 3 4]; % Connect points 
+% pointColors = {'r', 'g', 'b', 'y'}; % Corner colors 
 
-depth = 1;
-points = [depth, depth, depth, depth;  % X-coordinates 
-          0.5, -0.5, -0.5,  0.5;       % Y-coordinates
-          0.5,  0.5, -0.5, -0.5];      % Z-coordinates
-pointColors = {'r', 'g', 'b', 'y'}; % Corner colors
+% points = [depth, depth, depth, depth;  % X-coordinates 
+%           0.5, -0.5, -0.5,  0.5;       % Y-coordinates
+%           0.5,  0.5, -0.5, -0.5];      % Z-coordinates
 
-% Set axis limits
-% axisLimits = [-1, 1, -1, 1, -1, 1];
-axisLimits = [min(xm)-1, max(xm)+1, min(ym)-1, max(ym)+1, min(zm)-1, max(zm)+1]; 
+% points = [ % X-coordinates   Y-coordinates   Z-coordinates
+%     -0.5,  -0.5,  0.5,   0.5,   0.0,   0.0;   % Base (box corners and arrowhead)
+%     -0.5,   0.5,  0.5,  -0.5,   0.0,   0.0;   % Base (box corners and arrowhead)
+%      0.0,   0.0,  0.0,   0.0,   0.5,   1.0];  % Base Z and Arrowhead Z
+
+% points = rand(3, numPoints) - 0.5; % Random points in [-0.5, 0.5] for all dimensions
+points = [depth*ones(1, numPoints);                % Fixed X-coordinates at depth = 1 
+          rand(1, numPoints) - 0.5;          % Random Y-coordinates in [-0.5, 0.5]
+          rand(1, numPoints) - 0.5];         % Random Z-coordinates in [-0.5, 0.5]
 
 %% Plot rotations/translations
 
@@ -154,6 +162,11 @@ figure('Color', 'w');
 xlabel('X'); ylabel('Y'); zlabel('Z');
 grid on;
 hold on;
+
+% Set axis limits
+range = depth*1.5;
+% axisLimits = [-1, 1, -1, 1, -1, 1];
+axisLimits = [min(xm)-range, max(xm)+range, min(ym)-range, max(ym)+range, min(zm)-range, max(zm)+range];
 
 for i = 1:numFrames
     cla;
@@ -178,16 +191,20 @@ for i = 1:numFrames
           'cyan', 'FaceAlpha', 0.5, 'EdgeColor', 'none');
     
     % Plot the points
-    for j = 1:4
+    for j = 1:numPoints
         scatter3(translated(1, j), translated(2, j), translated(3, j), ...
-                 100, pointColors{j}, 'filled');
+                 10, 'k', 'filled');
     end
+    % for j = 1:4
+    %     scatter3(translated(1, j), translated(2, j), translated(3, j), ...
+    %              100, pointColors{j}, 'filled');
+    % end
     
     axis equal;
     axis(axisLimits);
     title(['Frame ', num2str(i)]);
     drawnow;
-    pause(0.01);
+    % pause(0.01);
 
     % Write frame to video
     frame = getframe(gcf);
