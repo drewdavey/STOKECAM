@@ -2,6 +2,8 @@
 % Drew Davey
 % Last updated: 2024-12-13
 
+% This is matlab built-in func.. just testing
+
 function R = quat2rotm(q)
     qw = q(1);
     qx = q(2);
