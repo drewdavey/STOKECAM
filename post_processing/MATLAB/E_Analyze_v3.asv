@@ -198,6 +198,7 @@ points = [depth, depth, depth, depth;  % X-coordinates
 %           rand(1, numPoints) - 0.5];         % Random Z-coordinates in [-0.5, 0.5]
 
 
+
 %% Plot rotations/translations
 
 video = VideoWriter(fullfile(figDir, '3D_Orientation_with_Plane.mp4'), 'MPEG-4');

@@ -4,7 +4,7 @@
 
 % This is matlab built-in func.. just testing
 
-function R = quat2rotm(q)
+function R = quat2rotm_DD(q)
     qw = q(1);
     qx = q(2);
     qy = q(3);
