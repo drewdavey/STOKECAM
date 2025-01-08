@@ -108,18 +108,12 @@ def toggle_modes():
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
-def cap0(fdir_cam0, tnext, i):
-    tnow = datetime.now(timezone.utc)
-    while tnow < tnext:
-        tnow = datetime.now(timezone.utc)
-    tstr = tnow.strftime('%H%M%S%f')
+def cap0(fdir_cam0, i):
+    tstr = str(time.monotonic_ns())
     cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
 
-def cap1(fdir_cam1, tnext, i):
-    tnow = datetime.now(timezone.utc)
-    while tnow < tnext:
-        tnow = datetime.now(timezone.utc)
-    tstr = tnow.strftime('%H%M%S%f')
+def cap1(fdir_cam1, i):
+    tstr = str(time.monotonic_ns())
     cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
 
 def exit_standby(fname_log):
@@ -137,8 +131,6 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
     fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
-    imu = open(fname_imu, 'a')
-    imu.write(f"burst,RP_time,VN_timeUtc,VN_timeGps\n")
     s = Sensor() # Create sensor object and connect to the VN-200
     csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)
@@ -148,30 +140,16 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 0
-            while not (cd := s.getNextMeasurement()):
-                time.sleep(0.1)
-            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-            if tUtc := cd.time.timeUtc: imu.write(f"start,{tstr},{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03},")
-            if tGps := cd.time.timeGps.microseconds(): imu.write(f"{tGps} \n")
-            ## ^^ think this is printing old tstamps
             red.on()
             while right_button.is_pressed:
-                tnow = datetime.now(timezone.utc)
-                tnext = tnow + timedelta(seconds=dt)
-                p0 = threading.Thread(target=cap0, args=[fdir_cam0, tnext, i])
-                p1 = threading.Thread(target=cap1, args=[fdir_cam1, tnext, i]) 
+                p0 = threading.Thread(target=cap0, args=[fdir_cam0, i])
+                p1 = threading.Thread(target=cap1, args=[fdir_cam1, i])
                 p0.start(), p1.start()
                 p0.join(), p1.join()
                 i += 1
-            while not (cd := s.getNextMeasurement()):
-                time.sleep(0.1)
-            tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-            if tUtc := cd.time.timeUtc: imu.write(f"stop,{tstr},{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03},")
-            if tGps := cd.time.timeGps.microseconds(): imu.write(f"{tGps} \n")
             red.off()
         time.sleep(0.2)
     csvExporter.stop()
-    imu.close()
     s.disconnect()
     exit_standby(fname_log)
     # monitor_gps(portName)
@@ -191,12 +169,12 @@ except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
 portName = '/dev/ttyUSB0'                       # Default port for VN-200
 config_VN200_output(portName)                   # Config VN-200 output           
 
-# Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
-while not sync_clock(portName, clock_timeout):  
-    [led.on() for led in (red, green, yellow)]  
-    while not (right_button.is_held and left_button.is_held):
-        time.sleep(0.1)
-    [led.off() for led in (red, green, yellow)]
+# # Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
+# while not sync_clock(portName, clock_timeout):  
+#     [led.on() for led in (red, green, yellow)]  
+#     while not (right_button.is_held and left_button.is_held):
+#         time.sleep(0.1)
+#     [led.off() for led in (red, green, yellow)]
 
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
