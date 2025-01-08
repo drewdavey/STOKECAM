@@ -50,24 +50,27 @@ else
 end
 
 %% Parse filenames to extract timestamps
-for i = 1:length(selectedFiles0) 
-    [cameraID0, tshort0, imageNum0, tlong0] = parse_filename(selectedFiles0(i).name);
-    hours0 = tlong0(1:2); minutes0 = tlong0(3:4); seconds0 = tlong0(5:6); microseconds0 = tlong0(7:end);
-    fullTimestamp0 = [hours0, ':', minutes0, ':', seconds0, '.', microseconds0];
-    tstamps0(i) = datetime(fullTimestamp0, 'InputFormat', 'HH:mm:ss.SSSSSS', 'Format', 'HH:mm:ss.SSSSSS');
+% Initialize arrays to store timestamps in nanoseconds
+tstamps0 = zeros(1, length(selectedFiles0));
+tstamps1 = zeros(1, length(selectedFiles1));
+
+% Parse filenames to extract timestamps in nanoseconds
+for i = 1:length(selectedFiles0)
+    [~, tstamp0, ~] = parse_filename(selectedFiles0(i).name);  % Get timestamp in nanoseconds as a string
+    tstamps0(i) = str2double(tstamp0);  % Convert to numeric nanoseconds
 end
+
 for i = 1:length(selectedFiles1)
-    [cameraID1, tshort1, imageNum1, tlong1] = parse_filename(selectedFiles1(i).name);
-    hours1 = tlong1(1:2); minutes1 = tlong1(3:4); seconds1 = tlong1(5:6); microseconds1 = tlong1(7:end); 
-    fullTimestamp1 = [hours1, ':', minutes1, ':', seconds1, '.', microseconds1];
-    tstamps1(i) = datetime(fullTimestamp1, 'InputFormat', 'HH:mm:ss.SSSSSS', 'Format', 'HH:mm:ss.SSSSSS');
+    [~, tstamp1, ~] = parse_filename(selectedFiles1(i).name);  % Get timestamp in nanoseconds as a string
+    tstamps1(i) = str2double(tstamp1);  % Convert to numeric nanoseconds
 end
-timeDiffs = zeros(1, length(tstamps0));  
+
+% Calculate the difference in time between image pairs in nanoseconds
+timeDiffs = zeros(1, length(tstamps0));
 for i = 1:length(tstamps0)
-    % Calculate the difference in time for each image pair (in seconds)
-    timeDiffInSeconds = seconds(tstamps1(i) - tstamps0(i));
-    % Convert the time difference to microseconds (1 second = 1e6 microseconds)
-    timeDiffs(i) = timeDiffInSeconds * 1e6;
+    % Calculate the time difference in nanoseconds directly
+    timeDiffNs = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
+    timeDiffs(i) = timeDiffNs;  % Store the time difference
 end
 
 %% Plot timestamps
