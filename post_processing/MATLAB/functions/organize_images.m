@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-10-06
+% Last updated: 2025-01-08
 
 function waveFolder = organize_images(mainDir)
     % Input: main directory containing 'cam0' and 'cam1' folders
@@ -23,29 +23,36 @@ function waveFolder = organize_images(mainDir)
         selectedFile = selectedFiles(i);        
         
         % Extract timestamp and image number from selected file
-        [cameraID, timestamp, imageNum] = parse_filename(selectedFile.name);        
+        [cameraID, timestamp, ~] = parse_filename(selectedFile.name);        
         
-        % Find the corresponding file in the other folder
-        correspondingFile = find_corresponding_file(cameraID, timestamp, imageNum, cam0Files, cam1Files);        
-        if isempty(correspondingFile)
+        % Convert the selected timestamp to numeric (nanoseconds)
+        targetTimeNs = str2double(timestamp);
+        
+        % Determine the other camera's file list
+        if cameraID == '0'
+            otherFiles = cam1Files;
+        else
+            otherFiles = cam0Files;
+        end
+
+        % Find the nearest timestamp match in the other camera's file list
+        nearestFile = find_nearest_file(otherFiles, targetTimeNs);
+        
+        if isempty(nearestFile)
             warning(['Corresponding file not found for ', selectedFile.name]);
             continue;  % Skip to the next file if no match is found
         end        
+
+        % Copy the files into the wave folder
         if folderIndex == 1
-            
-            % Copy selected file to wavei/cam0/
             copyfile(fullfile(cam0Dir, selectedFile.name), fullfile(waveFolder, 'cam0', selectedFile.name));
-            
-            % Copy corresponding file to wavei/cam1/
-            copyfile(fullfile(cam1Dir, correspondingFile.name), fullfile(waveFolder, 'cam1', correspondingFile.name));
+            copyfile(fullfile(cam1Dir, nearestFile.name), fullfile(waveFolder, 'cam1', nearestFile.name));
         else
-            
-            % Copy selected file to wavei/cam1/
             copyfile(fullfile(cam1Dir, selectedFile.name), fullfile(waveFolder, 'cam1', selectedFile.name));
-            
-            % Copy corresponding file to wavei/cam0/
-            copyfile(fullfile(cam0Dir, correspondingFile.name), fullfile(waveFolder, 'cam0', correspondingFile.name));
+            copyfile(fullfile(cam0Dir, nearestFile.name), fullfile(waveFolder, 'cam0', nearestFile.name));
         end
     end    
     disp(['Files successfully copied to ', waveFolder]);
 end
+
+
