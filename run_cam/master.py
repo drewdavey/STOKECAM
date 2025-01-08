@@ -108,11 +108,17 @@ def toggle_modes():
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
-def cap0(fdir_cam0, i):
+def cap0(fdir_cam0, tnext, i):
+    tnow = time.monotonic_ns()
+    while tnow < tnext:
+        pass
     tstr = str(time.monotonic_ns())
     cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
 
-def cap1(fdir_cam1, i):
+def cap1(fdir_cam1, tnext, i):
+    tnow = time.monotonic_ns()
+    while tnow < tnext:
+        pass
     tstr = str(time.monotonic_ns())
     cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
 
@@ -142,8 +148,10 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             i = 0
             red.on()
             while right_button.is_pressed:
-                p0 = threading.Thread(target=cap0, args=[fdir_cam0, i])
-                p1 = threading.Thread(target=cap1, args=[fdir_cam1, i])
+                tnow = time.monotonic_ns()
+                tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
+                p0 = threading.Thread(target=cap0, args=[fdir_cam0, tnext, i])
+                p1 = threading.Thread(target=cap1, args=[fdir_cam1, tnext, i])
                 p0.start(), p1.start()
                 p0.join(), p1.join()
                 i += 1
@@ -169,12 +177,12 @@ except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
 portName = '/dev/ttyUSB0'                       # Default port for VN-200
 config_VN200_output(portName)                   # Config VN-200 output           
 
-# # Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
-# while not sync_clock(portName, clock_timeout):  
-#     [led.on() for led in (red, green, yellow)]  
-#     while not (right_button.is_held and left_button.is_held):
-#         time.sleep(0.1)
-#     [led.off() for led in (red, green, yellow)]
+# Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
+while not sync_clock(portName, clock_timeout):  
+    [led.on() for led in (red, green, yellow)]  
+    while not (right_button.is_held and left_button.is_held):
+        time.sleep(0.1)
+    [led.off() for led in (red, green, yellow)]
 
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
