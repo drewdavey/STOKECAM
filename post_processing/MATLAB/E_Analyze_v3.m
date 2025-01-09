@@ -76,7 +76,7 @@ end
 %% Plot timestamps
 f1 = figure; hold on; grid on; box on; 
 plot(1:length(timeDiffs), timeDiffs, 'o-', 'LineWidth', 1.5);
-yline(0, '--k', 'LineWidth',2);time.monotonic_ns()
+yline(0, '--k', 'LineWidth',2);
 maxValue = max(abs(timeDiffs));  % Find the max absolute value
 % ylim([-maxValue, maxValue]);     % Set y-limits symmetrically
 % ylim([0, maxValue]);     % Set y-limits symmetrically
