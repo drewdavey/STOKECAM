@@ -70,13 +70,13 @@ timeDiffs = zeros(1, length(tstamps0));
 for i = 1:length(tstamps0)
     % Calculate the time difference in nanoseconds directly
     timeDiffNs = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
-    timeDiffs(i) = timeDiffNs;  % Store the time difference
+    timeDiffs(i) = timeDiffNs * 10^-3;  % Difference in microseconds
 end
 
 %% Plot timestamps
 f1 = figure; hold on; grid on; box on; 
 plot(1:length(timeDiffs), timeDiffs, 'o-', 'LineWidth', 1.5);
-yline(0, '--k', 'LineWidth',2);
+yline(0, '--k', 'LineWidth',2);time.monotonic_ns()
 maxValue = max(abs(timeDiffs));  % Find the max absolute value
 % ylim([-maxValue, maxValue]);     % Set y-limits symmetrically
 % ylim([0, maxValue]);     % Set y-limits symmetrically
