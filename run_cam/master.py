@@ -109,15 +109,13 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
 
 def cap0(fdir_cam0, tnext, i):
-    tnow = time.monotonic_ns()
-    while tnow < tnext:
+    while time.monotonic_ns() < tnext:
         pass
     tstr = str(time.monotonic_ns())
     cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
 
 def cap1(fdir_cam1, tnext, i):
-    tnow = time.monotonic_ns()
-    while tnow < tnext:
+    while time.monotonic_ns() < tnext:
         pass
     tstr = str(time.monotonic_ns())
     cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
