@@ -12,10 +12,6 @@ g = 9.81; % gravity
 
 res = 300;          % resolution for figures (.pngs)
 
-dX = 0.1;     % X step size for plotting (meters)
-dY = 0.1;     % Y step size for plotting (meters)
-dZ = 0.1;       % Z step size for plotting (meters)
-
 path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
 
 load([path '/imu.mat']);
@@ -157,15 +153,15 @@ print(f4, fullfile(figDir, 'ypr.png'), '-dpng', ['-r', num2str(res)]);
 
 %% Position
 
-% % UTM
-% xm = vn.posEcefX;
-% ym = vn.posEcefY;
-% zm = vn.posEcefZ;
+% UTM
+xm = vn.posEcefX;
+ym = vn.posEcefY;
+zm = vn.posEcefZ;
 
 % UTM (local)
-xm = vn.posEcefX - vn.posEcefX(1);
-ym = vn.posEcefY - vn.posEcefY(1);
-zm = vn.posEcefZ - vn.posEcefZ(1);
+% xm = vn.posEcefX - vn.posEcefX(1);
+% ym = vn.posEcefY - vn.posEcefY(1);
+% zm = vn.posEcefZ - vn.posEcefZ(1);
 
 %% Compute rotation matrix from quaternion
 numFrames = numel(vn.quatX);
@@ -282,119 +278,58 @@ end
 
 close(video);
 
-% %% Plot points3D rectified
-% 
-% video = VideoWriter(fullfile(figDir, '3D_Orientation_points3D.mp4'), 'MPEG-4');
-% video.FrameRate = 10;
-% open(video);
-% 
-% figure;
-% xlabel('X'); ylabel('Y'); zlabel('Z');
-% grid on;
-% hold on;
-% 
-% % Set axis limits
-% range = depth*1.5;
-% % axisLimits = [-1, 1, -1, 1, -1, 1];
-% axisLimits = [min(xm)-range, max(xm)+range, min(ym)-range, max(ym)+range, min(zm)-range, max(zm)+range];
-% 
-% for i = 1:numFrames
-%     R = rotationMatrices(:, :, i);
-% 
-%     % Load points3D
-%     load(fullfile(matDir,matFiles(i).name));
-%     points = data.points3D';
-% 
-%     % Rotate the points
-%     rotated = R * points;
-% 
-%     % Translate the points 
-%     translated = rotated + [xm(i); ym(i); zm(i)];
-% 
-%     % Plot the camera axes 
-%     xAxis = R * [1; 0; 0];
-%     yAxis = R * [0; 1; 0];
-%     zAxis = R * [0; 0; 1];
-% 
-%     % quiver3(xm(i), ym(i), zm(i), xAxis(1), xAxis(2), xAxis(3), 'r', 'LineWidth', 2);
-%     % quiver3(xm(i), ym(i), zm(i), yAxis(1), yAxis(2), yAxis(3), 'g', 'LineWidth', 2);
-%     % quiver3(xm(i), ym(i), zm(i), zAxis(1), zAxis(2), zAxis(3), 'b', 'LineWidth', 2);
-% 
-%     for j = 1:1000:length(points)
-%         scatter3(translated(1, j), translated(2, j), translated(3, j), ...
-%                  10, pointColors{i}, 'filled'); hold on;
-%     end
-% 
-%     axis equal;
-%     axis(axisLimits);
-%     title(['Frame ', num2str(i)]);
-%     drawnow;
-%     % pause(0.01);
-% 
-%     % Write frame to video
-%     frame = getframe(gcf);
-%     writeVideo(video, frame);
-% end
-% 
-% close(video);
+%% Plot points3D rectified
 
-%% Plot X-Y cross sections
-shapesDir = fullfile(figDir, 'shapes');
-if ~exist(shapesDir, 'dir') && loadMats
-    mkdir(shapesDir);  % Create shapes/ directory if it doesn't exist
-end
+video = VideoWriter(fullfile(figDir, '3D_Orientation_points3D.mp4'), 'MPEG-4');
+video.FrameRate = 10;
+open(video);
 
-for k = 1:length(matFilenames)
-    matData = load(fullfile(matDir, matFilenames{k}));
-    matData = matData.data;
-    if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
+figure;
+xlabel('X'); ylabel('Y'); zlabel('Z');
+grid on;
+hold on;
 
-        R = rotationMatrices(:, :, i);
+% Set axis limits
+range = depth*1.5;
+% axisLimits = [-1, 1, -1, 1, -1, 1];
+axisLimits = [min(xm)-range, max(xm)+range, min(ym)-range, max(ym)+range, min(zm)-range, max(zm)+range];
 
-        points3D = matData.points3D;
-        
-        % % Rotate the points
-        % points3D = R * points3D;
-        % 
-        % points3D = points3D';
+for i = 1:numFrames
+    R = rotationMatrices(:, :, i);
+    
+    % Load points3D
+    load(fullfile(matDir,matFiles(i).name));
+    points = data.points3D';
 
-        % % Translate the points 
-        % points3D = points3D' + [xm(i); ym(i); zm(i)]';
-
-        % Get the x-values, y-values (flip y-values), and z-values (depth)
-        xValues = points3D(:,1);
-        yValues = -points3D(:,2);  % Flip the Y values by multiplying by -1
-        zValues = points3D(:,3);
-        
-        % Get the minimum and maximum Z, X, Y values
-        minX = min(xValues);
-        maxX = max(xValues);
-        minY = min(yValues);
-        maxY = max(yValues);
-        minZ = min(zValues);
-        maxZ = max(zValues);
-
-        figure; hold on; axis equal; grid on;
-        blueToRed = [linspace(0, 1, 256)', zeros(256, 1), linspace(1, 0, 256)'];
-        colormap(blueToRed);
-
-        scatter(points3D(:,1),points3D(:,2))
-
-        title(sprintf('Cross Sections for %s', matFiles(k).name), 'Interpreter', 'none');
-        xlabel('X (m)');
-        ylabel('Y (m)');
-        yline(minY, '--k', 'LineWidth',2); % lowest water level (trough)
-        c = colorbar;
-        c.Label.String = 'Z (m)';
-        clim([minZ maxZ]);  % Set the colorbar limits to match the Z range
-
-        % Save the figure in the shapes/ directory
-        % exportgraphics(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
-        %     'Resolution', res);
-        print(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
-            '-dpng', ['-r', num2str(res)]);
-        close(gcf); 
-    else
-        disp(['points3D not found in ', matFiles(k).name, ' or ', matFiles(k).name, ' not yet cleaned.']);
+    % Rotate the points
+    rotated = R * points;
+    
+    % Translate the points 
+    translated = rotated + [xm(i); ym(i); zm(i)];
+    
+    % Plot the camera axes 
+    xAxis = R * [1; 0; 0];
+    yAxis = R * [0; 1; 0];
+    zAxis = R * [0; 0; 1];
+    
+    % quiver3(xm(i), ym(i), zm(i), xAxis(1), xAxis(2), xAxis(3), 'r', 'LineWidth', 2);
+    % quiver3(xm(i), ym(i), zm(i), yAxis(1), yAxis(2), yAxis(3), 'g', 'LineWidth', 2);
+    % quiver3(xm(i), ym(i), zm(i), zAxis(1), zAxis(2), zAxis(3), 'b', 'LineWidth', 2);
+    
+    for j = 1:1000:length(points)
+        scatter3(translated(1, j), translated(2, j), translated(3, j), ...
+                 10, pointColors{i}, 'filled'); hold on;
     end
+
+    axis equal;
+    axis(axisLimits);
+    title(['Frame ', num2str(i)]);
+    drawnow;
+    % pause(0.01);
+
+    % Write frame to video
+    frame = getframe(gcf);
+    writeVideo(video, frame);
 end
+
+close(video);

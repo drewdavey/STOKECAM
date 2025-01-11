@@ -63,7 +63,7 @@ for m = 1:length(paths)
         [cameraID0, timestamp0, imageNum0] = parse_filename(cam0Files(i).name);
         
         % Find the corresponding cam1 file
-        correspondingFile = find_corresponding_file(cameraID0, timestamp0, imageNum0, cam0Files, cam1Files);
+        correspondingFile = find_nearest_file(cam1Files, timestamp0);
         
         % If no corresponding file is found, delete the cam0 file
         if isempty(correspondingFile)
@@ -78,7 +78,7 @@ for m = 1:length(paths)
         [cameraID1, timestamp1, imageNum1] = parse_filename(cam1Files(i).name);
     
         % Find the corresponding cam0 file
-        correspondingFile = find_corresponding_file(cameraID1, timestamp1, imageNum1, cam0Files, cam1Files);
+        correspondingFile = find_nearest_file(cam0Files, timestamp1);
         
         % If no corresponding file is found, delete the cam1 file
         if isempty(correspondingFile)
@@ -140,7 +140,7 @@ for m = 1:length(paths)
                 end
                 
                 % Find the corresponding cam1 file
-                cam1File = find_corresponding_file('0', timestamp, imageNum, cam0Files, cam1Files);
+                cam1File = find_nearest_file(cam1Files, timestamp);
                 cam1FilePath = fullfile(cam1File.folder, cam1File.name);
                 if exist(cam1FilePath, 'file')
                     delete(cam1FilePath); 
@@ -148,7 +148,7 @@ for m = 1:length(paths)
                 end
                 
                 % Find the corresponding cam1 file
-                cam0File = find_corresponding_file('1', timestamp, imageNum, cam0Files, cam1Files);
+                cam0File = find_corresponding_file(cam0Files, timestamp);
                 cam0FilePath = fullfile(cam0File.folder, cam0File.name);
                 if exist(cam0FilePath, 'file')
                     delete(cam0FilePath); 
