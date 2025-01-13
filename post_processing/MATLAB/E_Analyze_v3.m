@@ -140,17 +140,17 @@ yaw = vn.yaw;
 pitch = vn.pitch;
 roll = vn.roll;
 
-f4 = figure; 
+f4 = figure;
 subplot(3,1,1); hold on; grid on; box on; axis tight;
 plot(1:length(yaw), yaw, 'r', 'LineWidth', 1);
-ylabel('yaw'); 
+ylabel('yaw');
 subplot(3,1,2); hold on; grid on; box on; axis tight;
 plot(1:length(pitch), pitch, 'g', 'LineWidth', 1);
 ylabel('pitch');
 subplot(3,1,3); hold on; grid on; box on; axis tight;
 plot(1:length(roll), roll, 'b', 'LineWidth', 1);
-ylabel('roll'); 
-xlabel('idx'); 
+ylabel('roll');
+xlabel('idx');
 sgtitle('YPR');
 
 print(f4, fullfile(figDir, 'ypr.png'), '-dpng', ['-r', num2str(res)]);
@@ -353,17 +353,17 @@ for k = 1:length(matFilenames)
 
         points3D = matData.points3D;
         
-        % % Rotate the points
-        % points3D = R * points3D;
-        % 
+        % Rotate the points
+        points3D = R * points3D';
+
         % points3D = points3D';
 
-        % % Translate the points 
-        % points3D = points3D' + [xm(i); ym(i); zm(i)]';
+        % Translate the points 
+        points3D = points3D' + [xm(i); ym(i); zm(i)]';
 
         % Get the x-values, y-values (flip y-values), and z-values (depth)
         xValues = points3D(:,1);
-        yValues = -points3D(:,2);  % Flip the Y values by multiplying by -1
+        yValues = points3D(:,2);  % Flip the Y values by multiplying by -1
         zValues = points3D(:,3);
         
         % Get the minimum and maximum Z, X, Y values
@@ -374,11 +374,11 @@ for k = 1:length(matFilenames)
         minZ = min(zValues);
         maxZ = max(zValues);
 
-        figure; hold on; axis equal; grid on;
+        figure; hold on; axis equal; grid on; axis tight;
         blueToRed = [linspace(0, 1, 256)', zeros(256, 1), linspace(1, 0, 256)'];
         colormap(blueToRed);
 
-        scatter(points3D(:,1),points3D(:,2))
+        scatter3(points3D(:,1),points3D(:,2),points3D(:,3),'.k')
 
         title(sprintf('Cross Sections for %s', matFiles(k).name), 'Interpreter', 'none');
         xlabel('X (m)');
@@ -392,8 +392,7 @@ for k = 1:length(matFilenames)
         % exportgraphics(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
         %     'Resolution', res);
         print(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
-            '-dpng', ['-r', num2str(res)]);
-        close(gcf); 
+            '-dpng', ['-r', num2str(res)]); 
     else
         disp(['points3D not found in ', matFiles(k).name, ' or ', matFiles(k).name, ' not yet cleaned.']);
     end
