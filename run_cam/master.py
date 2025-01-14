@@ -46,10 +46,12 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName):
         green.on(), time.sleep(0.5)
         yellow.on(), time.sleep(0.5)
         red.on(), time.sleep(0.5)
-        [led.blink(0.5,0.5) for led in (red, green, yellow)], time.sleep(3)
-        [led.on() for led in (red, green, yellow)],time.sleep(1.5)
-        p0 = threading.Thread(target=cap0, args=[fdir_cam0, tnow, i])
-        p1 = threading.Thread(target=cap1, args=[fdir_cam1, tnow, i]) 
+        # [led.blink(0.5,0.5) for led in (red, green, yellow)], time.sleep(3)
+        [led.on() for led in (red, green, yellow)]
+        tnow = time.monotonic_ns()
+        tnext = tnow + int(calib_dt * 1e9)  # Convert seconds to nanoseconds
+        p0 = threading.Thread(target=cap0, args=[fdir_cam0, tnext, i])
+        p1 = threading.Thread(target=cap1, args=[fdir_cam1, tnext, i]) 
         p0.start(), p1.start()
         p0.join(), p1.join()
         [led.off() for led in (red, green, yellow)]

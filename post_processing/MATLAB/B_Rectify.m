@@ -155,11 +155,11 @@ for m = 1:length(paths)
         [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));
     
         % Plotting
-        f1 = figure(1);
-        imshow(stereoAnaglyph(J1,J2)); % Display rectified images
-        filename = [timestamp '_' imageNum '_rect.png'];
-        fullFilePath = fullfile(rectifiedImagesDir, filename);
-        exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
+        % f1 = figure(1);
+        % imshow(stereoAnaglyph(J1,J2)); % Display rectified images
+        % filename = [timestamp '_' imageNum '_rect.png'];
+        % fullFilePath = fullfile(rectifiedImagesDir, filename);
+        % exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
         f2 = figure(2); 
         imshow(disparityMap, [0, 64]); % Display disparity map
         colormap jet; colorbar;

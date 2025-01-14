@@ -71,20 +71,25 @@ end
 
 % Calculate the difference in time between image pairs in nanoseconds
 timeDiffs = zeros(1, length(tstamps0));
+
+t = zeros(1, length(tstamps0)); % Create avg tstamps for plotting
+
 for i = 1:length(tstamps0)
-    % Calculate the time difference in nanoseconds directly
+    t(i) = ((tstamps0(i) + tstamps1(i)) / 2) * 10^-9; % Average tstamp in sec
     timeDiffNs = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
     timeDiffs(i) = timeDiffNs * 10^-3;  % Difference in microseconds
 end
 
+t = t - t(1); % make time relative
+
 %% Plot timestamps
 f1 = figure; hold on; grid on; box on; 
-plot(1:length(timeDiffs), timeDiffs, 'o-', 'LineWidth', 1.5);
+plot(t, timeDiffs, 'o-', 'LineWidth', 1.5);
 yline(0, '--k', 'LineWidth',2);
 maxValue = max(abs(timeDiffs));  % Find the max absolute value
 % ylim([-maxValue, maxValue]);     % Set y-limits symmetrically
 % ylim([0, maxValue]);     % Set y-limits symmetrically
-xlabel('Image Pair (Index)');
+xlabel('Time (sec)');
 ylabel('Time Difference (\mus)');
 title('Image Delay');
 % exportgraphics(f1, fullfile(figDir, 'TimeDifferencePlot.png'), 'Resolution', res);
@@ -99,18 +104,18 @@ at = sqrt(ax.^2 + ay.^2 + az.^2);
 
 f2 = figure; 
 subplot(4,1,1); hold on; grid on; box on; axis tight;
-plot(1:length(ax), ax, 'r', 'LineWidth', 1);
+plot(t, ax, 'r', 'LineWidth', 1);
 ylabel('g'); legend('x');
 subplot(4,1,2); hold on; grid on; box on; axis tight;
-plot(1:length(ay), ay, 'g', 'LineWidth', 1);
+plot(t, ay, 'g', 'LineWidth', 1);
 ylabel('g'); legend('y');
 subplot(4,1,3); hold on; grid on; box on; axis tight;
-plot(1:length(az), az, 'b', 'LineWidth', 1);
+plot(t, az, 'b', 'LineWidth', 1);
 ylabel('g'); legend('z');
 subplot(4,1,4); hold on; grid on; box on; axis tight;
-plot(1:length(at), at, 'm', 'LineWidth', 1);
+plot(t, at, 'm', 'LineWidth', 1);
 ylabel('g'); legend('total');
-xlabel('idx'); 
+xlabel('Time (sec)'); 
 sgtitle('XYZ accel');
 
 print(f2, fullfile(figDir, 'accel.png'), '-dpng', ['-r', num2str(res)]);
@@ -122,15 +127,15 @@ mz = vn.magZ;
 
 f3 = figure; 
 subplot(3,1,1); hold on; grid on; box on; axis tight;
-plot(1:length(mx), mx, 'r', 'LineWidth', 1);
+plot(t, mx, 'r', 'LineWidth', 1);
 ylabel('mag'); legend('x');
 subplot(3,1,2); hold on; grid on; box on; axis tight;
-plot(1:length(my), my, 'g', 'LineWidth', 1);
+plot(t, my, 'g', 'LineWidth', 1);
 ylabel('mag'); legend('y');
 subplot(3,1,3); hold on; grid on; box on; axis tight;
-plot(1:length(mz), mz, 'b', 'LineWidth', 1);
+plot(t, mz, 'b', 'LineWidth', 1);
 ylabel('mag'); legend('z');
-xlabel('idx'); 
+xlabel('Time (sec)'); 
 sgtitle('XYZ mag');
 
 print(f3, fullfile(figDir, 'mag.png'), '-dpng', ['-r', num2str(res)]);
@@ -142,15 +147,15 @@ roll = vn.roll;
 
 f4 = figure;
 subplot(3,1,1); hold on; grid on; box on; axis tight;
-plot(1:length(yaw), yaw, 'r', 'LineWidth', 1);
+plot(t, yaw, 'r', 'LineWidth', 1);
 ylabel('yaw');
 subplot(3,1,2); hold on; grid on; box on; axis tight;
-plot(1:length(pitch), pitch, 'g', 'LineWidth', 1);
+plot(t, pitch, 'g', 'LineWidth', 1);
 ylabel('pitch');
 subplot(3,1,3); hold on; grid on; box on; axis tight;
-plot(1:length(roll), roll, 'b', 'LineWidth', 1);
+plot(t, roll, 'b', 'LineWidth', 1);
 ylabel('roll');
-xlabel('idx');
+xlabel('Time (sec)');
 sgtitle('YPR');
 
 print(f4, fullfile(figDir, 'ypr.png'), '-dpng', ['-r', num2str(res)]);

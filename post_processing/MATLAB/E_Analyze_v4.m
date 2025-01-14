@@ -1,0 +1,192 @@
+% STOKECAM Post-Processing
+% Drew Davey
+% Last updated: 2025-01-14
+
+clear; clc; close all;
+
+addpath('functions/');
+
+%% Inputs
+
+g = 9.81; % gravity
+
+res = 300;    % resolution for figures (.pngs)
+
+dX = 0.1;     % X step size for plotting (meters)
+dY = 0.1;     % Y step size for plotting (meters)
+dZ = 0.1;     % Z step size for plotting (meters)
+
+path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
+
+load([path '/imu.mat']);
+
+%% Organize dirs
+cam0Dir = fullfile(path, 'cam0');
+cam1Dir = fullfile(path, 'cam1');
+matDir = fullfile(path, 'mats');
+ptCloudDir = fullfile(path, 'ptClouds');
+rectifiedImagesDir = fullfile(path, 'Rectified_Images');
+figDir = fullfile(path, 'figs');
+if ~exist(figDir, 'dir')
+    mkdir(figDir);  % Create the 'figs/' folder if it doesn't exist
+end
+% Set loadMats if mat and rectified dirs exist
+if exist(matDir, 'dir') && exist(rectifiedImagesDir, 'dir')
+    loadMats = 1; % Enable loading mats based on rectified images
+    matFiles = dir(fullfile(matDir, '*.mat'));
+else
+    loadMats = 0; % Skip loading mats
+end
+
+%% Select images from cam0 and cam1
+cam0Images = dir(fullfile(cam0Dir, '*.jpg'));
+cam1Images = dir(fullfile(cam1Dir, '*.jpg'));
+% Convert filenames into struct arrays same as select_files output
+selectedFiles0 = struct('name', {cam0Images.name});
+selectedFiles1 = struct('name', {cam1Images.name});
+% Select all mats automatically
+if loadMats
+    matFiles = dir(fullfile(matDir, '*.mat'));
+    matFilenames = {matFiles.name};
+else
+    matFilenames = [];
+    disp('No mats/ to analyze.');
+end
+
+%% Parse filenames to extract timestamps
+% Initialize arrays to store timestamps in nanoseconds
+tstamps0 = zeros(1, length(selectedFiles0));
+tstamps1 = zeros(1, length(selectedFiles1));
+
+% Parse filenames to extract timestamps in nanoseconds
+for i = 1:length(selectedFiles0)
+    [~, tstamp0, ~] = parse_filename(selectedFiles0(i).name);  % Get timestamp in nanoseconds as a string
+    tstamps0(i) = str2double(tstamp0);  % Convert to numeric nanoseconds
+end
+
+for i = 1:length(selectedFiles1)
+    [~, tstamp1, ~] = parse_filename(selectedFiles1(i).name);  % Get timestamp in nanoseconds as a string
+    tstamps1(i) = str2double(tstamp1);  % Convert to numeric nanoseconds
+end
+
+% Calculate the difference in time between image pairs in nanoseconds
+timeDiffs = zeros(1, length(tstamps0));
+for i = 1:length(tstamps0)
+    % Calculate the time difference in nanoseconds directly
+    timeDiffNs = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
+    timeDiffs(i) = timeDiffNs * 10^-3;  % Difference in microseconds
+end
+
+%% Position
+
+% % ECEF
+% xm = vn.posEcefX;
+% ym = vn.posEcefY;
+% zm = vn.posEcefZ;
+
+% % ECEF (local)
+% xm = vn.posEcefX - vn.posEcefX(1);
+% ym = vn.posEcefY - vn.posEcefY(1);
+% zm = vn.posEcefZ - vn.posEcefZ(1);
+
+% Convert geodetic to UTM
+[xm, ym, zone] = deg2utm(vn.lat, vn.lon);
+
+% Geoid height correction 
+geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
+
+zm = vn.alt - geoidHeight;
+
+%% Compute rotation matrix from quaternion
+numFrames = numel(vn.quatX);
+rotationMatrices = zeros(3, 3, numFrames);
+for i = 1:numFrames
+    qx = vn.quatX(i);
+    qy = vn.quatY(i);
+    qz = vn.quatZ(i);
+    qw = vn.quatW(i);
+
+    rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
+end
+
+% %% Compute rotation matrix from Yaw-Pitch-Roll (3-2-1 sequence)
+% numFrames = numel(vn.yaw);
+% rotationMatrices = zeros(3, 3, numFrames);
+% 
+% for i = 1:numFrames
+%     yaw = deg2rad(vn.yaw(i));   % Yaw (rotation around Z-axis)
+%     pitch = deg2rad(vn.pitch(i));  % Pitch (rotation around Y-axis)
+%     roll = deg2rad(vn.roll(i));    % Roll (rotation around X-axis)
+% 
+%     % Compute rotation matrix using 3-2-1 (Z-Y-X) Euler sequence
+%     Rz = [cos(yaw), -sin(yaw), 0;
+%           sin(yaw),  cos(yaw), 0;
+%                 0,        0,  1];  % Yaw (Z-axis)
+% 
+%     Ry = [ cos(pitch), 0, sin(pitch);
+%                    0, 1,          0;
+%           -sin(pitch), 0, cos(pitch)];  % Pitch (Y-axis)
+% 
+%     Rx = [1,        0,         0;
+%           0, cos(roll), -sin(roll);
+%           0, sin(roll),  cos(roll)];  % Roll (X-axis)
+% 
+%     % Final rotation matrix (Z-Y-X sequence)
+%     rotationMatrices(:, :, i) = Rz * Ry * Rx;
+% end
+
+%% Plot X-Y cross sections
+shapesDir = fullfile(figDir, 'shapes');
+if ~exist(shapesDir, 'dir') && loadMats
+    mkdir(shapesDir);  % Create shapes/ directory if it doesn't exist
+end
+
+figure;
+for k = 1:length(matFilenames)
+    matData = load(fullfile(matDir, matFilenames{k}));
+    matData = matData.data;
+    if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
+
+        R = rotationMatrices(:, :, i);
+
+        points3D = matData.points3D';
+        
+        % Rotate the points
+        points3D = R * points3D;
+
+        % Translate the points 
+        points3D = points3D' + [xm(i); ym(i); zm(i)]';
+
+        % Get the x-values, y-values, and z-values (depth)
+        xValues = points3D(:,1);
+        yValues = points3D(:,2);
+        zValues = points3D(:,3);
+        
+        % Get the minimum and maximum X, Y, Z values
+        minX = min(xValues);
+        maxX = max(xValues);
+        minY = min(yValues);
+        maxY = max(yValues);
+        minZ = min(zValues);
+        maxZ = max(zValues);
+
+        hold on; axis equal; grid on; axis tight;
+
+        % scatter3(points3D(:,1), points3D(:,2), points3D(:,3),...
+        %     1, double(matData.colors) / 255, 'filled');
+
+        scatter3(points3D(:,1), points3D(:,2), points3D(:,3), 1);
+
+        title(sprintf('Cross Sections for %s', matFiles(k).name));
+        xlabel('X (m)');
+        ylabel('Y (m)');
+
+        legend show;
+
+        % Save the figure in the shapes/ directory
+        print(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
+            '-dpng', ['-r', num2str(res)]); 
+    else
+        disp(['points3D not found in ', matFiles(k).name, ' or ', matFiles(k).name, ' not yet cleaned.']);
+    end
+end
