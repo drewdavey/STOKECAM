@@ -188,8 +188,8 @@ for k = 1:length(matFilenames)
         % Point cloud in camera reference frame
         points3D = matData.points3D;
         
-        % Reorder to X, Z, Y for NED convention
-        points3D = points3D(:, [1, 3, 2]); % Swap Y and Z
+        % % Reorder to X, Z, Y for NED convention
+        % points3D = points3D(:, [1, 3, 2]); % Swap Y and Z
 
         % Rotate the points
         points3D = (R * points3D')'; % Rotate and transpose back to Nx3
