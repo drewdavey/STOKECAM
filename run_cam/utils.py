@@ -240,7 +240,11 @@ def VN200_status(portName, fname_log, gps_timeout):
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     VN-200 Time: {vn_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
             log.write(f"{tstr}:     RP Time: {rp_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
-            log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n\n")
+            log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n")
+            rp_mono_time = time.monotonic_ns()
+            vn_mono_time = cd.time.timeStartup.microseconds()
+            delta_mono_time = vn_mono_time - rp_mono_time
+            log.write(f"{tstr}:     Startup Time Offset (VN200 - RP): {delta_mono_time} nanoseconds\n\n")
         else:
             log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
 

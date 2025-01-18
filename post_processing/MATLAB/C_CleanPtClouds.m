@@ -9,9 +9,9 @@ addpath('functions/');
 %% Inputs
 
 basicFlag = 1;      % basic QC and trim to bbox
-trimFlag = 1;       % trim to refined polygon`
+trimFlag = 0;       % trim to refined polygon`
 colorFlag = 0;      % filter by RGB thresholds
-manualFlag = 1;     % manually clean 
+manualFlag = 0;     % manually clean 
 
 bounds = [-10 10 -10 10 0 30];   % [xmin xmax ymin ymax zmin zmax] for trimming points (meters)
 

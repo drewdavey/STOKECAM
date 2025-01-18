@@ -114,7 +114,7 @@ for m = 1:length(paths)
     end
     
     % Loop through each frame
-    for i = 1:length(imageFileNames1)
+    for i = 1:5:length(imageFileNames1)
         I1 = imread(imageFileNames1{i});
         I2 = imread(imageFileNames2{i});
     

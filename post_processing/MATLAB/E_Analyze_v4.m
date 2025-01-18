@@ -79,23 +79,59 @@ end
 
 %% Position
 
-% % ECEF
-% xm = vn.posEcefX;
-% ym = vn.posEcefY;
-% zm = vn.posEcefZ;
+% % Convert geodetic to UTM
+% [xm, ym, zone] = deg2utm(vn.lat, vn.lon);
+% % Geoid height correction 
+% geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
+% zm = vn.alt - geoidHeight;
 
-% % ECEF (local)
+% ECEF
+xm = vn.posEcefX;
+ym = vn.posEcefY;
+zm = vn.posEcefZ;
 % xm = vn.posEcefX - vn.posEcefX(1);
 % ym = vn.posEcefY - vn.posEcefY(1);
 % zm = vn.posEcefZ - vn.posEcefZ(1);
 
-% Convert geodetic to UTM
-[xm, ym, zone] = deg2utm(vn.lat, vn.lon);
+% %  Direction cosine matrix (ECEF to NED)
+% % Define the angles mu (latitude) and l (longitude)
+% mu = deg2rad(vn.lat); % Convert latitude to radians
+% l = deg2rad(vn.lon);  % Convert longitude to radians
+% 
+% % Initialize arrays for transformed coordinates
+% ox2 = zeros(size(xm));
+% oy2 = zeros(size(ym));
+% oz2 = zeros(size(zm));
+% 
+% % Loop through each data point to calculate the rotated coordinates
+% for i = 1:length(xm)
+%     % Define the initial vector for the current point
+%     v0 = [xm(i); ym(i); zm(i)];
+% 
+%     % Define the rotation matrices for the current mu and l
+%     R1 = [-sin(mu(i)), 0, cos(mu(i));
+%             0,         1,      0;
+%           -cos(mu(i)), 0, -sin(mu(i))];
+% 
+%     R2 = [cos(l(i)),  sin(l(i)), 0;
+%          -sin(l(i)),  cos(l(i)), 0;
+%                0,         0,     1];
+% 
+%     % Combine the rotations
+%     R = R1 * R2;
+% 
+%     % Apply the combined rotation to the initial vector
+%     v2 = R * v0;
+% 
+%     % Store the rotated coordinates
+%     ox2(i) = v2(1);
+%     oy2(i) = v2(2);
+%     oz2(i) = v2(3);
+% end
 
-% Geoid height correction 
-geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
-
-zm = vn.alt - geoidHeight;
+% Using built in func (ECEF to NED)
+wgs84 = wgs84Ellipsoid;
+[ox2, oy2, oz2] = ecef2ned(xm, ym, zm, vn.lat, vn.lon, vn.alt, wgs84);
 
 %% Compute rotation matrix from quaternion
 numFrames = numel(vn.quatX);
@@ -149,13 +185,20 @@ for k = 1:length(matFilenames)
 
         R = rotationMatrices(:, :, i);
 
-        points3D = matData.points3D';
+        % Point cloud in camera reference frame
+        points3D = matData.points3D;
         
+        % Reorder to X, Z, Y for NED convention
+        points3D = points3D(:, [1, 3, 2]); % Swap Y and Z
+
         % Rotate the points
-        points3D = R * points3D;
+        points3D = (R * points3D')'; % Rotate and transpose back to Nx3
+
+        % Origin in NED
+        origin = [ox2(i); oy2(i); oz2(i)];
 
         % Translate the points 
-        points3D = points3D' + [xm(i); ym(i); zm(i)]';
+        points3D = points3D + origin';
 
         % Get the x-values, y-values, and z-values (depth)
         xValues = points3D(:,1);
@@ -172,19 +215,19 @@ for k = 1:length(matFilenames)
 
         hold on; axis equal; grid on; axis tight;
 
-        % scatter3(points3D(:,1), points3D(:,2), points3D(:,3),...
+        % scatter3(xValues, yValues, zValues,...
         %     1, double(matData.colors) / 255, 'filled');
 
-        scatter3(points3D(:,1), points3D(:,2), points3D(:,3), 1);
+        scatter3(xValues, zValues, yValues, 1);
 
-        title(sprintf('Cross Sections for %s', matFiles(k).name));
+        title([matFiles(k).name(end-8:end-4)]);
         xlabel('X (m)');
         ylabel('Y (m)');
 
         legend show;
 
         % Save the figure in the shapes/ directory
-        print(gcf, fullfile(shapesDir, sprintf('CrossSection_Plot_%s.png', matFiles(k).name(1:end-4))),...
+        print(gcf, fullfile(shapesDir, [matFiles(k).name(end-8:end-4)]),...
             '-dpng', ['-r', num2str(res)]); 
     else
         disp(['points3D not found in ', matFiles(k).name, ' or ', matFiles(k).name, ' not yet cleaned.']);

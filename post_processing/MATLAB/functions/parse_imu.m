@@ -37,6 +37,7 @@ function imu = parse_imu(mainDir, waveFolder)
     
         % Find the VN system timestamp nearest neighbor
         [~, idx] = min(abs(vn.timeStartup - avgTimestampNs));  
+        % [~, idx] = min(abs(vn.systemTimeStamp - avgTimestampNs));
         closest_idx(i) = idx;  % Store the index
     end
 
