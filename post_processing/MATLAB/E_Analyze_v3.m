@@ -10,11 +10,11 @@ addpath('functions/');
 
 g = 9.81; % gravity
 
-res = 300;          % resolution for figures (.pngs)
+res = 300;    % resolution for figures (.pngs)
 
 dX = 0.1;     % X step size for plotting (meters)
 dY = 0.1;     % Y step size for plotting (meters)
-dZ = 0.1;       % Z step size for plotting (meters)
+dZ = 0.1;     % Z step size for plotting (meters)
 
 path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
 

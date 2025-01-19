@@ -20,8 +20,8 @@ UniquenessThreshold = 0;       % only applied if specs
 
 % Applied to BM only
 DisparityRange = [0 64];       % only applied if specs
-BlockSize = 15;                % only applied if specs
-ContrastThreshold = 0.5;       % only applied if specs
+BlockSize = 25;                % only applied if specs
+ContrastThreshold = 0.25;       % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
 TextureThreshold = 0.00002;    % only applied if specs
 
@@ -114,7 +114,7 @@ for m = 1:length(paths)
     end
     
     % Loop through each frame
-    for i = 1:5:length(imageFileNames1)
+    for i = 1:length(imageFileNames1)
         I1 = imread(imageFileNames1{i});
         I2 = imread(imageFileNames2{i});
     

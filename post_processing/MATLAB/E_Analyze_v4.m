@@ -79,20 +79,20 @@ end
 
 %% Position
 
-% % Convert geodetic to UTM
-% [xm, ym, zone] = deg2utm(vn.lat, vn.lon);
-% % Geoid height correction 
-% geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
-% zm = vn.alt - geoidHeight;
+% Convert geodetic to UTM
+[xm, ym, zone] = deg2utm(vn.lat, vn.lon);
+% Geoid height correction 
+geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
+zm = vn.alt - geoidHeight;
 
-% ECEF
-xm = vn.posEcefX;
-ym = vn.posEcefY;
-zm = vn.posEcefZ;
-% xm = vn.posEcefX - vn.posEcefX(1);
-% ym = vn.posEcefY - vn.posEcefY(1);
-% zm = vn.posEcefZ - vn.posEcefZ(1);
-
+% % ECEF
+% xm = vn.posEcefX;
+% ym = vn.posEcefY;
+% zm = vn.posEcefZ;
+% % xm = vn.posEcefX - vn.posEcefX(1);
+% % ym = vn.posEcefY - vn.posEcefY(1);
+% % zm = vn.posEcefZ - vn.posEcefZ(1);
+% 
 % %  Direction cosine matrix (ECEF to NED)
 % % Define the angles mu (latitude) and l (longitude)
 % mu = deg2rad(vn.lat); % Convert latitude to radians
@@ -129,9 +129,9 @@ zm = vn.posEcefZ;
 %     oz2(i) = v2(3);
 % end
 
-% Using built in func (ECEF to NED)
-wgs84 = wgs84Ellipsoid;
-[ox2, oy2, oz2] = ecef2ned(xm, ym, zm, vn.lat, vn.lon, vn.alt, wgs84);
+% % Using built in func (ECEF to NED)
+% wgs84 = wgs84Ellipsoid;
+% [ox2, oy2, oz2] = ecef2ned(xm, ym, zm, vn.lat, vn.lon, vn.alt, wgs84);
 
 %% Compute rotation matrix from quaternion
 numFrames = numel(vn.quatX);
@@ -181,21 +181,23 @@ figure;
 for k = 1:length(matFilenames)
     matData = load(fullfile(matDir, matFilenames{k}));
     matData = matData.data;
-    if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
+    % if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
+    if isfield(matData, 'points3D')
 
         R = rotationMatrices(:, :, i);
 
         % Point cloud in camera reference frame
         points3D = matData.points3D;
         
-        % % Reorder to X, Z, Y for NED convention
+        % Reorder to X, Z, Y for NED convention
         % points3D = points3D(:, [1, 3, 2]); % Swap Y and Z
 
         % Rotate the points
         points3D = (R * points3D')'; % Rotate and transpose back to Nx3
 
         % Origin in NED
-        origin = [ox2(i); oy2(i); oz2(i)];
+        % origin = [ox2(i); oy2(i); oz2(i)];
+        origin = [xm(i); ym(i); zm(i)];
 
         % Translate the points 
         points3D = points3D + origin';
