@@ -79,55 +79,55 @@ end
 
 %% Position
 
-% Convert geodetic to UTM
-[xm, ym, zone] = deg2utm(vn.lat, vn.lon);
-% Geoid height correction 
-geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
-zm = vn.alt - geoidHeight;
+% % Convert geodetic to UTM
+% [xm, ym, zone] = deg2utm(vn.lat, vn.lon);
+% % Geoid height correction 
+% geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
+% zm = vn.alt - geoidHeight;
 
-% % ECEF
-% xm = vn.posEcefX;
-% ym = vn.posEcefY;
-% zm = vn.posEcefZ;
-% % xm = vn.posEcefX - vn.posEcefX(1);
-% % ym = vn.posEcefY - vn.posEcefY(1);
-% % zm = vn.posEcefZ - vn.posEcefZ(1);
-% 
-% %  Direction cosine matrix (ECEF to NED)
-% % Define the angles mu (latitude) and l (longitude)
-% mu = deg2rad(vn.lat); % Convert latitude to radians
-% l = deg2rad(vn.lon);  % Convert longitude to radians
-% 
-% % Initialize arrays for transformed coordinates
-% ox2 = zeros(size(xm));
-% oy2 = zeros(size(ym));
-% oz2 = zeros(size(zm));
-% 
-% % Loop through each data point to calculate the rotated coordinates
-% for i = 1:length(xm)
-%     % Define the initial vector for the current point
-%     v0 = [xm(i); ym(i); zm(i)];
-% 
-%     % Define the rotation matrices for the current mu and l
-%     R1 = [-sin(mu(i)), 0, cos(mu(i));
-%             0,         1,      0;
-%           -cos(mu(i)), 0, -sin(mu(i))];
-% 
-%     R2 = [cos(l(i)),  sin(l(i)), 0;
-%          -sin(l(i)),  cos(l(i)), 0;
-%                0,         0,     1];
-% 
-%     % Combine the rotations
-%     R = R1 * R2;
-% 
-%     % Apply the combined rotation to the initial vector
-%     v2 = R * v0;
-% 
-%     % Store the rotated coordinates
-%     ox2(i) = v2(1);
-%     oy2(i) = v2(2);
-%     oz2(i) = v2(3);
-% end
+% ECEF
+xm = vn.posEcefX;
+ym = vn.posEcefY;
+zm = vn.posEcefZ;
+% xm = vn.posEcefX - vn.posEcefX(1);
+% ym = vn.posEcefY - vn.posEcefY(1);
+% zm = vn.posEcefZ - vn.posEcefZ(1);
+
+%  Direction cosine matrix (ECEF to NED)
+% Define the angles mu (latitude) and l (longitude)
+mu = deg2rad(vn.lat); % Convert latitude to radians
+l = deg2rad(vn.lon);  % Convert longitude to radians
+
+% Initialize arrays for transformed coordinates
+ox2 = zeros(size(xm));
+oy2 = zeros(size(ym));
+oz2 = zeros(size(zm));
+
+% Loop through each data point to calculate the rotated coordinates
+for i = 1:length(xm)
+    % Define the initial vector for the current point
+    v0 = [xm(i); ym(i); zm(i)];
+
+    % Define the rotation matrices for the current mu and l
+    R1 = [-sin(mu(i)), 0, cos(mu(i));
+            0,         1,      0;
+          -cos(mu(i)), 0, -sin(mu(i))];
+
+    R2 = [cos(l(i)),  sin(l(i)), 0;
+         -sin(l(i)),  cos(l(i)), 0;
+               0,         0,     1];
+
+    % Combine the rotations
+    R = R1 * R2;
+
+    % Apply the combined rotation to the initial vector
+    v2 = R * v0;
+
+    % Store the rotated coordinates
+    ox2(i) = v2(1);
+    oy2(i) = v2(2);
+    oz2(i) = v2(3);
+end
 
 % % Using built in func (ECEF to NED)
 % wgs84 = wgs84Ellipsoid;
@@ -190,14 +190,14 @@ for k = 1:length(matFilenames)
         points3D = matData.points3D;
         
         % Reorder to X, Z, Y for NED convention
-        % points3D = points3D(:, [1, 3, 2]); % Swap Y and Z
+        points3D = points3D(:, [1, 3, 2]); % Swap Y and Z
 
         % Rotate the points
         points3D = (R * points3D')'; % Rotate and transpose back to Nx3
 
         % Origin in NED
-        % origin = [ox2(i); oy2(i); oz2(i)];
-        origin = [xm(i); ym(i); zm(i)];
+        origin = [ox2(i); oy2(i); oz2(i)];
+        % origin = [xm(i); ym(i); zm(i)];
 
         % Translate the points 
         points3D = points3D + origin';
@@ -207,13 +207,13 @@ for k = 1:length(matFilenames)
         yValues = points3D(:,2);
         zValues = points3D(:,3);
         
-        % Get the minimum and maximum X, Y, Z values
-        minX = min(xValues);
-        maxX = max(xValues);
-        minY = min(yValues);
-        maxY = max(yValues);
-        minZ = min(zValues);
-        maxZ = max(zValues);
+        % % Get the minimum and maximum X, Y, Z values
+        % minX = min(xValues);
+        % maxX = max(xValues);
+        % minY = min(yValues);
+        % maxY = max(yValues);
+        % minZ = min(zValues);
+        % maxZ = max(zValues);
 
         hold on; axis equal; grid on; axis tight;
 
