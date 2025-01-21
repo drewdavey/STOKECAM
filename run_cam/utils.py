@@ -72,6 +72,11 @@ def config_VN200_output(portName):
     sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
     s.writeRegister(sync_control)
 
+    #### CONFIGURE THE NMEA OUTPUT
+    nmea_control = Registers.System.NmeaOutput1()
+    nmea_control.port = Registers.SyncControl.SyncOutMode.GpsPps
+    s.writeRegister(sync_control)
+
     #### CONFIGURE ADOR AND AODF 
     asyncDataOutputType = Registers.AsyncOutputType()
     asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
@@ -99,6 +104,7 @@ def config_VN200_output(portName):
     binaryOutput1Register.imu.mag = 1
     binaryOutput1Register.attitude.ypr = 1
     binaryOutput1Register.attitude.quaternion = 1
+    binaryOutput1Register.attitude.dcm = 1
     binaryOutput1Register.ins.posLla = 1
     binaryOutput1Register.ins.posEcef = 1
     binaryOutput1Register.ins.posU = 1
