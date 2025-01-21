@@ -74,8 +74,8 @@ def config_VN200_output(portName):
 
     #### CONFIGURE THE NMEA OUTPUT
     nmea_control = Registers.System.NmeaOutput1()
-    nmea_control.port = Registers.SyncControl.SyncOutMode.GpsPps
-    s.writeRegister(sync_control)
+    nmea_control.port = Registers.System.NmeaOutput1.Port.Serial1
+    s.writeRegister(nmea_control)
 
     #### CONFIGURE ADOR AND AODF 
     asyncDataOutputType = Registers.AsyncOutputType()
