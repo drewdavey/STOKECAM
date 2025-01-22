@@ -14,8 +14,8 @@ res = 300;    % resolution for figures (.pngs)
 
 figDir = './figs';
 
-name = 'stairs';
-% name = 'picnic';
+% name = 'stairs';
+name = 'picnic';
 
 vn = readtable([name '.csv']);
 

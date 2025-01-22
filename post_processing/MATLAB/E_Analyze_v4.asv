@@ -246,7 +246,7 @@ end
 %% Calculate distances from origin for each set of points
 dist_cam = sqrt(sum(xyz_cam.^2, 2));
 dist_imu = sqrt(sum(xyz_imu.^2, 2));
-dist_world = sqrt(sum((xyz_world - cam_origin).^2, 2));
+dist_world = sqrt(sum((xyz_world - cam_origin).^2, 2)) ;
 
 figure; hold on; grid on;
 title('Distance from Origin');
