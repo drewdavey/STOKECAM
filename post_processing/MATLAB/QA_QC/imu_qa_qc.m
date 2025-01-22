@@ -15,6 +15,7 @@ res = 300;    % resolution for figures (.pngs)
 figDir = './figs';
 
 name = 'stairs';
+% name = 'picnic';
 
 vn = readtable([name '.csv']);
 
@@ -129,6 +130,29 @@ for i = 1:numFrames
 
     rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
 end
+
+qx = vn.quatX;
+qy = vn.quatY;
+qz = vn.quatZ;
+qw = vn.quatW;
+
+f5 = figure; 
+subplot(4,1,1); hold on; grid on; box on; axis tight;
+plot(t, qx, 'r', 'LineWidth', 1); ylim([-1 1]);
+ylabel('qx'); 
+subplot(4,1,2); hold on; grid on; box on; axis tight;
+plot(t, qy, 'g', 'LineWidth', 1); ylim([-1 1]);
+ylabel('qy');
+subplot(4,1,3); hold on; grid on; box on; axis tight;
+plot(t, qz, 'b', 'LineWidth', 1); ylim([-1 1]);
+ylabel('qz'); 
+subplot(4,1,4); hold on; grid on; box on; axis tight;
+plot(t, qw, 'm', 'LineWidth', 1); ylim([-1 1]);
+ylabel('qw');
+xlabel('Time (sec)'); 
+sgtitle([name ' quats']);
+print(f5, fullfile(figDir, [name ' quats.png']), '-dpng', ['-r', num2str(res)]);
+
 
 %% Plot location
 

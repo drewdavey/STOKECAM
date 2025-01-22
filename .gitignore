@@ -1,6 +1,6 @@
 run_cam/old/
 post_processing/MATLAB/old/
-post_processing/MATLAB/QA_QC/
+post_processing/MATLAB/QA_QC/figs/
 post_processing/Python/old/
 docs/old/
 run_cam/__pycache__/
