@@ -18,6 +18,7 @@ dZ = 0.1;     % Z step size for plotting (meters)
 
 % path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
 path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250119\000216_session_auto\wave1';
+% path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250112\000447_session_auto\wave3';
 load([path '/imu.mat']);
 
 %% Organize dirs
@@ -72,10 +73,13 @@ end
 % Calculate the difference in time between image pairs in nanoseconds
 timeDiffs = zeros(1, length(tstamps0));
 for i = 1:length(tstamps0)
+    t(i) = ((tstamps0(i) + tstamps1(i)) / 2) * 10^-9; % Average tstamp in sec
     % Calculate the time difference in nanoseconds directly
     timeDiffNs = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
     timeDiffs(i) = timeDiffNs * 10^-3;  % Difference in microseconds
 end
+
+t = t - t(1); % make time relative
 
 %% Position
 
@@ -84,6 +88,13 @@ end
 % Geoid height correction 
 geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
 zm = vn.alt - geoidHeight;
+
+E = xm - xm(1);
+N = ym - ym(1);
+U = zm - zm(1);
+
+% LL to XY SIO
+[xSIO, ySIO] = lltoxy_siopier(vn.lat, vn.lon);
 
 % % ECEF
 % xm = vn.posEcefX;
@@ -176,83 +187,94 @@ if ~exist(shapesDir, 'dir') && loadMats
     mkdir(shapesDir);  % Create shapes/ directory if it doesn't exist
 end
 
-for k = 1:length(matFilenames)-4
-    matData = load(fullfile(matDir, matFilenames{k}));
+for i = 1
+% for i = 1:length(matFilenames)
+    matData = load(fullfile(matDir, matFilenames{i}));
     matData = matData.data;
     % if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
     if isfield(matData, 'points3D')
 
-        % Point cloud in camera reference frame
+        %%%%%%%%%%%%%% Point cloud in camera reference frame %%%%%%%%%%%%%%
         xyz_cam = matData.points3D;
         
         figure(1); hold on; axis equal; grid on; axis tight;
         title('camera coord.');
-        scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
+        % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
+        scatter(xyz_cam(:,1), xyz_cam(:,2), 1, xyz_cam(:,3));
+        xlabel('X cam');
+        ylabel('Y cam');
+        zlabel('Z cam');
+        colorbar;
 
-        % Reorder to X, Z, Y for NED convention
+        %%%%%%%%%%%%%% Reorder to X, Z, Y for NED convention %%%%%%%%%%%%%%
         % xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 -1 0]; % Swap Y and Z and flip Y
-        xyz_imu = xyz_cam * [0 1 0; 0 0 -1; 1 0 0]; %
+
+        % % % This is what works
+        % xyz_imu = xyz_cam * [0 1 0; 0 0 -1; 1 0 0]; % XYZ_imu = +Y-Z+X_cam
+
+        % This should be right
+        xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 1 0]; % XYZ_imu = +Z+X+Y_cam
 
         figure(2); hold on; axis equal; grid on; axis tight;
         title('imu coord.');
-        scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
+        % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
+        scatter(xyz_imu(:,1), xyz_imu(:,2), 1, xyz_imu(:,3));
+        xlabel('X imu');
+        ylabel('Y imu');
+        zlabel('Z imu');
 
-        % Rotation matrix
+        %%%%%%%%%%%%%%%%%%%%%% Rotation matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R = rotationMatrices(:, :, i);
+
+        % Rotate and transpose
+        xyz_NED = (R * xyz_imu')';
+
+        figure(3); hold on; axis equal; grid on; axis tight;
+        title('rotated into NED');
+    xlabel('N world'); ylabel('E world'); zlabel('D world');
+        scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
+            1, double(matData.colors) / 255, 'filled');
 
         % Origin
         % imu_origin = [xm(i), ym(i), zm(i)];
-        cam_origin = [xm(i), ym(i), zm(i)];
+        % cam_origin = [E(i), N(i), U(i)]; % ENU?
+        % cam_origin = [N(i), E(i), -U(i)]; % NED?
+        cam_origin = [ySIO(i), xSIO(i), U(i)]; % XY_SIO and Up 
 
-        % Rotate, transpose, and translate
-        xyz_world = (R * xyz_imu')' + cam_origin;
+        %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
+        xyz_world = xyz_NED + cam_origin;
 
-        figure(3); hold on; axis equal; grid on; axis tight;
+        figure(4); hold on; axis equal; grid on; axis tight;
         title('world coord.');
-        scatter3(xyz_world(:,1), xyz_world(:,2), xyz_world(:,3), 1);
-
-        % % Get the x-values, y-values, and z-values (depth)
-        % xValues = points3D(:,1);
-        % yValues = points3D(:,2);
-        % zValues = points3D(:,3);
-        
-        % % Get the minimum and maximum X, Y, Z values
-        % minX = min(xValues);
-        % maxX = max(xValues);
-        % minY = min(yValues);
-        % maxY = max(yValues);
-        % minZ = min(zValues);
-        % maxZ = max(zValues);
-
-        % scatter3(xValues, yValues, zValues,...
+        % scatter3(xyz_world(:,1), xyz_world(:,2), xyz_world(:,3), 1);
+        % scatter3(xyz_world(:,1), xyz_world(:,2), -xyz_world(:,3),...
         %     1, double(matData.colors) / 255, 'filled');
+        % xlabel('N world'); ylabel('E world'); zlabel('D world');
 
-        % scatter3(xValues, yValues, zValues, 1);
+        scatter3(xyz_world(:,2), xyz_world(:,1), xyz_world(:,3),...
+            1, double(matData.colors) / 255, 'filled');
+        xlabel('X_S_I_O'); ylabel('Y_S_I_O'); zlabel('D world');
 
-        % title([matFiles(k).name(end-8:end-4)]);
-        % xlabel('X (m)');
-        % ylabel('Y (m)');
-        % 
+        % title([matFiles(i).name(end-8:end-4)]);
         % legend show;
         % 
         % % Save the figure in the shapes/ directory
-        % print(gcf, fullfile(shapesDir, [matFiles(k).name(end-8:end-4)]),...
+        % print(gcf, fullfile(shapesDir, [matFiles(i).name(end-8:end-4)]),...
         %     '-dpng', ['-r', num2str(res)]); 
-   
     end
 end
 
 
-%% Calculate distances from origin for each set of points
-dist_cam = sqrt(sum(xyz_cam.^2, 2));
-dist_imu = sqrt(sum(xyz_imu.^2, 2));
-dist_world = sqrt(sum((xyz_world - cam_origin).^2, 2)) ;
-
-figure; hold on; grid on;
-title('Distance from Origin');
-plot(dist_cam, 'LineWidth', 2);
-plot(dist_imu, 'LineWidth', 1);
-plot(dist_world, 'LineWidth', 0.5);
-ylabel('Distance');
-legend('Cam','IMU','World');
+% %% Calculate distances from origin for each set of points
+% dist_cam = sqrt(sum(xyz_cam.^2, 2));
+% dist_imu = sqrt(sum(xyz_imu.^2, 2));
+% dist_world = sqrt(sum((xyz_world - cam_origin).^2, 2));
+% 
+% figure; hold on; grid on;
+% title('Distance from Origin');
+% plot(dist_cam, 'LineWidth', 2);
+% plot(dist_imu, 'LineWidth', 1);
+% plot(dist_world, 'LineWidth', 0.5);
+% ylabel('Distance');
+% legend('Cam','IMU','World');
 

@@ -12,6 +12,7 @@ res = 300;    % resolution for figures (.pngs)
 
 % path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250112\000447_session_auto\wave3';
 path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250119\000216_session_auto\wave1';
+load([path '/imu.mat']);
 
 %% Organize dirs
 cam0Dir = fullfile(path, 'cam0');
@@ -52,52 +53,97 @@ for i = 1:length(tstamps0)
 end
 t = t - t(1); % make time relative
 
+%% Position
+
+% Convert geodetic to UTM
+[xm, ym, zone] = deg2utm(vn.lat, vn.lon);
+% Geoid height correction 
+geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
+zm = vn.alt - geoidHeight;
+% 
+xm = xm - xm(1);
+ym = ym - ym(1);
+zm = zm - zm(1);
+
+%% Compute rotation matrix from quaternion
+numFrames = numel(vn.quatX);
+rotationMatrices = zeros(3, 3, numFrames);
+for i = 1:numFrames
+    qx = vn.quatX(i);
+    qy = vn.quatY(i);
+    qz = vn.quatZ(i);
+    qw = vn.quatW(i);
+    rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
+end
+
 %% points
-for k = 1:length(matFilenames)
-    matData = load(fullfile(matDir, matFilenames{k}));
+for i = 1:length(matFilenames)-4
+    matData = load(fullfile(matDir, matFilenames{i}));
     matData = matData.data;
     % if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
     if isfield(matData, 'points3D')
 
         % Point cloud in camera reference frame
-        points3D = matData.points3D;
-        
-        % % Reorder to X, Z, Y for NED convention
-        % points3D = points3D(:, [1, 3, 2]); % Swap Y and Z
-
-        % Get the x-values, y-values, and z-values (depth)
-        xValues = points3D(:,1);
-        yValues = points3D(:,2);
-        zValues = points3D(:,3);
-        
-        % % Get the minimum and maximum X, Y, Z values
-        % minX = min(xValues);
-        % maxX = max(xValues);
-        % minY = min(yValues);
-        % maxY = max(yValues);
-        % minZ = min(zValues);
-        % maxZ = max(zValues);
+        xyz_cam = matData.points3D;
 
         figure;
         set(gcf,'position',[124 173 1039 302]);
         subplot(1,3,1)
-        histogram(xValues, 'Normalization', 'probability');
+        histogram(xyz_cam(:,1), 'Normalization', 'probability');
         title('X');
         subplot(1,3,2)
-        histogram(yValues, 'Normalization', 'probability');
+        histogram(xyz_cam(:,2), 'Normalization', 'probability');
         title('Y');
         subplot(1,3,3)
-        histogram(zValues, 'Normalization', 'probability');
+        histogram(xyz_cam(:,3), 'Normalization', 'probability');
         title('Z');
-        
-        sgtitle([matFiles(k).name(end-8:end-4)]);
-        print(gcf, fullfile(figDir, [matFiles(k).name(end-8:end-4)]),...
+        sgtitle([matFiles(i).name(end-8:end-4) ' cam']);
+        print(gcf, fullfile(figDir, [matFiles(i).name(end-8:end-4) ' cam']),...
             '-dpng', ['-r', num2str(res)]);
 
-        % scatter3(xValues, yValues, zValues,...
-        %     1, double(matData.colors) / 255, 'filled');
+        % Reorder to X, Z, Y for NED convention
+        % xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 -1 0]; % Swap Y and Z and flip Y
+        xyz_imu = xyz_cam * [0 1 0; 0 0 -1; 1 0 0]; %
 
-        % scatter3(xValues, zValues, yValues, 1);
+        figure;
+        set(gcf,'position',[124 173 1039 302]);
+        subplot(1,3,1)
+        histogram(xyz_imu(:,1), 'Normalization', 'probability');
+        title('X');
+        subplot(1,3,2)
+        histogram(xyz_imu(:,2), 'Normalization', 'probability');
+        title('Y');
+        subplot(1,3,3)
+        histogram(xyz_imu(:,3), 'Normalization', 'probability');
+        title('Z');
+        sgtitle([matFiles(i).name(end-8:end-4) ' imu']);
+        print(gcf, fullfile(figDir, [matFiles(i).name(end-8:end-4) ' imu']),...
+            '-dpng', ['-r', num2str(res)]);
+
+        % Rotation matrix
+        R = rotationMatrices(:, :, i);
+
+        % Origin
+        % imu_origin = [xm(i), ym(i), zm(i)];
+        cam_origin = [xm(i), ym(i), zm(i)];
+
+        % Rotate, transpose, and translate
+        xyz_world = (R * xyz_imu')' + cam_origin;
+
+        figure;
+        set(gcf,'position',[124 173 1039 302]);
+        subplot(1,3,1)
+        histogram(xyz_world(:,1), 'Normalization', 'probability');
+        title('X');
+        subplot(1,3,2)
+        histogram(xyz_world(:,2), 'Normalization', 'probability');
+        title('Y');
+        subplot(1,3,3)
+        histogram(xyz_world(:,3), 'Normalization', 'probability');
+        title('Z');
+        sgtitle([matFiles(i).name(end-8:end-4) ' world']);
+        print(gcf, fullfile(figDir, [matFiles(i).name(end-8:end-4) ' world']),...
+            '-dpng', ['-r', num2str(res)]);
     end
 end
 

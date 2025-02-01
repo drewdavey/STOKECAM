@@ -14,8 +14,8 @@ res = 300;    % resolution for figures (.pngs)
 
 figDir = './figs';
 
-% name = 'stairs';
-name = 'picnic';
+name = 'stairs';
+% name = 'picnic';
 
 vn = readtable([name '.csv']);
 
@@ -156,33 +156,33 @@ print(f5, fullfile(figDir, [name ' quats.png']), '-dpng', ['-r', num2str(res)]);
 
 %% Plot location
 
-% lat = vn.gnss1PosLat;
-% lon = vn.gnss1PosLon;
-% alt = vn.gnss1PosAlt;
-% 
-% buffer = 0.0001;
-% figure; ax = geoaxes; 
-% geobasemap(ax, 'satellite'); hold on;
-% geolimits([min(lat)-buffer max(lat)+buffer], [min(lon)-buffer max(lon)+buffer]);
-% video = VideoWriter(fullfile(figDir, 'gps.mp4'), 'MPEG-4');
-% video.FrameRate = 30; 
-% open(video);
-% h1 = geoplot(NaN, NaN, '-b', 'LineWidth', 1, 'DisplayName', 'Path'); hold on;
-% h2 = geoscatter(NaN, NaN, 20, 'r','filled', 'DisplayName', 'VN-200'); 
-% legend show;
-% for i = 1:length(lat)
-%     % title(string(vn.timeGps(i)));
-%     title(['Frame ', num2str(i)]);
-%     % geoscatter(lat(i), lon(i), 10, 'r','filled'); hold on;
-%     h1.LatitudeData = lat(1:i);
-%     h1.LongitudeData = lon(1:i);
-%     h2.LatitudeData = lat(i);
-%     h2.LongitudeData = lon(i);
-%     pause(0.1);
-%     frame = getframe(gcf);
-%     writeVideo(video, frame);
-% end
-% close(video);
+lat = vn.gnss1PosLat;
+lon = vn.gnss1PosLon;
+alt = vn.gnss1PosAlt;
+
+buffer = 0.0001;
+figure; ax = geoaxes; 
+geobasemap(ax, 'satellite'); hold on;
+geolimits([min(lat)-buffer max(lat)+buffer], [min(lon)-buffer max(lon)+buffer]);
+video = VideoWriter(fullfile(figDir, 'gps.mp4'), 'MPEG-4');
+video.FrameRate = 30; 
+open(video);
+h1 = geoplot(NaN, NaN, '-b', 'LineWidth', 1, 'DisplayName', 'Path'); hold on;
+h2 = geoscatter(NaN, NaN, 20, 'r','filled', 'DisplayName', 'VN-200'); 
+legend show;
+for i = 1:length(lat)
+    % title(string(vn.timeGps(i)));
+    title(['Frame ', num2str(i), ' Alt: ', num2str(alt(i))]);
+    % geoscatter(lat(i), lon(i), 10, 'r','filled'); hold on;
+    h1.LatitudeData = lat(1:i);
+    h1.LongitudeData = lon(1:i);
+    h2.LatitudeData = lat(i);
+    h2.LongitudeData = lon(i);
+    pause(0.1);
+    frame = getframe(gcf);
+    writeVideo(video, frame);
+end
+close(video);
 
 
 
