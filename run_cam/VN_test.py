@@ -5,6 +5,7 @@
 
 import os
 import time
+import vectornav
 from vectornav import *
 from datetime import datetime, timezone, timedelta
 from vectornav.Registers import *
