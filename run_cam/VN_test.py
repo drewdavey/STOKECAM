@@ -11,8 +11,11 @@ from vectornav.Registers import *
 # from vectornav.Registers import VpeBasicControl
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
+portName = '/dev/ttyUSB0'
+fdir_out = '/home/pi/Downloads/'
+
 s = Sensor()                      # Create sensor object and connect to the VN-200 
-s.autoConnect('/dev/ttyUSB0')           # at the baud rate of 115200 (115,200 bytes/s) 
+s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
 # #### CONFIGURE THE SYNC OUTPUT
 # sync_control = Registers.SyncControl()
@@ -64,4 +67,14 @@ binaryOutput1Register.gnss.gnss1NumSats = 1
 binaryOutput1Register.gnss.gnss1TimeUtc = 1
 s.writeRegister(binaryOutput1Register)
 
+s.disconnect()
+
+
+s = Sensor() # Create sensor object and connect to the VN-200
+csvExporter = ExporterCsv(fdir_out, True)
+s.autoConnect(portName)
+s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
+csvExporter.start()
+time.sleep(1)
+csvExporter.stop()
 s.disconnect()
