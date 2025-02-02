@@ -1,0 +1,48 @@
+
+FirmwareUpdater API
+###################
+
+FirmwareUpdater
+===============
+
+.. py:class:: vectornav.Plugins.FirmwareUpdater(sensor: Sensor, port: str)
+
+    .. automethod:: vectornav.Plugins.FirmwareUpdater.updateFirmware
+
+
+File
+====
+
+.. py:class:: vectornav.Plugins.FirmwareUpdater.File()
+
+    .. py:attribute:: filePath
+        :type: str
+
+    .. py:attribute:: processor
+        :type: vectornav.Plugins.FirmwareUpdater.Processor
+
+
+Processor
+=========
+
+.. py:class:: vectornav.Plugins.FirmwareUpdater.Processor()
+
+    .. py:attribute:: Nav = <Processor.Nav: 0>
+
+    .. py:attribute:: Gnss = <Processor.Gnss: 1>
+    
+    .. py:attribute:: Imu = <Processor.Gnss: 2>
+
+    .. py:attribute:: Poll = <Processor.Gnss: '?'>
+
+Params
+======
+
+.. py:class:: vectornav.Plugins.FirmwareUpdater.Params()
+
+    .. py:attribute:: firmwareBaudRate
+        :type: vectornav.Sensor.BaudRate
+
+    .. py:attribute:: bootloaderBaudRate
+        :type: vectornav.Sensor.BaudRate
+
