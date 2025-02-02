@@ -79,11 +79,11 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 csvExporter.start()
 # time.sleep(1)
 
-binaryOutput1Register = Registers.BinaryOutput1()
+reg = Registers.GnssSolLla()
 t0 = time.time()
 while (time.time() - t0 < 5):
-    s.readRegister(binaryOutput1Register)
-    t = binaryOutput1Register.time.timeGps
+    s.readRegister(reg)
+    t = reg.gpsTow
     print(t)
 
     # serial = Registers.Serial()
