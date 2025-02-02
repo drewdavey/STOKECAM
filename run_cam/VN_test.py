@@ -14,10 +14,10 @@ from vectornav.Commands import Command, KnownMagneticDisturbance
 s = Sensor()                      # Create sensor object and connect to the VN-200 
 s.autoConnect('/dev/ttyUSB0')           # at the baud rate of 115200 (115,200 bytes/s) 
 
-#### CONFIGURE THE SYNC OUTPUT
-sync_control = Registers.SyncControl()
-sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
-s.writeRegister(sync_control)
+# #### CONFIGURE THE SYNC OUTPUT
+# sync_control = Registers.SyncControl()
+# sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
+# s.writeRegister(sync_control)
 
 #### CONFIGURE THE NMEA OUTPUT
 nmea_control = Registers.NmeaOutput1()
