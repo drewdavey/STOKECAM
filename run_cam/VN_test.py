@@ -82,9 +82,12 @@ csvExporter.start()
 binaryOutput1Register = Registers.BinaryOutput1()
 t0 = time.time()
 while (time.time() - t0 < 5):
-    t_reg = s.readRegister(binaryOutput1Register)
-    t = t_reg.time.timeGps
+    s.readRegister(binaryOutput1Register)
+    t = binaryOutput1Register.time.timeGps
     print(t)
+
+    # serial = Registers.Serial()
+    # s.readRegister(serial)
 
 csvExporter.stop()
 s.disconnect()
