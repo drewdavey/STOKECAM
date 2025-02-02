@@ -18,10 +18,10 @@ sync_control = Registers.SyncControl()
 sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
 s.writeRegister(sync_control)
 
-# #### CONFIGURE THE NMEA OUTPUT
-# nmea_control = Registers.System.NmeaOutput1()
-# nmea_control.port = Registers.System.NmeaOutput1.Port.Serial1
-# s.writeRegister(nmea_control)
+#### CONFIGURE THE NMEA OUTPUT
+nmea_control = Registers.System.NmeaOutput1()
+nmea_control.port = Registers.System.NmeaOutput1.Port.Serial1
+s.writeRegister(nmea_control)
 
 #### CONFIGURE ADOR AND AODF 
 # asyncDataOutputType = Registers.AsyncOutputType()
