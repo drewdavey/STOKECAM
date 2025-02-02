@@ -83,6 +83,7 @@ t0 = time.time()
 while (time.time() - t0 < 5):
     t_reg = s.readRegister(binaryOutput1Register)
     t = t_reg.time.timeUtc
+    print(t)
 
 csvExporter.stop()
 s.disconnect()
