@@ -18,6 +18,12 @@ fdir_out = '/home/drew/Downloads/'
 s = Sensor()                      # Create sensor object and connect to the VN-200 
 s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
+
+# ### LOAD CONFIG IF EXIST
+# configurator = Plugins.SensorConfigurator(vs, port)
+# configurator.SaveConfiguration(pathToSaveFile)
+# configurator.LoadConfiguration(pathToLoadFile)
+
 #### CONFIGURE THE SYNC OUTPUT
 sync_control = Registers.SyncControl()
 sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
@@ -79,11 +85,12 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 csvExporter.start()
 
 # reg = Registers.GnssSolLla()
-# t0 = time.time()
-# while (time.time() - t0 < 5):
-#     s.readRegister(reg)
-#     t = reg.gpsTow
-#     print(t)
+reg = Registers.BinaryOutputMeasurements()
+t0 = time.time()
+while (time.time() - t0 < 5):
+    s.readRegister(reg)
+    t = reg.time.timeGps
+    print(t)
 
 csvExporter.stop()
 s.disconnect()
