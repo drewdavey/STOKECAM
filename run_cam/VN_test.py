@@ -84,13 +84,13 @@ s.autoConnect(portName)
 s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
 csvExporter.start()
 
-# reg = Registers.GnssSolLla()
-reg = Registers.BinaryOutputMeasurements()
-t0 = time.time()
-while (time.time() - t0 < 5):
-    s.readRegister(reg)
-    t = reg.time.timeGps
-    print(t)
+# # reg = Registers.GnssSolLla()
+# reg = Registers.BinaryOutputMeasurements()
+# t0 = time.time()
+# while (time.time() - t0 < 5):
+#     s.readRegister(reg)
+#     t = reg.time.timeGps
+#     print(t)
 
 csvExporter.stop()
 s.disconnect()
