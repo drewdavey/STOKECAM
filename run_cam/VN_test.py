@@ -30,9 +30,10 @@ s.writeRegister(nmea_control)
 
 #### CONFIGURE ADOR AND AODF 
 # asyncDataOutputType = Registers.AsyncOutputType()
-# asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
+# asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.GPS
 # asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
 # # s.writeRegister(asyncDataOutputType)
+
 # asyncDataOutputFreq= Registers.AsyncOutputFreq()
 # asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
 # asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
@@ -78,12 +79,11 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 csvExporter.start()
 # time.sleep(1)
 
-
+binaryOutput1Register = Registers.BinaryOutput.Common()
 t0 = time.time()
 while (time.time() - t0 < 5):
-    binaryOutput1Register = Registers.BinaryOutput()
     t_reg = s.readRegister(binaryOutput1Register)
-    t = t_reg.time.timeUtc
+    t = t_reg.timeGps
     print(t)
 
 csvExporter.stop()
