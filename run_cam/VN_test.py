@@ -13,7 +13,7 @@ from vectornav.Plugins import ExporterCsv
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
-fdir_out = '/home/pi/Downloads/'
+fdir_out = '/home/drew/Downloads/'
 
 s = Sensor()                      # Create sensor object and connect to the VN-200 
 s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
