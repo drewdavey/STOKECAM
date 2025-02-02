@@ -1,114 +1,69 @@
-# The MIT License (MIT)
-# 
-#  VectorNav Software Development Kit (v0.15.1)
-# Copyright (c) 2024 VectorNav Technologies, LLC
-# 
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+#!/usr/bin/env python
 
-from setuptools import setup, Extension
-from pybind11.setup_helpers import Pybind11Extension
-from pathlib import Path
-import platform 
-regScan = Path('plugins/PyRegisterScan.cpp')
-firUpdt = Path('plugins/PyFirmwareUpdate.cpp')
-simpleLogger = Path('plugins/PySimpleLogger.cpp')
-dataExp = Path('plugins/PyDataExport.cpp')
+import os
+from distutils.core import setup, Extension
 
-# Overwrite GNSS groups to enable satInfo and rawMeas, which are disabled by default in c++
-macros = [('__PYTHON__', None),('GNSS_GROUP_ENABLE', 0xFFFFFFFF),('GNSS2_GROUP_ENABLE', 0xFFFFFFFF)]
-plugins = []
-includes = ['../cpp/include/', '../cpp/plugins', '../cpp/libs', './include']
+additional_libs = None
+if os.name == 'nt':
+    additional_libs = [ 'Advapi32' ]
 
-if regScan.exists():
-    print("Adding Register Scan Plugin")
-    macros.append(('__REGSCAN__', None))
-    plugins.append(str(regScan))
-    plugins.extend([
-        '../cpp/plugins/RegisterScan/RegisterScan.cpp'
+
+module_raw = Extension(
+    'vnpy._libvncxx',
+    include_dirs = [ 'libvncxx/include', 'libvncxx/libvnc/include' ],
+    swig_opts = [ '-c++' ],
+    libraries = additional_libs,
+    sources = [
+        'vnpy/libvncxx_wrap.cpp',
+        'libvncxx/src/attitude.cpp',
+        'libvncxx/src/compositedata.cpp',
+        'libvncxx/src/conversions.cpp',
+        'libvncxx/src/criticalsection.cpp',
+        'libvncxx/src/error_detection.cpp',
+        'libvncxx/src/event.cpp',
+        'libvncxx/src/ezasyncdata.cpp',
+        'libvncxx/src/packet.cpp',
+        'libvncxx/src/packetfinder.cpp',
+        'libvncxx/src/port.cpp',
+        'libvncxx/src/position.cpp',
+        'libvncxx/src/registers.cpp',
+        'libvncxx/src/searcher.cpp',
+        'libvncxx/src/sensorconfig.cpp',
+        'libvncxx/src/sensorfeatures.cpp',
+        'libvncxx/src/sensors.cpp',
+        'libvncxx/src/serialport.cpp',
+        'libvncxx/src/thread.cpp',
+        'libvncxx/src/types.cpp',
+        'libvncxx/src/util.cpp',
+        'libvncxx/src/utilities.cpp',
+        'libvncxx/src/version.cpp',
+        'libvncxx/src/vntime.cpp',
+        'libvncxx/src/devices/DeviceError.cpp',
+        'libvncxx/libvnc/src/vncompositedata.c',
+        'libvncxx/libvnc/src/vnconv.c',
+        'libvncxx/libvnc/src/vncriticalsection.c',
+        'libvncxx/libvnc/src/vnerrdet.c',
+        'libvncxx/libvnc/src/vnerror.c',
+        'libvncxx/libvnc/src/vnevent.c',
+        'libvncxx/libvnc/src/vnezasyncdata.c',
+        'libvncxx/libvnc/src/vnmatrix.c',
+        'libvncxx/libvnc/src/vnsearcher.c',
+        'libvncxx/libvnc/src/vnsensor.c',
+        'libvncxx/libvnc/src/vnserialport.c',
+        'libvncxx/libvnc/src/vnspi.c',
+        'libvncxx/libvnc/src/vnstring.c',
+        'libvncxx/libvnc/src/vnthread.c',
+        'libvncxx/libvnc/src/vntime.c',
+        'libvncxx/libvnc/src/vnupack.c',
+        'libvncxx/libvnc/src/vnupackf.c',
+        'libvncxx/libvnc/src/vnutil.c',
+        'libvncxx/libvnc/src/vnvector.c'
     ])
-    includes.append('../cpp/plugins/RegisterScan/include')
-
-if firUpdt.exists():
-    print("Adding Firmware Update Plugin")
-    macros.append(('__FIRMWARE_UPDATE__', None))
-    plugins.append(str(firUpdt))
-    plugins.extend([
-        '../cpp/plugins/FirmwareUpdate/src/Bootloader.cpp',
-        '../cpp/plugins/FirmwareUpdate/src/FirmwareUpdater.cpp',   
-        '../cpp/plugins/FirmwareUpdate/src/VnXml.cpp',   
-    ])
-    includes.append('../cpp/plugins/FirmwareUpdate/include')
-
-if simpleLogger.exists():
-    print("Adding Simple Logger Plugin")
-    macros.append(('__SIMPLE_LOGGER__', None))
-    plugins.append(str(simpleLogger))
-    includes.append('../cpp/plugins/SimpleLogger')
-if dataExp.exists():
-    print("Adding Data Exprot Plugin")
-    macros.append(('__DATAEXPORT__', None))
-    plugins.append(str(dataExp))
-    includes.append('../cpp/plugins/DataExport/include')
-
-ext_libs = []
-if platform.system() == 'Windows':
-    ext_libs.append('winmm')
-
-ext_modules = [
-    Pybind11Extension(
-        "vectornav",
-        [
-            # Pybind Files
-            'src/vectornav.cpp',
-            'src/PyRegisters.cpp',
-            'src/PyCommands.cpp',   
-
-            # Implemenation
-            '../cpp/src/Implementation/AsciiPacketDispatcher.cpp',
-            '../cpp/src/Implementation/AsciiPacketProtocol.cpp',
-            '../cpp/src/Implementation/BinaryHeader.cpp',
-            '../cpp/src/Implementation/CommandProcessor.cpp',
-            '../cpp/src/Implementation/FaPacketDispatcher.cpp',
-            '../cpp/src/Implementation/FaPacketProtocol.cpp',
-            '../cpp/src/Implementation/FbPacketDispatcher.cpp',
-            '../cpp/src/Implementation/FbPacketProtocol.cpp',
-            '../cpp/src/Implementation/PacketSynchronizer.cpp',
-
-            # Interface
-            '../cpp/src/Interface/Command.cpp',
-            '../cpp/src/Interface/Sensor.cpp',
-            '../cpp/src/Interface/Registers.cpp',
-            
-            # plugins            
-            *plugins,
-        ],
-        include_dirs=includes,
-        language="c++",
-        cxx_std=17,
-        define_macros=macros,
-        libraries=ext_libs
-    ),
-]
 
 setup(
-    name='vectornav',
-    version='0.15.1',
-    ext_modules=ext_modules,
-)
+    name='vnpy',
+    version='1.0',
+    description='VectorNav Python Library',
+    author='VectorNav Technologies, LLC',
+    packages=['vnpy'],
+    ext_modules = [ module_raw ])

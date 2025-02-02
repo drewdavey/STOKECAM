@@ -1,7 +1,7 @@
 The MIT License (MIT)
 
-VectorNav SDK (v0.15.1)
-Copyright (c) 2024 VectorNav Technologies, LLC
+VectorNav Programming Library (v1.2.0.0)
+Copyright (c) 2015 VectorNav Technologies, LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
