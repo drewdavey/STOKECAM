@@ -76,6 +76,13 @@ csvExporter = ExporterCsv(fdir_out, True)
 s.autoConnect(portName)
 s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
 csvExporter.start()
-time.sleep(1)
+# time.sleep(1)
+
+
+t0 = time.time()
+while (time.time() - t0 < 5):
+    t_reg = s.readRegister(binaryOutput1Register)
+    t = t_reg.time.timeUtc
+
 csvExporter.stop()
 s.disconnect()
