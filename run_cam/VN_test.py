@@ -16,7 +16,7 @@ portName = '/dev/ttyUSB0'
 fdir_out = '/home/drew/Downloads/'
 
 s = Sensor()                      # Create sensor object and connect to the VN-200 
-s.autoConnect(portName, 115200)           # at the baud rate of 115200 (115,200 bytes/s) 
+s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
 # #### CONFIGURE THE SYNC OUTPUT
 # sync_control = Registers.SyncControl()
@@ -49,8 +49,8 @@ binaryOutput1Register.time.timeGps = 1
 binaryOutput1Register.time.timeSyncIn = 1
 binaryOutput1Register.time.timeGpsPps = 0
 binaryOutput1Register.imu.imuStatus = 1
-binaryOutput1Register.imu.temperature = 1
-binaryOutput1Register.imu.pressure = 1
+binaryOutput1Register.imu.temperature = 0
+binaryOutput1Register.imu.pressure = 0
 binaryOutput1Register.imu.accel = 1
 binaryOutput1Register.imu.mag = 1
 binaryOutput1Register.attitude.ypr = 1
