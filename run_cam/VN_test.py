@@ -23,10 +23,10 @@ sync_control = Registers.SyncControl()
 sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
 s.writeRegister(sync_control)
 
-#### CONFIGURE THE NMEA OUTPUT
-nmea_control = Registers.NmeaOutput1()
-nmea_control.port = Registers.NmeaOutput1.Port.Serial1
-s.writeRegister(nmea_control)
+# #### CONFIGURE THE NMEA OUTPUT
+# nmea_control = Registers.NmeaOutput1()
+# nmea_control.port = Registers.NmeaOutput1.Port.Serial1
+# s.writeRegister(nmea_control)
 
 #### CONFIGURE ADOR AND AODF 
 # asyncDataOutputType = Registers.AsyncOutputType()
@@ -77,17 +77,13 @@ csvExporter = ExporterCsv(fdir_out, True)
 s.autoConnect(portName)
 s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
 csvExporter.start()
-# time.sleep(1)
 
-reg = Registers.GnssSolLla()
-t0 = time.time()
-while (time.time() - t0 < 5):
-    s.readRegister(reg)
-    t = reg.gpsTow
-    print(t)
-
-    # serial = Registers.Serial()
-    # s.readRegister(serial)
+# reg = Registers.GnssSolLla()
+# t0 = time.time()
+# while (time.time() - t0 < 5):
+#     s.readRegister(reg)
+#     t = reg.gpsTow
+#     print(t)
 
 csvExporter.stop()
 s.disconnect()
