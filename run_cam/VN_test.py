@@ -8,7 +8,7 @@ import time
 from vectornav import *
 from datetime import datetime, timezone, timedelta
 from vectornav.Registers import *
-# from vectornav.Registers import VpeBasicControl
+from vectornav.Plugins import ExporterCsv
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
