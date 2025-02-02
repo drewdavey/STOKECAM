@@ -5,7 +5,7 @@
 
 import os
 import time
-import yaml
+
 from vectornav import *
 from datetime import datetime, timezone, timedelta
 from vectornav.Registers import VpeBasicControl
