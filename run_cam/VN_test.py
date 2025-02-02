@@ -92,5 +92,7 @@ csvExporter.start()
 #     t = reg.time.timeGps
 #     print(t)
 
+time.sleep(5)
+
 csvExporter.stop()
 s.disconnect()
