@@ -1,0 +1,86 @@
+
+.. _program_listing_file_documentation__FirmwareUpdate_CLI_FirmwareUpdate.hpp:
+
+Program Listing for File CLI_FirmwareUpdate.hpp
+===============================================
+
+|exhale_lsh| :ref:`Return to documentation for file <file_documentation__FirmwareUpdate_CLI_FirmwareUpdate.hpp>` (``documentation\_FirmwareUpdate\CLI_FirmwareUpdate.hpp``)
+
+.. |exhale_lsh| unicode:: U+021B0 .. UPWARDS ARROW WITH TIP LEFTWARDS
+
+.. code-block:: cpp
+
+   #ifndef __CLI__FIRMWAREUPDATE_HPP__
+   #define __CLI__FIRMWAREUPDATE_HPP__
+   
+   #pragma managed(push, off)
+   #include "FirmwareUpdater.hpp"
+   #pragma managed(pop)
+   
+   #include <msclr/marshal_cppstd.h>
+   
+   using namespace System;
+   namespace VNSDK
+   {
+    class FirmwareUpdater
+   {
+     private:
+       VN::FirmwareUpdater &_firmwareUpdater = VN::FirmwareUpdater();
+       Sensor * _sensor = nullptr;
+       VN::Sensor::BaudRate _firmwareBaudRate = VN::Sensor::BaudRate::Baud115200;
+       VN::Sensor::BaudRate _bootloaderBaudRate = VN::Sensor::BaudRate::Baud115200;
+   
+     public:
+       FirmwareUpdater(Sensor * & sensor)
+       {
+           _sensor = sensor;
+       }
+   
+       void UpdateFirmware(String * vnxmlPath)
+       {
+           std::string unmanagedPath = msclr::interop::marshal_as<std::string>(vnxmlPath);
+           const bool failed = _firmwareUpdater.updateFirmware(&_sensor->GetNativeInstance(), (VN::Filesystem::FilePath)unmanagedPath,
+               { _firmwareBaudRate, _bootloaderBaudRate });
+               if (failed) {
+                   throw gcnew System::Exception("Firmware update failed");
+               }
+       }
+   
+       void UpdateFirmware(String * navPath, String * gnssPath, String * imuPath)
+       {
+           std::string unmanagedNavPath = msclr::interop::marshal_as<std::string>(navPath);
+           std::string unmanagedGnssPath = msclr::interop::marshal_as<std::string>(gnssPath);
+           std::string unmanagedImuPath = msclr::interop::marshal_as<std::string>(imuPath);
+           bool failed = true;
+           VN::FirmwareUpdater::FilePaths filePaths;
+   
+           if (navPath->Length > 0)
+           {
+               if (filePaths.push_back({unmanagedNavPath, VN::FirmwareUpdater::Processor::Nav})) { throw gcnew System::Exception("Failed to push filepaths"); }
+           }
+           if (gnssPath->Length > 0)
+           {
+               if (filePaths.push_back({unmanagedGnssPath, VN::FirmwareUpdater::Processor::Gnss})) { throw gcnew System::Exception("Failed to push filepaths"); }
+           }
+           if (imuPath->Length > 0)
+           {
+               if (filePaths.push_back({unmanagedImuPath, VN::FirmwareUpdater::Processor::Imu})) { throw gcnew System::Exception("Failed to push filepaths"); }
+           }
+   
+           if (!filePaths.empty())
+           {
+               failed = _firmwareUpdater.updateFirmware(
+                   &_sensor->GetNativeInstance(),
+                   filePaths,
+                   { _firmwareBaudRate, _bootloaderBaudRate });
+           }
+   
+   
+           if (failed) {
+               throw gcnew System::Exception("Firmware update failed");
+           }
+       }
+   };
+   } // namespace VNSDK
+   
+   #endif // __CLI_FIRMWAREUPDATE_HPP__

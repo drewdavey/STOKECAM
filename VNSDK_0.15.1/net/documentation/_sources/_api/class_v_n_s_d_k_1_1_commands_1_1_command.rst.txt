@@ -1,0 +1,35 @@
+.. _exhale_class_class_v_n_s_d_k_1_1_commands_1_1_command:
+
+Class Command
+=============
+
+- Defined in :ref:`file_documentation__include_CLI_Commands.hpp`
+
+
+Inheritance Relationships
+-------------------------
+
+Derived Types
+*************
+
+- ``public VNSDK::Commands::AsyncOutputEnable`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_async_output_enable`)
+- ``public VNSDK::Commands::FirmwareUpdate`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_firmware_update`)
+- ``public VNSDK::Commands::KnownAccelerationDisturbance`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_known_acceleration_disturbance`)
+- ``public VNSDK::Commands::KnownMagneticDisturbance`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_known_magnetic_disturbance`)
+- ``public VNSDK::Commands::PollBinaryOutputMessage`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_poll_binary_output_message`)
+- ``public VNSDK::Commands::Reset`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_reset`)
+- ``public VNSDK::Commands::RestoreFactorySettings`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_restore_factory_settings`)
+- ``public VNSDK::Commands::SetFilterBias`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_set_filter_bias`)
+- ``public VNSDK::Commands::SetInitialHeading`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_set_initial_heading`)
+- ``public VNSDK::Commands::WriteSettings`` (:ref:`exhale_class_class_v_n_s_d_k_1_1_commands_1_1_write_settings`)
+
+
+Class Documentation
+-------------------
+
+
+.. doxygenclass:: VNSDK::Commands::Command
+   :project: VectorNav SDK
+   :members:
+   :protected-members:
+   :undoc-members:

@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Data Export &#8212; VectorNav 0.15.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/cloud.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noticia+Text:400,i,b,bi|Open+Sans:400,i,b,bi|Roboto+Mono:400,i,b,bi&amp;display=swap" type="text/css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/tabs.js"></script>
+
+    
+    
+     
+        <script src="../_static/jquery.cookie.js"></script>
+    
+
+    
+     
+        <script src="../_static/cloud.base.js"></script>
+    
+
+    
+     
+        <script src="../_static/cloud.js"></script>
+    
+
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DataExport API" href="data_export_api.html" />
+    <link rel="prev" title="RegisterScan API" href="register_scan_api.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="data_export_api.html" title="DataExport API"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="register_scan_api.html" title="RegisterScan API"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="../Documentation.html">VectorNav 0.15.1 documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Plugins</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Data Export</a></li> 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="data-export">
+<h1>Data Export<a class="headerlink" href="#data-export" title="Permalink to this headline">¶</a></h1>
+<p>The DataExport plugin provides the necessary classes to export data form the sensor directly to various file formats such as Csv,Ascii,Rinex, and Imr files. In addition, the same classes can be used to export data from a file.</p>
+<section id="using-the-dataexport-plugin">
+<h2>Using the DataExport Plugin<a class="headerlink" href="#using-the-dataexport-plugin" title="Permalink to this headline">¶</a></h2>
+<p>The DataExport plugin works via the Exporter class. It is an abstract base class where other exporters like <a class="reference internal" href="data_export_api.html#vectornav.Plugins.ExporterCsv" title="vectornav.Plugins.ExporterCsv"><code class="xref py py-class docutils literal notranslate"><span class="pre">vectornav.Plugins.ExporterCsv</span></code></a>, <a class="reference internal" href="data_export_api.html#vectornav.Plugins.ExporterAscii" title="vectornav.Plugins.ExporterAscii"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExporterAscii</span></code></a>, etc.. are derived from insuring a common interface. The mechanism from a file and in real-time are slightly different. The examples of both are in the subsequent sections.</p>
+<section id="exporting-in-real-time">
+<h3>Exporting in Real-Time<a class="headerlink" href="#exporting-in-real-time" title="Permalink to this headline">¶</a></h3>
+<p>To export data from a CSV in real-time requires the following imports</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">vectornav</span>
+<span class="kn">from</span> <span class="nn">vectornav</span> <span class="kn">import</span> <span class="n">Sensor</span>
+<span class="kn">from</span> <span class="nn">vectornav.Plugins</span> <span class="kn">import</span> <span class="n">ExporterCsv</span>
+</pre></div>
+</div>
+<p>We can create a ExporterCsv class which has two arguments – the folder to log the CSV files, and whether to include system timestamps (the time reported by the computer when a packet of data was received). The ExporterCsv class requires a <strong>folder</strong> not a file path. This is because each unique packet output by the sensor will generate its own CSV file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">vs</span> <span class="o">=</span> <span class="n">Sensor</span><span class="p">()</span>
+<span class="n">csvExporter</span> <span class="o">=</span> <span class="n">ExporterCsv</span><span class="p">(</span><span class="n">local_folder</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="c1"># exporting with system timestamps</span>
+</pre></div>
+</div>
+<p>Before exporting data from the sensor, the exporter needs to provide its internal queue to a subscriber of your choice. For all data from the sensor subscribe to both Ascii and Binary packets:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># subscribe to binary FA packets</span>
+<span class="n">vs</span><span class="o">.</span><span class="n">subscribeToMessage</span><span class="p">(</span>
+        <span class="n">csvExporter</span><span class="o">.</span><span class="n">getQueuePtr</span><span class="p">(),</span>
+        <span class="n">vectornav</span><span class="o">.</span><span class="n">Registers</span><span class="o">.</span><span class="n">BinaryOutputMeasurements</span><span class="p">(),</span>
+        <span class="n">vectornav</span><span class="o">.</span><span class="n">FaPacketDispatcher</span><span class="o">.</span><span class="n">SubscriberFilterType</span><span class="o">.</span><span class="n">AnyMatch</span>
+<span class="p">)</span>
+
+<span class="c1"># subscribe to binary VectorNav ascii packets</span>
+<span class="n">vs</span><span class="o">.</span><span class="n">subscribeToMessage</span><span class="p">(</span>
+        <span class="n">csvExporter</span><span class="o">.</span><span class="n">getQueuePtr</span><span class="p">(),</span>
+        <span class="s2">&quot;VN&quot;</span><span class="p">,</span>
+        <span class="n">vectornav</span><span class="o">.</span><span class="n">AsciiPacketDispatcher</span><span class="o">.</span><span class="n">SubscriberFilterType</span><span class="o">.</span><span class="n">StartsWith</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>With the subscribers setup, connect to the sensor and begin logging:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">vs</span><span class="o">.</span><span class="n">autoConnect</span><span class="p">(</span><span class="n">your_port</span><span class="p">)</span>
+
+<span class="n">csvExporter</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">csvExporter</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="exporting-from-a-file">
+<h3>Exporting from a file<a class="headerlink" href="#exporting-from-a-file" title="Permalink to this headline">¶</a></h3>
+<p>Exporting data from a file requires quite a few pieces, so there is a convenience class to easily allow exporting data from a file. Only one import is required:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">vectornav.Plugins</span> <span class="kn">import</span> <span class="n">FileExporter</span>
+</pre></div>
+</div>
+<p>A factory pattern allows adding exporters easily:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fileExporter</span><span class="o">.</span><span class="n">addCsvExporter</span><span class="p">(</span><span class="n">outputPath</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="c1"># system timestamps are not necessary</span>
+<span class="n">fileExporter</span><span class="o">.</span><span class="n">addAsciiExporter</span><span class="p">(</span><span class="n">outputPath</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With the desired exporters added, pass the file location of a binary file to the fileExporter to export the data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fileExporter</span><span class="o">.</span><span class="n">processFile</span><span class="p">(</span><span class="n">filePath</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+        <p class="logo"><a href="../Documentation.html" title="Documentation">
+          <img class="logo" src="../_static/VectorNav_LogoStacked_ForWeb_RGB_Full-Color.png" alt="Logo"/>
+        </a></p>
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="../Documentation.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../pages/migration_guide.html">Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/key_functionality.html">Key Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">VNSDK API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Plugins</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="simple_logger.html">Simple Logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_logger_api.html">SimpleLogger API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_scan.html">Register Scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="register_scan_api.html">RegisterScan API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_export_api.html">DataExport API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="firmware_update.html">Firmware Update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="firmware_updater_api.html">FirmwareUpdater API</a></li>
+</ul>
+</li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="register_scan_api.html"
+                          title="Previous page">&larr; RegisterScan API</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="data_export_api.html"
+                          title="Next page">&rarr; DataExport API</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/plugins/data_export.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="data_export_api.html" title="DataExport API"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="register_scan_api.html" title="RegisterScan API"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="../Documentation.html">VectorNav 0.15.1 documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="index.html" >Plugins</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Data Export</a></li> 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2024, VectorNav Technologies.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>
