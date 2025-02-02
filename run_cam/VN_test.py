@@ -5,10 +5,9 @@
 
 import os
 import time
-
 from vectornav import *
 from datetime import datetime, timezone, timedelta
-from vectornav.Registers import VpeBasicControl
+from vectornav.Registers import VpeBasicControl, System 
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
 s = Sensor()                      # Create sensor object and connect to the VN-200 
