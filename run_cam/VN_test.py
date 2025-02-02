@@ -25,10 +25,10 @@ s.writeRegister(sync_control)
 # s.writeRegister(nmea_control)
 
 #### CONFIGURE ADOR AND AODF 
-asyncDataOutputType = Registers.AsyncOutputType()
-asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
-asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
-s.writeRegister(asyncDataOutputType)
+# asyncDataOutputType = Registers.AsyncOutputType()
+# asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
+# asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+# s.writeRegister(asyncDataOutputType)
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
 asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
 asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
