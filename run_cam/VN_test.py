@@ -79,11 +79,11 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 csvExporter.start()
 # time.sleep(1)
 
-binaryOutput1Register = Registers.BinaryOutput.common()
+binaryOutput1Register = Registers.BinaryOutput1()
 t0 = time.time()
 while (time.time() - t0 < 5):
     t_reg = s.readRegister(binaryOutput1Register)
-    t = t_reg.timeGps
+    t = t_reg.common.timeGps
     print(t)
 
 csvExporter.stop()
