@@ -14,8 +14,9 @@ res = 300;    % resolution for figures (.pngs)
 
 figDir = './figs';
 
-name = 'stairs';
+% name = 'stairs';
 % name = 'picnic';
+name = 'arbor';
 
 vn = readtable([name '.csv']);
 
@@ -55,49 +56,49 @@ sgtitle([name ' xyz lla']);
 xlabel('Time (sec)');
 print(gcf, fullfile(figDir, [name ' xyzlla.png']), '-dpng', ['-r', num2str(res)]);
 
-%% Plot accel
-ax = vn.accelX/g;
-ay = vn.accelY/g;
-az = vn.accelZ/g;
-at = sqrt(ax.^2 + ay.^2 + az.^2);
+% %% Plot accel
+% ax = vn.accelX/g;
+% ay = vn.accelY/g;
+% az = vn.accelZ/g;
+% at = sqrt(ax.^2 + ay.^2 + az.^2);
+% 
+% f2 = figure; 
+% subplot(4,1,1); hold on; grid on; box on; axis tight;
+% plot(t, ax, 'r', 'LineWidth', 1);
+% ylabel('g'); legend('x');
+% subplot(4,1,2); hold on; grid on; box on; axis tight;
+% plot(t, ay, 'g', 'LineWidth', 1);
+% ylabel('g'); legend('y');
+% subplot(4,1,3); hold on; grid on; box on; axis tight;
+% plot(t, az, 'b', 'LineWidth', 1);
+% ylabel('g'); legend('z');
+% subplot(4,1,4); hold on; grid on; box on; axis tight;
+% plot(t, at, 'm', 'LineWidth', 1);
+% ylabel('g'); legend('total');
+% xlabel('Time (sec)'); 
+% sgtitle([name ' accel']);
+% 
+% print(f2, fullfile(figDir, [name ' accel.png']), '-dpng', ['-r', num2str(res)]);
 
-f2 = figure; 
-subplot(4,1,1); hold on; grid on; box on; axis tight;
-plot(t, ax, 'r', 'LineWidth', 1);
-ylabel('g'); legend('x');
-subplot(4,1,2); hold on; grid on; box on; axis tight;
-plot(t, ay, 'g', 'LineWidth', 1);
-ylabel('g'); legend('y');
-subplot(4,1,3); hold on; grid on; box on; axis tight;
-plot(t, az, 'b', 'LineWidth', 1);
-ylabel('g'); legend('z');
-subplot(4,1,4); hold on; grid on; box on; axis tight;
-plot(t, at, 'm', 'LineWidth', 1);
-ylabel('g'); legend('total');
-xlabel('Time (sec)'); 
-sgtitle([name ' accel']);
-
-print(f2, fullfile(figDir, [name ' accel.png']), '-dpng', ['-r', num2str(res)]);
-
-%% Plot mag
-mx = vn.magX;
-my = vn.magY;
-mz = vn.magZ;
-
-f3 = figure; 
-subplot(3,1,1); hold on; grid on; box on; axis tight;
-plot(t, mx, 'r', 'LineWidth', 1);
-ylabel('mag'); legend('x');
-subplot(3,1,2); hold on; grid on; box on; axis tight;
-plot(t, my, 'g', 'LineWidth', 1);
-ylabel('mag'); legend('y');
-subplot(3,1,3); hold on; grid on; box on; axis tight;
-plot(t, mz, 'b', 'LineWidth', 1);
-ylabel('mag'); legend('z');
-xlabel('Time (sec)'); 
-sgtitle([name ' mag']);
-
-print(f3, fullfile(figDir, [name ' mag.png']), '-dpng', ['-r', num2str(res)]);
+% %% Plot mag
+% mx = vn.magX;
+% my = vn.magY;
+% mz = vn.magZ;
+% 
+% f3 = figure; 
+% subplot(3,1,1); hold on; grid on; box on; axis tight;
+% plot(t, mx, 'r', 'LineWidth', 1);
+% ylabel('mag'); legend('x');
+% subplot(3,1,2); hold on; grid on; box on; axis tight;
+% plot(t, my, 'g', 'LineWidth', 1);
+% ylabel('mag'); legend('y');
+% subplot(3,1,3); hold on; grid on; box on; axis tight;
+% plot(t, mz, 'b', 'LineWidth', 1);
+% ylabel('mag'); legend('z');
+% xlabel('Time (sec)'); 
+% sgtitle([name ' mag']);
+% 
+% print(f3, fullfile(figDir, [name ' mag.png']), '-dpng', ['-r', num2str(res)]);
 
 %% Plot YPR
 yaw = vn.yaw;

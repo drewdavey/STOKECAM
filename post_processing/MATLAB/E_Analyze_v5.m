@@ -17,8 +17,10 @@ dY = 0.1;     % Y step size for plotting (meters)
 dZ = 0.1;     % Z step size for plotting (meters)
 
 % path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
-path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250119\000216_session_auto\wave1';
+% path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250119\000216_session_auto\wave1';
 % path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250112\000447_session_auto\wave3';
+path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250202\234540_session_auto\wave1';
+
 load([path '/imu.mat']);
 
 %% Organize dirs
@@ -104,45 +106,6 @@ U = zm - zm(1);
 % ym = vn.posEcefY - vn.posEcefY(1);
 % zm = vn.posEcefZ - vn.posEcefZ(1);
 
-% %  Direction cosine matrix (ECEF to NED)
-% % Define the angles mu (latitude) and l (longitude)
-% mu = deg2rad(vn.lat); % Convert latitude to radians
-% l = deg2rad(vn.lon);  % Convert longitude to radians
-% 
-% % Initialize arrays for transformed coordinates
-% ox2 = zeros(size(xm));
-% oy2 = zeros(size(ym));
-% oz2 = zeros(size(zm));
-% 
-% % Loop through each data point to calculate the rotated coordinates
-% for i = 1:length(xm)
-%     % Define the initial vector for the current point
-%     v0 = [xm(i); ym(i); zm(i)];
-% 
-%     % Define the rotation matrices for the current mu and l
-%     R1 = [-sin(mu(i)), 0, cos(mu(i));
-%             0,         1,      0;
-%           -cos(mu(i)), 0, -sin(mu(i))];
-% 
-%     R2 = [cos(l(i)),  sin(l(i)), 0;
-%          -sin(l(i)),  cos(l(i)), 0;
-%                0,         0,     1];
-% 
-%     % Combine the rotations
-%     R = R1 * R2;
-% 
-%     % Apply the combined rotation to the initial vector
-%     v2 = R * v0;
-% 
-%     % Store the rotated coordinates
-%     ox2(i) = v2(1);
-%     oy2(i) = v2(2);
-%     oz2(i) = v2(3);
-% end
-
-% % Using built in func (ECEF to NED)
-% wgs84 = wgs84Ellipsoid;
-% [ox2, oy2, oz2] = ecef2ned(xm, ym, zm, vn.lat, vn.lon, vn.alt, wgs84);
 
 %% Compute rotation matrix from quaternion
 numFrames = numel(vn.quatX);
@@ -154,32 +117,6 @@ for i = 1:numFrames
     qw = vn.quatW(i);
     rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
 end
-
-% %% Compute rotation matrix from Yaw-Pitch-Roll (3-2-1 sequence)
-% numFrames = numel(vn.yaw);
-% rotationMatrices = zeros(3, 3, numFrames);
-% 
-% for i = 1:numFrames
-%     yaw = deg2rad(vn.yaw(i));   % Yaw (rotation around Z-axis)
-%     pitch = deg2rad(vn.pitch(i));  % Pitch (rotation around Y-axis)
-%     roll = deg2rad(vn.roll(i));    % Roll (rotation around X-axis)
-% 
-%     % Compute rotation matrix using 3-2-1 (Z-Y-X) Euler sequence
-%     Rz = [cos(yaw), -sin(yaw), 0;
-%           sin(yaw),  cos(yaw), 0;
-%                 0,        0,  1];  % Yaw (Z-axis)
-% 
-%     Ry = [ cos(pitch), 0, sin(pitch);
-%                    0, 1,          0;
-%           -sin(pitch), 0, cos(pitch)];  % Pitch (Y-axis)
-% 
-%     Rx = [1,        0,         0;
-%           0, cos(roll), -sin(roll);
-%           0, sin(roll),  cos(roll)];  % Roll (X-axis)
-% 
-%     % Final rotation matrix (Z-Y-X sequence)
-%     rotationMatrices(:, :, i) = Rz * Ry * Rx;
-% end
 
 %% Plot X-Y cross sections
 shapesDir = fullfile(figDir, 'shapes');
@@ -200,7 +137,7 @@ for i = 1
         figure(1); hold on; axis equal; grid on; axis tight;
         title('camera coord.');
         % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
-        scatter(xyz_cam(:,1), xyz_cam(:,2), 1, xyz_cam(:,3));
+        scatter(xyz_cam(:,1), -xyz_cam(:,2), 1, xyz_cam(:,3));
         xlabel('X cam');
         ylabel('Y cam');
         zlabel('Z cam');
@@ -232,8 +169,9 @@ for i = 1
         figure(3); hold on; axis equal; grid on; axis tight;
         title('rotated into NED');
         xlabel('N world'); ylabel('E world'); zlabel('D world');
-        scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
-            1, double(matData.colors) / 255, 'filled');
+        % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
+        %     1, double(matData.colors) / 255, 'filled');
+        scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),1);
 
         % Origin
         % imu_origin = [xm(i), ym(i), zm(i)];
@@ -246,35 +184,18 @@ for i = 1
 
         figure(4); hold on; axis equal; grid on; axis tight;
         title('world coord.');
-        % scatter3(xyz_world(:,1), xyz_world(:,2), xyz_world(:,3), 1);
-        % scatter3(xyz_world(:,1), xyz_world(:,2), -xyz_world(:,3),...
-        %     1, double(matData.colors) / 255, 'filled');
-        % xlabel('N world'); ylabel('E world'); zlabel('D world');
 
-        scatter3(xyz_world(:,2), xyz_world(:,1), -xyz_world(:,3),...
+        % scatter3(xyz_world(:,1), xyz_world(:,2), -xyz_world(:,3), 1);
+        
+        scatter3(xyz_world(:,2), xyz_world(:,1), xyz_world(:,3),...
             1, double(matData.colors) / 255, 'filled');
+        % xlabel('N world'); ylabel('E world'); zlabel('D world');
         xlabel('X_S_I_O'); ylabel('Y_S_I_O'); zlabel('D world');
 
-        % title([matFiles(i).name(end-8:end-4)]);
-        % legend show;
         % 
         % % Save the figure in the shapes/ directory
         % print(gcf, fullfile(shapesDir, [matFiles(i).name(end-8:end-4)]),...
         %     '-dpng', ['-r', num2str(res)]); 
     end
 end
-
-
-% %% Calculate distances from origin for each set of points
-% dist_cam = sqrt(sum(xyz_cam.^2, 2));
-% dist_imu = sqrt(sum(xyz_imu.^2, 2));
-% dist_world = sqrt(sum((xyz_world - cam_origin).^2, 2));
-% 
-% figure; hold on; grid on;
-% title('Distance from Origin');
-% plot(dist_cam, 'LineWidth', 2);
-% plot(dist_imu, 'LineWidth', 1);
-% plot(dist_world, 'LineWidth', 0.5);
-% ylabel('Distance');
-% legend('Cam','IMU','World');
 

@@ -14,10 +14,10 @@ from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
 fdir_out = '/home/drew/Downloads/'
+fname_log = fdir_out + 'latency_test.txt'
 
 s = Sensor()                      # Create sensor object and connect to the VN-200 
 s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
-
 
 # ### LOAD CONFIG IF EXIST
 # configurator = Plugins.SensorConfigurator(vs, port)
@@ -77,22 +77,45 @@ s.writeRegister(binaryOutput1Register)
 
 s.disconnect()
 
+####### Simulate STOKECAM #######
 
+log = open(fname_log, 'a')
+
+
+# Enter standby mode
 s = Sensor() # Create sensor object and connect to the VN-200
 csvExporter = ExporterCsv(fdir_out, True)
 s.autoConnect(portName)
 s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
+
+tstart1 = time.monotonic_ns()
 csvExporter.start()
+tstart2 = time.monotonic_ns()
+tstart = (tstart1 + tstart2) / 2
 
-# # reg = Registers.GnssSolLla()
+log.write(f"start, {tstart}\n")
+
+# While in burst
+# reg = Registers.GnssSolLla()
 # reg = Registers.BinaryOutputMeasurements()
-# t0 = time.time()
-# while (time.time() - t0 < 5):
-#     s.readRegister(reg)
-#     t = reg.time.timeGps
-#     print(t)
+t0 = time.time()
+while (time.time() - t0 < 5):
+    # s.readRegister(reg)
+    # t = reg.time.timeGps
+    # print(t)
+    t = time.monotonic_ns()
+    log.write(f"burst, {t}\n")
 
-time.sleep(5)
+# time.sleep(5)
 
+
+# Exit standby
+tstop1 = time.monotonic_ns()
 csvExporter.stop()
+tstop2 = time.monotonic_ns()
+tstop = (tstop1 + tstop2) / 2
+
+log.write(f"stop, {tstop}\n")
+
 s.disconnect()
+log.close()
