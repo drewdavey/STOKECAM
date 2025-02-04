@@ -44,7 +44,7 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 # s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
-asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate100Hz
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
 asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
 s.writeRegister(asyncDataOutputFreq)
 
@@ -63,9 +63,9 @@ binaryOutput1Register.imu.imuStatus = 1
 # binaryOutput1Register.imu.pressure = 1
 # binaryOutput1Register.imu.accel = 1
 # binaryOutput1Register.imu.mag = 1
-binaryOutput1Register.attitude.ypr = 1
+# binaryOutput1Register.attitude.ypr = 1
 binaryOutput1Register.attitude.quaternion = 1
-binaryOutput1Register.attitude.dcm = 0
+# binaryOutput1Register.attitude.dcm = 0
 binaryOutput1Register.ins.posLla = 1
 binaryOutput1Register.ins.posEcef = 1
 binaryOutput1Register.ins.posU = 1
