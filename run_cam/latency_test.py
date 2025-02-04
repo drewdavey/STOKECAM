@@ -14,7 +14,7 @@ from vectornav.Plugins import ExporterCsv
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
-fdir_out = '/home/drew/Downloads/'
+fdir_out = '/home/drew/Downloads'
 fname_log = fdir_out + 'latency_test2.txt'
 
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
