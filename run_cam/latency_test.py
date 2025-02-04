@@ -50,7 +50,7 @@ s.writeRegister(asyncDataOutputFreq)
 
 #### CONFIGURE THE BINARY OUTPUT
 binaryOutput1Register = Registers.BinaryOutput1()
-binaryOutput1Register.rateDivisor = 20           ### 40 Hz (~800/rateDivisor) ###
+binaryOutput1Register.rateDivisor = 16           ### 40 Hz (~800/rateDivisor) ###
 binaryOutput1Register.asyncMode.serial1 = 1
 # binaryOutput1Register.asyncMode.serial2 = 0
 binaryOutput1Register.time.timeUtc = 1
