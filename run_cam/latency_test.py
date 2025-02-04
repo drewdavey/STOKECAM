@@ -14,8 +14,8 @@ from vectornav.Plugins import ExporterCsv
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
-fdir_out = '/home/drew/Downloads/'
-fname_log = fdir_out + 'drift_test.txt'
+fdir_out = '/home/drew/Downloads/latency_test.csv'
+fname_log = fdir_out + 'latency_test.txt'
 
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 dt = inputs['dt']
@@ -38,16 +38,16 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 # nmea_control.port = Registers.NmeaOutput1.Port.Serial1
 # s.writeRegister(nmea_control)
 
-#### CONFIGURE ADOR AND AODF 
-# asyncDataOutputType = Registers.AsyncOutputType()
-# asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.GPS
-# asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
-# # s.writeRegister(asyncDataOutputType)
+### CONFIGURE ADOR AND AODF 
+asyncDataOutputType = Registers.AsyncOutputType()
+asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.GPS
+asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+# s.writeRegister(asyncDataOutputType)
 
-# asyncDataOutputFreq= Registers.AsyncOutputFreq()
-# asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
-# asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
-# s.writeRegister(asyncDataOutputFreq)
+asyncDataOutputFreq= Registers.AsyncOutputFreq()
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
+asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+s.writeRegister(asyncDataOutputFreq)
 
 #### CONFIGURE THE BINARY OUTPUT
 binaryOutput1Register = Registers.BinaryOutput1()
@@ -59,18 +59,18 @@ binaryOutput1Register.time.timeStartup = 1
 binaryOutput1Register.time.timeGps = 1
 binaryOutput1Register.time.timeSyncIn = 1
 binaryOutput1Register.time.timeGpsPps = 1
-# binaryOutput1Register.imu.imuStatus = 1
-# binaryOutput1Register.imu.temperature = 1
-# binaryOutput1Register.imu.pressure = 1
-# binaryOutput1Register.imu.accel = 1
-# binaryOutput1Register.imu.mag = 1
+binaryOutput1Register.imu.imuStatus = 1
+binaryOutput1Register.imu.temperature = 1
+binaryOutput1Register.imu.pressure = 1
+binaryOutput1Register.imu.accel = 1
+binaryOutput1Register.imu.mag = 1
 binaryOutput1Register.attitude.ypr = 1
 binaryOutput1Register.attitude.quaternion = 1
-# binaryOutput1Register.attitude.dcm = 0
-# binaryOutput1Register.ins.posLla = 1
-# binaryOutput1Register.ins.posEcef = 1
-# binaryOutput1Register.ins.posU = 1
-# binaryOutput1Register.ins.insStatus = 1
+binaryOutput1Register.attitude.dcm = 0
+binaryOutput1Register.ins.posLla = 1
+binaryOutput1Register.ins.posEcef = 1
+binaryOutput1Register.ins.posU = 1
+binaryOutput1Register.ins.insStatus = 1
 binaryOutput1Register.gnss.gnss1PosLla = 1
 binaryOutput1Register.gnss.gnss1PosEcef = 1
 binaryOutput1Register.gnss.gnss1PosUncertainty = 1
@@ -110,18 +110,23 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 # reg = Registers.GnssSolLla()
 # reg = Registers.BinaryOutputMeasurements()
 t0 = time.time()
-while (time.time() - t0 < 5):
+while (time.time() - t0 < 4):
     # s.readRegister(reg)
     # t = reg.time.timeGps
     # print(t)
-    cd = s.getNextMeasurement()
+
+    # cd = s.getNextMeasurement()
+    # rp_time = time.monotonic_ns()
+    # while not cd:
+    #     cd = s.getNextMeasurement()
+    #     rp_time = time.monotonic_ns()
+    # vn_time = cd.time.timeStartup.microseconds() * 1e3
+    # delta_time = vn_time - rp_time
+    # log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
+
     rp_time = time.monotonic_ns()
-    while not cd:
-        cd = s.getNextMeasurement()
-        rp_time = time.monotonic_ns()
-    vn_time = cd.time.timeStartup.microseconds() * 1e3
-    delta_time = vn_time - rp_time
-    log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
+    log.write(f"{rp_time}\n")
+
     time.sleep(dt)
 
 # # Exit standby
