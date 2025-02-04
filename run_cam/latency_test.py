@@ -38,11 +38,11 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 # nmea_control.port = Registers.NmeaOutput1.Port.Serial1
 # s.writeRegister(nmea_control)
 
-# ### CONFIGURE ADOR AND AODF 
-# asyncDataOutputType = Registers.AsyncOutputType()
+### CONFIGURE ADOR AND AODF 
+asyncDataOutputType = Registers.AsyncOutputType()
 # asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.GPS
-# asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
-# # s.writeRegister(asyncDataOutputType)
+asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+# s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
 asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
