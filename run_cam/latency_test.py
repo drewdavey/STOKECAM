@@ -45,7 +45,7 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 # # s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
-asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate100Hz
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
 asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
 s.writeRegister(asyncDataOutputFreq)
 
