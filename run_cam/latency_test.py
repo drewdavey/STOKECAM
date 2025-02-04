@@ -43,10 +43,10 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 # asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
 # s.writeRegister(asyncDataOutputType)
 
-asyncDataOutputFreq= Registers.AsyncOutputFreq()
-asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
-asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
-s.writeRegister(asyncDataOutputFreq)
+# asyncDataOutputFreq= Registers.AsyncOutputFreq()
+# asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
+# asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+# s.writeRegister(asyncDataOutputFreq)
 
 #### CONFIGURE THE BINARY OUTPUT
 binaryOutput1Register = Registers.BinaryOutput1()
