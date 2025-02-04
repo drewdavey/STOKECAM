@@ -12,7 +12,7 @@ from vectornav import *
 
 # Create sensor object and connect to the VN-200 
 # at the baud rate of 115200 (115,200 bytes/s)
-s = VnSensor()
+s = Sensor()
 s.connect('/dev/ttyUSB0', 115200)
 
 # Disconnect from the sensor
