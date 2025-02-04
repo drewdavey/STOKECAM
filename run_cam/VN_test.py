@@ -93,6 +93,9 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 
 cd = s.getNextMeasurement()
 rp_time = time.monotonic_ns()
+while not cd:
+    cd = s.getNextMeasurement()
+    rp_time = time.monotonic_ns()
 vn_time = cd.time.timeStartup.microseconds()
 delta_time = vn_time - rp_time
 log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
@@ -114,6 +117,9 @@ while (time.time() - t0 < 5):
     # print(t)
     cd = s.getNextMeasurement()
     rp_time = time.monotonic_ns()
+    while not cd:
+        cd = s.getNextMeasurement()
+        rp_time = time.monotonic_ns()
     vn_time = cd.time.timeStartup.microseconds()
     delta_time = vn_time - rp_time
     log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
