@@ -63,19 +63,19 @@ binaryOutput1Register.imu.imuStatus = 1
 # binaryOutput1Register.imu.pressure = 1
 # binaryOutput1Register.imu.accel = 1
 # binaryOutput1Register.imu.mag = 1
-# binaryOutput1Register.attitude.ypr = 1
-# binaryOutput1Register.attitude.quaternion = 1
-# binaryOutput1Register.attitude.dcm = 0
-# binaryOutput1Register.ins.posLla = 1
-# binaryOutput1Register.ins.posEcef = 1
-# binaryOutput1Register.ins.posU = 1
-# binaryOutput1Register.ins.insStatus = 1
-# binaryOutput1Register.gnss.gnss1PosLla = 1
-# binaryOutput1Register.gnss.gnss1PosEcef = 1
-# binaryOutput1Register.gnss.gnss1PosUncertainty = 1
-# binaryOutput1Register.gnss.gnss1Fix = 1
-# binaryOutput1Register.gnss.gnss1NumSats = 1
-# binaryOutput1Register.gnss.gnss1TimeUtc = 1
+binaryOutput1Register.attitude.ypr = 1
+binaryOutput1Register.attitude.quaternion = 1
+binaryOutput1Register.attitude.dcm = 0
+binaryOutput1Register.ins.posLla = 1
+binaryOutput1Register.ins.posEcef = 1
+binaryOutput1Register.ins.posU = 1
+binaryOutput1Register.ins.insStatus = 1
+binaryOutput1Register.gnss.gnss1PosLla = 1
+binaryOutput1Register.gnss.gnss1PosEcef = 1
+binaryOutput1Register.gnss.gnss1PosUncertainty = 1
+binaryOutput1Register.gnss.gnss1Fix = 1
+binaryOutput1Register.gnss.gnss1NumSats = 1
+binaryOutput1Register.gnss.gnss1TimeUtc = 1
 s.writeRegister(binaryOutput1Register)
 
 s.disconnect()
