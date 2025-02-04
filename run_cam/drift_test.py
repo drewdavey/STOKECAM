@@ -15,7 +15,7 @@ from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
 fdir_out = '/home/drew/Downloads/'
-fname_log = fdir_out + 'latency_test.txt'
+fname_log = fdir_out + 'drift_test.txt'
 
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 dt = inputs['dt']
@@ -28,15 +28,15 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 # configurator.SaveConfiguration(pathToSaveFile)
 # configurator.LoadConfiguration(pathToLoadFile)
 
-#### CONFIGURE THE SYNC OUTPUT
-sync_control = Registers.SyncControl()
-sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
-s.writeRegister(sync_control)
+# #### CONFIGURE THE SYNC OUTPUT
+# sync_control = Registers.SyncControl()
+# sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
+# s.writeRegister(sync_control)
 
-#### CONFIGURE THE NMEA OUTPUT
-nmea_control = Registers.NmeaOutput1()
-nmea_control.port = Registers.NmeaOutput1.Port.Serial1
-s.writeRegister(nmea_control)
+# #### CONFIGURE THE NMEA OUTPUT
+# nmea_control = Registers.NmeaOutput1()
+# nmea_control.port = Registers.NmeaOutput1.Port.Serial1
+# s.writeRegister(nmea_control)
 
 #### CONFIGURE ADOR AND AODF 
 # asyncDataOutputType = Registers.AsyncOutputType()
@@ -91,21 +91,20 @@ csvExporter = ExporterCsv(fdir_out, True)
 s.autoConnect(portName)
 s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
 
-cd = s.getNextMeasurement()
-rp_time = time.monotonic_ns()
-while not cd:
-    cd = s.getNextMeasurement()
-    rp_time = time.monotonic_ns()
-vn_time = cd.time.timeStartup.microseconds() * 1e3
-delta_time = vn_time - rp_time
-log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
+# cd = s.getNextMeasurement()
+# rp_time = time.monotonic_ns()
+# while not cd:
+#     cd = s.getNextMeasurement()
+#     rp_time = time.monotonic_ns()
+# vn_time = cd.time.timeStartup.microseconds() * 1e3
+# delta_time = vn_time - rp_time
+# log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
 
-tstart1 = time.monotonic_ns()
-csvExporter.start()
-tstart2 = time.monotonic_ns()
-tstart = (tstart1 + tstart2) / 2
-
-log.write(f"start, {tstart}\n")
+# tstart1 = time.monotonic_ns()
+# csvExporter.start()
+# tstart2 = time.monotonic_ns()
+# tstart = (tstart1 + tstart2) / 2
+# log.write(f"start, {tstart}\n")
 
 # While in burst
 # reg = Registers.GnssSolLla()
@@ -125,13 +124,12 @@ while (time.time() - t0 < 5):
     log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
     time.sleep(dt)
 
-# Exit standby
-tstop1 = time.monotonic_ns()
-csvExporter.stop()
-tstop2 = time.monotonic_ns()
-tstop = (tstop1 + tstop2) / 2
-
-log.write(f"stop, {tstop}\n")
+# # Exit standby
+# tstop1 = time.monotonic_ns()
+# csvExporter.stop()
+# tstop2 = time.monotonic_ns()
+# tstop = (tstop1 + tstop2) / 2
+# log.write(f"stop, {tstop}\n")
 
 s.disconnect()
 log.close()
