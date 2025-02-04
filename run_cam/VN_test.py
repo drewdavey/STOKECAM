@@ -5,6 +5,7 @@
 
 import os
 import time
+from utils import *
 import vectornav
 from vectornav import *
 from datetime import datetime, timezone, timedelta
@@ -15,6 +16,9 @@ from vectornav.Commands import Command, KnownMagneticDisturbance
 portName = '/dev/ttyUSB0'
 fdir_out = '/home/drew/Downloads/'
 fname_log = fdir_out + 'latency_test.txt'
+
+inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
+dt = inputs['dt']
 
 s = Sensor()                      # Create sensor object and connect to the VN-200 
 s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
@@ -81,12 +85,17 @@ s.disconnect()
 
 log = open(fname_log, 'a')
 
-
 # Enter standby mode
 s = Sensor() # Create sensor object and connect to the VN-200
 csvExporter = ExporterCsv(fdir_out, True)
 s.autoConnect(portName)
 s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
+
+cd = s.getNextMeasurement()
+rp_time = time.monotonic_ns()
+vn_time = cd.time.timeStartup.microseconds()
+delta_time = vn_time - rp_time
+log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
 
 tstart1 = time.monotonic_ns()
 csvExporter.start()
@@ -103,11 +112,12 @@ while (time.time() - t0 < 5):
     # s.readRegister(reg)
     # t = reg.time.timeGps
     # print(t)
-    t = time.monotonic_ns()
-    log.write(f"burst, {t}\n")
-
-# time.sleep(5)
-
+    cd = s.getNextMeasurement()
+    rp_time = time.monotonic_ns()
+    vn_time = cd.time.timeStartup.microseconds()
+    delta_time = vn_time - rp_time
+    log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
+    time.sleep(dt)
 
 # Exit standby
 tstop1 = time.monotonic_ns()
