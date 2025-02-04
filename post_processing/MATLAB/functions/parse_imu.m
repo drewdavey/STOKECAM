@@ -2,7 +2,7 @@
 % Drew Davey
 % Last updated: 2024-12-16
 
-function imu = parse_imu(mainDir, waveFolder)
+function [imu, diffs] = parse_imu(mainDir, waveFolder)
 
     % Load IMU/GPS
     vn_tmp = dir(fullfile(mainDir, '*.csv'));
@@ -37,11 +37,15 @@ function imu = parse_imu(mainDir, waveFolder)
 
         % Apply offset
         searchTime = avgTimestampNs; 
-    
+
         % Find the VN system timestamp nearest neighbor
         % [~, idx] = min(abs(vn.timeStartup - searchTime));  
         [~, idx] = min(abs(vn.systemTimeStamp - searchTime));
+
         closest_idx(i) = idx;  % Store the index
+
+        % Store camera - imu timestamp diff
+        diffs(i) = vn.systemTimeStamp(idx) - searchTime;
     end
 
     % Create new downsampled VN-200 struct

@@ -16,10 +16,10 @@ clipWaves = 1;
 while clipWaves
     mainDir = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session'); % load path to session
     waveFolder = organize_images(mainDir); % wave* directory containing 'cam0' and 'cam1' folders
-    vn = parse_imu(mainDir, waveFolder);
+    [vn, diffs] = parse_imu(mainDir, waveFolder);
 
     % Save parsed VN-200 data to waveDir
-    save(fullfile(waveFolder, 'imu.mat'), 'vn');
+    save(fullfile(waveFolder, 'imu.mat'), 'vn', 'diffs');
 
     if segment
         cam0Dir = fullfile(waveFolder, 'cam0');

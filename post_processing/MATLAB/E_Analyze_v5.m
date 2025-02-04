@@ -16,10 +16,10 @@ dX = 0.1;     % X step size for plotting (meters)
 dY = 0.1;     % Y step size for plotting (meters)
 dZ = 0.1;     % Z step size for plotting (meters)
 
-% path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
+path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
 % path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250119\000216_session_auto\wave1';
 % path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250112\000447_session_auto\wave3';
-path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250202\234540_session_auto\wave1';
+% path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250202\234540_session_auto\wave1';
 
 load([path '/imu.mat']);
 
@@ -124,8 +124,8 @@ if ~exist(shapesDir, 'dir') && loadMats
     mkdir(shapesDir);  % Create shapes/ directory if it doesn't exist
 end
 
-for i = 1
-% for i = 1:length(matFilenames)
+% for i = 1
+for i = 1:length(matFilenames)
     matData = load(fullfile(matDir, matFilenames{i}));
     matData = matData.data;
     % if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
@@ -146,11 +146,11 @@ for i = 1
         %%%%%%%%%%%%%% Reorder to X, Z, Y for NED convention %%%%%%%%%%%%%%
         % xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 -1 0]; % Swap Y and Z and flip Y
 
-        % % This is what works
-        xyz_imu = xyz_cam * [0 1 0; 0 0 -1; -1 0 0]; % XYZ_imu = +Y-Z+X_cam
+        % % % This is what works
+        % xyz_imu = xyz_cam * [0 1 0; 0 0 -1; -1 0 0]; % XYZ_imu = +Y-Z+X_cam
 
-        % % This should be right
-        % xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 1 0]; % XYZ_imu = +Z+X+Y_cam
+        % This should be right
+        xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 1 0]; % XYZ_imu = +Z+X+Y_cam
 
         figure(2); hold on; axis equal; grid on; axis tight;
         title('imu coord.');
@@ -185,10 +185,10 @@ for i = 1
         figure(4); hold on; axis equal; grid on; axis tight;
         title('world coord.');
 
-        % scatter3(xyz_world(:,1), xyz_world(:,2), -xyz_world(:,3), 1);
+        scatter3(xyz_world(:,1), xyz_world(:,2), xyz_world(:,3), 1);
         
-        scatter3(xyz_world(:,2), xyz_world(:,1), xyz_world(:,3),...
-            1, double(matData.colors) / 255, 'filled');
+        % scatter3(xyz_world(:,2), xyz_world(:,1), xyz_world(:,3),...
+        %     1, double(matData.colors) / 255, 'filled');
         % xlabel('N world'); ylabel('E world'); zlabel('D world');
         xlabel('X_S_I_O'); ylabel('Y_S_I_O'); zlabel('D world');
 
