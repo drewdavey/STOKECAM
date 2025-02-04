@@ -8,7 +8,7 @@ import sys
 import time
 
 # Import vnpy library
-from vnpy import *
+from vectornav import *
 
 # Create sensor object and connect to the VN-200 
 # at the baud rate of 115200 (115,200 bytes/s)
