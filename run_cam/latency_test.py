@@ -37,11 +37,11 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 # nmea_control.port = Registers.NmeaOutput1.Port.Serial1
 # s.writeRegister(nmea_control)
 
-### CONFIGURE ADOR AND AODF 
-asyncDataOutputType = Registers.AsyncOutputType()
-# asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.GPS
-asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
-s.writeRegister(asyncDataOutputType)
+# ### CONFIGURE ADOR AND AODF 
+# asyncDataOutputType = Registers.AsyncOutputType()
+# # asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.GPS
+# asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+# s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
 asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
@@ -74,7 +74,7 @@ binaryOutput1Register.ins.insStatus = 1
 # binaryOutput1Register.gnss.gnss1PosUncertainty = 1
 binaryOutput1Register.gnss.gnss1Fix = 1
 binaryOutput1Register.gnss.gnss1NumSats = 1
-binaryOutput1Register.gnss.gnss1TimeUtc = 1
+# binaryOutput1Register.gnss.gnss1TimeUtc = 1
 s.writeRegister(binaryOutput1Register)
 
 s.disconnect()
