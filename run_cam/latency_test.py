@@ -99,11 +99,11 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 # delta_time = vn_time - rp_time
 # log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
 
-# tstart1 = time.monotonic_ns()
+tstart1 = time.monotonic_ns()
 csvExporter.start()
-# tstart2 = time.monotonic_ns()
-# tstart = (tstart1 + tstart2) / 2
-# log.write(f"{tstart}\n")
+tstart2 = time.monotonic_ns()
+tstart = (tstart1 + tstart2) / 2
+log.write(f"{tstart}\n")
 
 # While in burst
 # reg = Registers.GnssSolLla()

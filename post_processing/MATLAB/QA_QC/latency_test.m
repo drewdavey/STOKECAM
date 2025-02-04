@@ -32,7 +32,7 @@ ylabel('relative time (ns)');
 title('systemTimeStamp vs. timeStartup');
 
 figure; grid on; box on; hold on;
-plot(idx(1:100),t_rp,'--r','LineWidth',2);
+plot(idx,t_rp,'--r','LineWidth',2);
 plot(idx,t_vn,'-b','LineWidth',1);
 xlabel('idx');
 ylabel('relative time (ns)');
