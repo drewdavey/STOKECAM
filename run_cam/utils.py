@@ -67,19 +67,8 @@ def config_VN200_output(portName):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
-    # #### CONFIGURE THE SYNC OUTPUT
-    # sync_control = Registers.SyncControl()
-    # sync_control.syncOutMode = Registers.SyncControl.SyncOutMode.GpsPps
-    # s.writeRegister(sync_control)
-
-    # #### CONFIGURE THE NMEA OUTPUT
-    # nmea_control = Registers.NmeaOutput1()
-    # nmea_control.port = Registers.NmeaOutput1.Port.Serial1
-    # s.writeRegister(nmea_control)
-
     #### CONFIGURE ADOR AND AODF 
     asyncDataOutputType = Registers.AsyncOutputType()
-    asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.YPR
     asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
     s.writeRegister(asyncDataOutputType)
     asyncDataOutputFreq= Registers.AsyncOutputFreq()
@@ -116,7 +105,6 @@ def config_VN200_output(portName):
     binaryOutput1Register.gnss.gnss1NumSats = 1
     binaryOutput1Register.gnss.gnss1TimeUtc = 1
     s.writeRegister(binaryOutput1Register)
-    
     s.disconnect()
 
 def sync_clock(portName, clock_timeout):
@@ -247,11 +235,11 @@ def VN200_status(portName, fname_log, gps_timeout):
             tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
             log.write(f"{tstr}:     VN-200 Time: {vn_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
             log.write(f"{tstr}:     RP Time: {rp_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
-            log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n\n")
+            log.write(f"{tstr}:     Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n")
             
             vn_mono_time = cd.time.timeStartup.microseconds()
-            delta_mono_time = vn_mono_time - rp_mono_time
-            log.write(f"{tstr}:     Startup Time Offset (VN200 - RP): {delta_mono_time} nanoseconds\n\n")
+            delta_mono_time = (vn_mono_time - rp_mono_time) * 1e-9
+            log.write(f"{tstr}:     Startup Time Offset (VN200 - RP): {delta_mono_time} seconds\n\n")
 
         else:
             log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")

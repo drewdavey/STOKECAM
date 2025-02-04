@@ -14,8 +14,8 @@ from vectornav.Plugins import ExporterCsv
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
-fdir_out = '/home/drew/Downloads/'
-fname_log = fdir_out + 'latency_test2.txt'
+fdir_out = '/home/drew/Downloads/session.csv'
+fname_log = '/home/drew/Downloads/latency_test2.txt'
 
 dt = 0.025
 
@@ -109,7 +109,7 @@ log.write(f"{tstart}\n")
 # reg = Registers.GnssSolLla()
 # reg = Registers.BinaryOutputMeasurements()
 t0 = time.time()
-while (time.time() - t0 < 10):
+while (time.time() - t0 < 1):
     # s.readRegister(reg)
     # t = reg.time.timeGps
     # print(t)

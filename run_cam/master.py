@@ -113,14 +113,14 @@ def toggle_modes():
 def cap0(fdir_cam0, tnext, i):
     while time.monotonic_ns() < tnext:
         pass
-    tstr = str(time.monotonic_ns())
-    cam0.capture_file(f"{fdir_cam0}0_{tstr}_{i+1:05}.jpg")
+    # tstr = str(time.monotonic_ns())
+    cam0.capture_file(f"{fdir_cam0}0_{str(time.monotonic_ns())}_{i+1:05}.jpg")
 
 def cap1(fdir_cam1, tnext, i):
     while time.monotonic_ns() < tnext:
         pass
-    tstr = str(time.monotonic_ns())
-    cam1.capture_file(f"{fdir_cam1}1_{tstr}_{i+1:05}.jpg")
+    # tstr = str(time.monotonic_ns())
+    cam1.capture_file(f"{fdir_cam1}1_{str(time.monotonic_ns())}_{i+1:05}.jpg")
 
 def exit_standby(fname_log):
     global standby
