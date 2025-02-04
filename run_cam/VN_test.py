@@ -96,7 +96,7 @@ rp_time = time.monotonic_ns()
 while not cd:
     cd = s.getNextMeasurement()
     rp_time = time.monotonic_ns()
-vn_time = cd.time.timeStartup.microseconds()
+vn_time = cd.time.timeStartup.microseconds() * 1e3
 delta_time = vn_time - rp_time
 log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
 
@@ -120,7 +120,7 @@ while (time.time() - t0 < 5):
     while not cd:
         cd = s.getNextMeasurement()
         rp_time = time.monotonic_ns()
-    vn_time = cd.time.timeStartup.microseconds()
+    vn_time = cd.time.timeStartup.microseconds() * 1e3
     delta_time = vn_time - rp_time
     log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
     time.sleep(dt)
