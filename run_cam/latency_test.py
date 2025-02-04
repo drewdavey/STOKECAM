@@ -44,7 +44,7 @@ asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
 s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
-asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate100Hz
 asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
 s.writeRegister(asyncDataOutputFreq)
 
