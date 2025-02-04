@@ -41,7 +41,7 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 asyncDataOutputType = Registers.AsyncOutputType()
 # asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.GPS
 asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
-# s.writeRegister(asyncDataOutputType)
+s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
 asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
