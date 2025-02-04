@@ -100,11 +100,11 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 # delta_time = vn_time - rp_time
 # log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
 
-# tstart1 = time.monotonic_ns()
+tstart1 = time.monotonic_ns()
 csvExporter.start()
-# tstart2 = time.monotonic_ns()
-# tstart = (tstart1 + tstart2) / 2
-# log.write(f"start, {tstart}\n")
+tstart2 = time.monotonic_ns()
+tstart = (tstart1 + tstart2) / 2
+log.write(f"{tstart}\n")
 
 # While in burst
 # reg = Registers.GnssSolLla()
@@ -129,12 +129,12 @@ while (time.time() - t0 < 4):
 
     time.sleep(dt)
 
-# # Exit standby
-# tstop1 = time.monotonic_ns()
+# Exit standby
+tstop1 = time.monotonic_ns()
 csvExporter.stop()
-# tstop2 = time.monotonic_ns()
-# tstop = (tstop1 + tstop2) / 2
-# log.write(f"stop, {tstop}\n")
+tstop2 = time.monotonic_ns()
+tstop = (tstop1 + tstop2) / 2
+log.write(f"{tstop}\n")
 
 s.disconnect()
 log.close()
