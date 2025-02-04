@@ -109,7 +109,7 @@ csvExporter.start()
 # reg = Registers.GnssSolLla()
 # reg = Registers.BinaryOutputMeasurements()
 t0 = time.time()
-while (time.time() - t0 < 5):
+while (time.time() - t0 < 10):
     # s.readRegister(reg)
     # t = reg.time.timeGps
     # print(t)
