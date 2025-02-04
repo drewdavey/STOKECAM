@@ -17,8 +17,7 @@ portName = '/dev/ttyUSB0'
 fdir_out = '/home/drew/Downloads/'
 fname_log = fdir_out + 'latency_test2.txt'
 
-inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
-dt = inputs['dt']
+dt = 0.025
 
 s = Sensor()                      # Create sensor object and connect to the VN-200 
 s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
@@ -45,13 +44,13 @@ asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
 # s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
-asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate25Hz
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
 asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
 s.writeRegister(asyncDataOutputFreq)
 
 #### CONFIGURE THE BINARY OUTPUT
 binaryOutput1Register = Registers.BinaryOutput1()
-binaryOutput1Register.rateDivisor = 32           ### 40 Hz (~800/rateDivisor) ###
+binaryOutput1Register.rateDivisor = 20           ### 40 Hz (~800/rateDivisor) ###
 binaryOutput1Register.asyncMode.serial1 = 1
 # binaryOutput1Register.asyncMode.serial2 = 0
 binaryOutput1Register.time.timeUtc = 1
@@ -110,7 +109,7 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 # reg = Registers.GnssSolLla()
 # reg = Registers.BinaryOutputMeasurements()
 t0 = time.time()
-while (time.time() - t0 < 4):
+while (time.time() - t0 < 5):
     # s.readRegister(reg)
     # t = reg.time.timeGps
     # print(t)
