@@ -100,7 +100,7 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 # log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
 
 # tstart1 = time.monotonic_ns()
-# csvExporter.start()
+csvExporter.start()
 # tstart2 = time.monotonic_ns()
 # tstart = (tstart1 + tstart2) / 2
 # log.write(f"{tstart}\n")
@@ -130,7 +130,7 @@ while (time.time() - t0 < 5):
 
 # # Exit standby
 # tstop1 = time.monotonic_ns()
-# csvExporter.stop()
+csvExporter.stop()
 # tstop2 = time.monotonic_ns()
 # tstop = (tstop1 + tstop2) / 2
 # log.write(f"{tstop}\n")
