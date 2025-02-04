@@ -83,7 +83,7 @@ s.disconnect()
 
 ####### Simulate STOKECAM #######
 
-log = open(fname_log, 'a')
+log = open(fname_log, 'w')
 
 # Enter standby mode
 s = Sensor() # Create sensor object and connect to the VN-200
