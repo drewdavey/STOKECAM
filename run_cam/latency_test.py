@@ -14,7 +14,7 @@ from vectornav.Plugins import ExporterCsv
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
-fdir_out = '/home/drew/Downloads'
+fdir_out = '/home/drew/Downloads/latency_test.csv'
 fname_log = fdir_out + 'latency_test2.txt'
 
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
@@ -101,7 +101,7 @@ s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutput
 # log.write(f"{rp_time}, {vn_time}, {delta_time}\n")
 
 # tstart1 = time.monotonic_ns()
-# csvExporter.start()
+csvExporter.start()
 # tstart2 = time.monotonic_ns()
 # tstart = (tstart1 + tstart2) / 2
 # log.write(f"start, {tstart}\n")
@@ -131,7 +131,7 @@ while (time.time() - t0 < 4):
 
 # # Exit standby
 # tstop1 = time.monotonic_ns()
-# csvExporter.stop()
+csvExporter.stop()
 # tstop2 = time.monotonic_ns()
 # tstop = (tstop1 + tstop2) / 2
 # log.write(f"stop, {tstop}\n")
