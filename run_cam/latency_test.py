@@ -43,27 +43,26 @@ s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s)
 # asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
 # s.writeRegister(asyncDataOutputType)
 
-# asyncDataOutputFreq= Registers.AsyncOutputFreq()
-# asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
-# asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
-# s.writeRegister(asyncDataOutputFreq)
+asyncDataOutputFreq= Registers.AsyncOutputFreq()
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
+asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
+s.writeRegister(asyncDataOutputFreq)
 
 #### CONFIGURE THE BINARY OUTPUT
 binaryOutput1Register = Registers.BinaryOutput1()
 binaryOutput1Register.rateDivisor = 20           ### 40 Hz (~800/rateDivisor) ###
 binaryOutput1Register.asyncMode.serial1 = 1
-# binaryOutput1Register.asyncMode.serial2 = 0
 binaryOutput1Register.time.timeUtc = 1
 binaryOutput1Register.time.timeStartup = 1
 binaryOutput1Register.time.timeGps = 1
-# binaryOutput1Register.time.timeSyncIn = 1
-# binaryOutput1Register.time.timeGpsPps = 1
-# binaryOutput1Register.imu.imuStatus = 1
-# binaryOutput1Register.imu.temperature = 1
-# binaryOutput1Register.imu.pressure = 1
-# binaryOutput1Register.imu.accel = 1
-# binaryOutput1Register.imu.mag = 1
-# binaryOutput1Register.attitude.ypr = 1
+binaryOutput1Register.time.timeSyncIn = 1
+binaryOutput1Register.time.timeGpsPps = 1
+binaryOutput1Register.imu.imuStatus = 1
+binaryOutput1Register.imu.temperature = 1
+binaryOutput1Register.imu.pressure = 1
+binaryOutput1Register.imu.accel = 1
+binaryOutput1Register.imu.mag = 1
+binaryOutput1Register.attitude.ypr = 1
 binaryOutput1Register.attitude.quaternion = 1
 # binaryOutput1Register.attitude.dcm = 0
 binaryOutput1Register.ins.posLla = 1
