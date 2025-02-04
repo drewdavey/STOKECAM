@@ -14,7 +14,7 @@ from vectornav.Plugins import ExporterCsv
 from vectornav.Commands import Command, KnownMagneticDisturbance
 
 portName = '/dev/ttyUSB0'
-fdir_out = '/home/drew/Downloads/session.csv'
+fdir_out = '/home/drew/Downloads/'
 fname_log = '/home/drew/Downloads/latency_test2.txt'
 
 dt = 0.025
@@ -44,13 +44,13 @@ asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
 s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
-asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
 asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
 s.writeRegister(asyncDataOutputFreq)
 
 #### CONFIGURE THE BINARY OUTPUT
 binaryOutput1Register = Registers.BinaryOutput1()
-binaryOutput1Register.rateDivisor = 16           ### 40 Hz (~800/rateDivisor) ###
+binaryOutput1Register.rateDivisor = 20           ### 40 Hz (~800/rateDivisor) ###
 binaryOutput1Register.asyncMode.serial1 = 1
 # binaryOutput1Register.asyncMode.serial2 = 0
 binaryOutput1Register.time.timeUtc = 1
@@ -88,7 +88,7 @@ log = open(fname_log, 'w')
 s = Sensor() # Create sensor object and connect to the VN-200
 csvExporter = ExporterCsv(fdir_out, True)
 s.autoConnect(portName)
-s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
+s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements())
 
 # cd = s.getNextMeasurement()
 # rp_time = time.monotonic_ns()
