@@ -44,13 +44,13 @@ asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
 s.writeRegister(asyncDataOutputType)
 
 asyncDataOutputFreq= Registers.AsyncOutputFreq()
-asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate40Hz
+asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
 asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
 s.writeRegister(asyncDataOutputFreq)
 
 #### CONFIGURE THE BINARY OUTPUT
 binaryOutput1Register = Registers.BinaryOutput1()
-binaryOutput1Register.rateDivisor = 20           ### 40 Hz (~800/rateDivisor) ###
+binaryOutput1Register.rateDivisor = 16           ### 40 Hz (~800/rateDivisor) ###
 binaryOutput1Register.asyncMode.serial1 = 1
 binaryOutput1Register.time.timeUtc = 1
 binaryOutput1Register.time.timeStartup = 1
