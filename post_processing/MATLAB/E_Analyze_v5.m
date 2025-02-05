@@ -17,11 +17,12 @@ dY = 0.1;     % Y step size for plotting (meters)
 dZ = 0.1;     % Z step size for plotting (meters)
 
 path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for analysis'); % load path to dir 
-% path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250119\000216_session_auto\wave1';
-% path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250112\000447_session_auto\wave3';
-% path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\testing\20250202\234540_session_auto\wave1';
+[~, last_folder] = fileparts(path);  % Extract the last folder name
 
-load([path '/imu.mat']);
+load(fullfile(path, [last_folder '.mat']));
+
+% Relative time
+t = data2.t0;
 
 %% Organize dirs
 cam0Dir = fullfile(path, 'cam0');
@@ -41,80 +42,96 @@ else
     loadMats = 0; % Skip loading mats
 end
 
-%% Select images from cam0 and cam1
-cam0Images = dir(fullfile(cam0Dir, '*.jpg'));
-cam1Images = dir(fullfile(cam1Dir, '*.jpg'));
-% Convert filenames into struct arrays same as select_files output
-selectedFiles0 = struct('name', {cam0Images.name});
-selectedFiles1 = struct('name', {cam1Images.name});
-% Select all mats automatically
-if loadMats
-    matFiles = dir(fullfile(matDir, '*.mat'));
-    matFilenames = {matFiles.name};
-else
-    matFilenames = [];
-    disp('No mats/ to analyze.');
+%% Plot cam delays
+f1 = figure; hold on; grid on; box on; 
+plot(t, data2.camDiffs * 1e6, 'o-', 'LineWidth', 1.5);
+yline(0, '--k', 'LineWidth',2);
+xlabel('Time (sec)');
+ylabel('Time Difference (\mus)');
+title('Image Delay');
+print(f1, fullfile(figDir, 'TimeDifferencePlot.png'), '-dpng', ['-r', num2str(res)]);
+
+%% Plot YPR
+yaw = data2.yaw;
+pitch = data2.pitch;
+roll = data2.roll;
+
+f2 = figure;
+subplot(3,1,1); hold on; grid on; box on; axis tight;
+plot(t, yaw, 'r', 'LineWidth', 1);
+ylabel('yaw');
+subplot(3,1,2); hold on; grid on; box on; axis tight;
+plot(t, pitch, 'g', 'LineWidth', 1);
+ylabel('pitch');
+subplot(3,1,3); hold on; grid on; box on; axis tight;
+plot(t, roll, 'b', 'LineWidth', 1);
+ylabel('roll');
+xlabel('Time (sec)');
+sgtitle('YPR');
+
+print(f2, fullfile(figDir, 'ypr.png'), '-dpng', ['-r', num2str(res)]);
+
+%% Plot location
+
+lat = data2.gnss1PosLat;
+lon = data2.gnss1PosLon;
+alt = data2.gnss1PosAlt;
+
+buffer = 0.0001;
+figure; ax = geoaxes; 
+geobasemap(ax, 'satellite'); hold on;
+geolimits([min(lat)-buffer max(lat)+buffer], [min(lon)-buffer max(lon)+buffer]);
+video = VideoWriter(fullfile(figDir, 'gps.mp4'), 'MPEG-4');
+video.FrameRate = 30; 
+open(video);
+h1 = geoplot(NaN, NaN, '-b', 'LineWidth', 1, 'DisplayName', 'Path'); hold on;
+h2 = geoscatter(NaN, NaN, 20, 'r','filled', 'DisplayName', 'VN-200'); 
+legend show;
+for i = 1:length(lat)
+    title(['Frame ', num2str(i)]);
+    % geoscatter(lat(i), lon(i), 10, 'r','filled'); hold on;
+    h1.LatitudeData = lat(1:i);
+    h1.LongitudeData = lon(1:i);
+    h2.LatitudeData = lat(i);
+    h2.LongitudeData = lon(i);
+    % pause(0.00001);
+    frame = getframe(gcf);
+    writeVideo(video, frame);
 end
-
-%% Parse filenames to extract timestamps
-% Initialize arrays to store timestamps in nanoseconds
-tstamps0 = zeros(1, length(selectedFiles0));
-tstamps1 = zeros(1, length(selectedFiles1));
-
-% Parse filenames to extract timestamps in nanoseconds
-for i = 1:length(selectedFiles0)
-    [~, tstamp0, ~] = parse_filename(selectedFiles0(i).name);  % Get timestamp in nanoseconds as a string
-    tstamps0(i) = str2double(tstamp0);  % Convert to numeric nanoseconds
-end
-
-for i = 1:length(selectedFiles1)
-    [~, tstamp1, ~] = parse_filename(selectedFiles1(i).name);  % Get timestamp in nanoseconds as a string
-    tstamps1(i) = str2double(tstamp1);  % Convert to numeric nanoseconds
-end
-
-% Calculate the difference in time between image pairs in nanoseconds
-timeDiffs = zeros(1, length(tstamps0));
-for i = 1:length(tstamps0)
-    t(i) = ((tstamps0(i) + tstamps1(i)) / 2) * 10^-9; % Average tstamp in sec
-    % Calculate the time difference in nanoseconds directly
-    timeDiffNs = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
-    timeDiffs(i) = timeDiffNs * 10^-3;  % Difference in microseconds
-end
-
-t = t - t(1); % make time relative
+close(video);
 
 %% Position
 
 % Convert geodetic to UTM
-[xm, ym, zone] = deg2utm(vn.lat, vn.lon);
+[xm, ym, zone] = deg2utm(data2.lat, data2.lon);
 % Geoid height correction 
-geoidHeight = geoidheight(vn.lat(1), vn.lon(1), 'EGM96'); 
-zm = vn.alt - geoidHeight;
+geoidHeight = geoidheight(data2.lat(1), data2.lon(1), 'EGM96'); 
+zm = data2.alt - geoidHeight;
 
 E = xm - xm(1);
 N = ym - ym(1);
 U = zm - zm(1);
 
 % LL to XY SIO
-[xSIO, ySIO] = lltoxy_siopier(vn.lat, vn.lon);
+[xSIO, ySIO] = lltoxy_siopier(data2.lat, data2.lon);
 
 % % ECEF
-% xm = vn.posEcefX;
-% ym = vn.posEcefY;
-% zm = vn.posEcefZ;
-% xm = vn.posEcefX - vn.posEcefX(1);
-% ym = vn.posEcefY - vn.posEcefY(1);
-% zm = vn.posEcefZ - vn.posEcefZ(1);
+% xm = data2.posEcefX;
+% ym = data2.posEcefY;
+% zm = data2.posEcefZ;
+% xm = data2.posEcefX - data2.posEcefX(1);
+% ym = data2.posEcefY - data2.posEcefY(1);
+% zm = data2.posEcefZ - data2.posEcefZ(1);
 
 
 %% Compute rotation matrix from quaternion
-numFrames = numel(vn.quatX);
+numFrames = numel(data2.quatX);
 rotationMatrices = zeros(3, 3, numFrames);
 for i = 1:numFrames
-    qx = vn.quatX(i);
-    qy = vn.quatY(i);
-    qz = vn.quatZ(i);
-    qw = vn.quatW(i);
+    qx = data2.quatX(i);
+    qy = data2.quatY(i);
+    qz = data2.quatZ(i);
+    qw = data2.quatW(i);
     rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
 end
 

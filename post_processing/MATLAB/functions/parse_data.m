@@ -2,7 +2,7 @@
 % Drew Davey
 % Last updated: 2024-12-16
 
-function [imu, diffs, t] = parse_data(mainDir, waveFolder)
+function data2 = parse_data(mainDir, waveFolder)
 
     % Load IMU/GPS
     vn_tmp = dir(fullfile(mainDir, '*.csv'));
@@ -30,49 +30,41 @@ function [imu, diffs, t] = parse_data(mainDir, waveFolder)
         tstamps1(i) = str2double(tstamp1);  % Convert to numeric nanoseconds
     end
 
-    % Find corresponding IMU times
+    % Calculate query times for IMU time series
     for i = 1:length(tstamps0)
-
         % Calculate the time difference in nanoseconds directly
-        timeDiffNs = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
-        diffs.cam(i) = timeDiffNs * 10^-3;  % Difference in microseconds
+        timeDiffNs(i) = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
 
         % Compute the average timestamp in nanoseconds
         avgTimestampNs = (tstamps0(i) + tstamps1(i)) / 2;
 
-        % Apply offset
-        searchTime = avgTimestampNs; 
-
-        % Find the VN system timestamp nearest neighbor
-        % [~, idx] = min(abs(vn.timeStartup - searchTime));  
-        [~, idx] = min(abs(vn.systemTimeStamp - searchTime));
-
-        closest_idx(i) = idx;  % Store the index
-
-
-        % Store camera - imu timestamp diff
-        diffs.imu(i) = vn.systemTimeStamp(idx) - searchTime;
+        % Interpolate IMU data to these times (apply lag here if necessary)
+        queryTime(i) = avgTimestampNs; 
     end
 
-    % Create new downsampled VN-200 struct
-    imu = vn(closest_idx,:);
+    % Initialize new struct
+    data2 = struct();
 
-    % % Fields to interpolate
-    % fields = vn.Properties.VariableNames;  % Get all column names of the vn table
-    % 
-    % % Loop over each field for interpolation
-    % for j = 1:length(fields)
-    %     field = fields{j};
-    % 
-    %     % Convert table column to array for numeric fields
-    %     fieldData = vn{:, field};  % Extract data as an array
-    % 
-    %     if isnumeric(fieldData)
-    %         % Perform linear interpolation for numeric data
-    %         imu{:, field} = interp1(vn.timeStartup, fieldData, avgTimestampNs, 'linear');
-    %     else
-    %         % Nearest neighbor assignment for non-numeric data
-    %         imu{:, field} = vn{closest_idx, field};
-    %     end
-    % end
+    % Fields to interpolate
+    fields = vn.Properties.VariableNames;  % Get all column names of the vn table
+
+    % Loop over each field for interpolation
+    for i = 2:numel(fields)
+
+        % Linearly interpolate each column to query points
+        interp_values = interp1(vn{:,1}, vn{:,i}, queryTime, 'linear', 'extrap');
+
+        % Store results in struct with same field names
+        data2.(fields{i}) = interp_values;
+    end
+
+    % Store query times as well
+    data2.queryTime = queryTime; % in nanoseconds
+
+    % Create relative time
+    data2.t0 = (queryTime - queryTime(1)) * 1e-9; % relative time in seconds
+
+    % Save cam delays
+    data2.camDiffs = timeDiffNs * 10^-9;  % cam delay in seconds
+
 end

@@ -2,8 +2,8 @@
 % Drew Davey
 % Last updated: 2025-01-08
 
+% Find the file in other set with the nearest timestamp 
 function nearestFile = find_nearest_file(files, targetTimeNs)
-    % Helper function to find the file with the nearest timestamp
     nearestFile = [];
     minTimeDiff = Inf;  % Initialize with a large value
 
