@@ -1,4 +1,4 @@
-# Last updated: 2024-11-26
+# Last updated: 2025-02-04
 ##################################
 # This script allows the user to toggle through camera settings, launch standby mode, and capture images syncronously by holding right button.
 # The user can also calibrate the cameras by holding the left button for more than 5 seconds.
