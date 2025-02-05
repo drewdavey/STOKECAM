@@ -84,7 +84,7 @@ def config_vecnav(portName):
     binaryOutput1Register.imu.temperature = 1
     binaryOutput1Register.imu.pressure = 1
     binaryOutput1Register.imu.accel = 1
-    binaryOutput1Register.imu.mag = 1
+    binaryOutput1Register.imu.mag = 0
     binaryOutput1Register.attitude.ypr = 1
     binaryOutput1Register.attitude.quaternion = 1
     binaryOutput1Register.ins.posLla = 1
@@ -247,7 +247,7 @@ def vecnav_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     imuStatus: Accel: {cd.imu.imuStatus.accelStatus}, Gyro: {cd.imu.imuStatus.gyroStatus}, Mag: {cd.imu.imuStatus.magStatus}, PresTemp: {cd.imu.imuStatus.presTempStatus}\n")
             log.write(f"{tstr}:     temperature: {cd.imu.temperature}\n")
             log.write(f"{tstr}:     pressure: {cd.imu.pressure}\n")
-            log.write(f"{tstr}:     mag: {cd.imu.mag}\n")
+            # log.write(f"{tstr}:     mag: {cd.imu.mag}\n")
             log.write(f"{tstr}:     accel: {cd.imu.accel}\n")
             log.write(f"{tstr}:     ypr: {cd.attitude.ypr}\n")
             log.write(f"{tstr}:     quaternion: Scalar: {cd.attitude.quaternion.scalar}, Vector: {cd.attitude.quaternion.vector}\n")
