@@ -67,7 +67,11 @@ def config_vecnav(portName):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
-    #### CONFIGURE ADOR AND AODF 
+    ### CONFIGURE ADOR AND AODF 
+    asyncDataOutputType = Registers.AsyncOutputType()
+    # asyncDataOutputType.ador = Registers.AsyncOutputType.Ador.GPS
+    asyncDataOutputType.serialPort = Registers.AsyncOutputType.SerialPort.Serial1
+    s.writeRegister(asyncDataOutputType)
     asyncDataOutputFreq= Registers.AsyncOutputFreq()
     asyncDataOutputFreq.adof = Registers.AsyncOutputFreq.Adof.Rate50Hz
     asyncDataOutputFreq.serialPort = Registers.AsyncOutputFreq.SerialPort.Serial1
@@ -80,11 +84,11 @@ def config_vecnav(portName):
     binaryOutput1Register.time.timeUtc = 1
     binaryOutput1Register.time.timeStartup = 1
     binaryOutput1Register.time.timeGps = 1
-    # binaryOutput1Register.imu.imuStatus = 1
-    # binaryOutput1Register.imu.temperature = 1
-    # binaryOutput1Register.imu.pressure = 1
-    # binaryOutput1Register.imu.accel = 1
-    # binaryOutput1Register.imu.mag = 1
+    binaryOutput1Register.imu.imuStatus = 1
+    binaryOutput1Register.imu.temperature = 1
+    binaryOutput1Register.imu.pressure = 1
+    binaryOutput1Register.imu.accel = 1
+    binaryOutput1Register.imu.mag = 1
     binaryOutput1Register.attitude.ypr = 1
     binaryOutput1Register.attitude.quaternion = 1
     binaryOutput1Register.ins.posLla = 1
@@ -244,11 +248,11 @@ def vecnav_status(portName, fname_log, gps_timeout):
             log.write(f"{tstr}:     timeUtc: {tUtc}\n")
             log.write(f"{tstr}:     timeStartup (μs): {cd.time.timeStartup.microseconds()}\n")
             log.write(f"{tstr}:     timeGps (μs): {cd.time.timeGps.microseconds()}\n")
-            # log.write(f"{tstr}:     imuStatus: Accel: {cd.imu.imuStatus.accelStatus}, Gyro: {cd.imu.imuStatus.gyroStatus}, Mag: {cd.imu.imuStatus.magStatus}, PresTemp: {cd.imu.imuStatus.presTempStatus}\n")
-            # log.write(f"{tstr}:     temperature: {cd.imu.temperature}\n")
-            # log.write(f"{tstr}:     pressure: {cd.imu.pressure}\n")
-            # log.write(f"{tstr}:     mag: {cd.imu.mag}\n")
-            # log.write(f"{tstr}:     accel: {cd.imu.accel}\n")
+            log.write(f"{tstr}:     imuStatus: Accel: {cd.imu.imuStatus.accelStatus}, Gyro: {cd.imu.imuStatus.gyroStatus}, Mag: {cd.imu.imuStatus.magStatus}, PresTemp: {cd.imu.imuStatus.presTempStatus}\n")
+            log.write(f"{tstr}:     temperature: {cd.imu.temperature}\n")
+            log.write(f"{tstr}:     pressure: {cd.imu.pressure}\n")
+            log.write(f"{tstr}:     mag: {cd.imu.mag}\n")
+            log.write(f"{tstr}:     accel: {cd.imu.accel}\n")
             log.write(f"{tstr}:     ypr: {cd.attitude.ypr}\n")
             log.write(f"{tstr}:     quaternion: Scalar: {cd.attitude.quaternion.scalar}, Vector: {cd.attitude.quaternion.vector}\n")
             log.write(f"{tstr}:     gnss1Fix: {cd.gnss.gnss1Fix}\n")
