@@ -8,8 +8,8 @@ import time
 import yaml
 from vectornav import *
 from datetime import datetime, timezone, timedelta
-# from vectornav.Registers import *
-# from vectornav.Commands import *
+from vectornav.Registers import *
+from vectornav.Commands import *
 
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
@@ -239,7 +239,7 @@ def vecnav_status(portName, fname_log, gps_timeout):
         log.write(f"{tstr}:     Startup Time Offset (VN200 - RP): {delta_mono_time} seconds\n\n")
     else:
         log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
-        
+
     t0 = time.time()
     while (time.time() - t0 < gps_timeout):
         cd = s.getNextMeasurement()
