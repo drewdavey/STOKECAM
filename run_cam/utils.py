@@ -117,14 +117,15 @@ def sync_clock(portName, gps_timeout):
     else:
         print("Timeout waiting for GNSS fix.")
         s.disconnect()
-        return False    # Sync failed
+        return False    # GPS timed out
     # Sync system time with VN-200
     t0 = time.time()
     while (time.time() - t0 < gps_timeout):
-        rp_time1 = datetime.now(timezone.utc)
-        cd = s.getNextMeasurement()
-        rp_time2 = datetime.now(timezone.utc)
-        rp_time = rp_time1 + (rp_time2 - rp_time1) / 2
+        # rp_time1 = datetime.now(timezone.utc)
+        cd = s.getNextMeasurement(1)
+        rp_time = datetime.now(timezone.utc)
+        # rp_time2 = datetime.now(timezone.utc)
+        # rp_time = rp_time1 + (rp_time2 - rp_time1) / 2
         if tUtc := cd.time.timeUtc:
             # Check time lag between RP and VN-200
             vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
@@ -206,17 +207,20 @@ def vecnav_status(portName, fname_log, gps_timeout):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     if gnssFix in valid_fixes:
         log.write(f"{tstr}:     GNSS Fix:  {gnssFix}, Number of satellites: {num_sats}\n")
+        
         t0 = time.time()
         while (time.time() - t0 < gps_timeout):
-            rp_time1 = datetime.now(timezone.utc)
-            rp_mono_time1 = time.monotonic_ns()
-            cd = s.getNextMeasurement()
-            rp_time2 = datetime.now(timezone.utc)
-            rp_mono_time2 = time.monotonic_ns()
-            if not cd: continue
+            # rp_time1 = datetime.now(timezone.utc)
+            # rp_mono_time1 = time.monotonic_ns()
+            cd = s.getNextMeasurement(1)
+            rp_time = datetime.now(timezone.utc)
+            rp_mono_time = time.monotonic_ns()
+            # rp_time2 = datetime.now(timezone.utc)
+            # rp_mono_time2 = time.monotonic_ns()
+
             # Compute averaged RP timestamps
-            rp_time = rp_time1 + (rp_time2 - rp_time1) / 2
-            rp_mono_time = (rp_mono_time1 + rp_mono_time2) // 2
+            # rp_time = rp_time1 + (rp_time2 - rp_time1) / 2
+            # rp_mono_time = (rp_mono_time1 + rp_mono_time2) // 2
             if tUtc := cd.time.timeUtc:
                 # Format the time as 'HHMMSSfff'
                 vn_time = f"20{tUtc.year:02}{tUtc.month:02}{tUtc.day:02}{tUtc.hour:02}{tUtc.minute:02}{tUtc.second:02}{tUtc.fracSec:03}"
