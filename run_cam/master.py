@@ -170,15 +170,15 @@ right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
 
 try:
-    clock_timeout = yaml.safe_load(open('../inputs.yaml', 'r'))['clock_timeout']
+    gps_timeout = yaml.safe_load(open('../inputs.yaml', 'r'))['gps_timeout']
 except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
-    clock_timeout = 10
+    gps_timeout = 60
 
-portName = '/dev/ttyUSB0'                       # Default port for VN-200
-config_VN200_output(portName)                   # Config VN-200 output           
+portName = '/dev/ttyUSB0'                 # Default port for VN-200
+config_vecnav(portName)                   # Config VN-200 output           
 
 # Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
-while not sync_clock(portName, clock_timeout):  
+while not sync_clock(portName, gps_timeout):  
     [led.on() for led in (red, green, yellow)]  
     while not (right_button.is_held and left_button.is_held):
         time.sleep(0.1)
@@ -189,10 +189,9 @@ inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 dt = inputs['dt']
 calib_dt = inputs['calib_dt']
 calib_frames = inputs['calib_frames']
-gps_timeout = inputs['gps_timeout']
 
 # Get IMU/GPS status. Print initial values to log.
-VN200_status(portName, fname_log, gps_timeout)  
+vecnav_status(portName, fname_log, gps_timeout)  
 
 global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
