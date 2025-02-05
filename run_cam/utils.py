@@ -7,9 +7,9 @@ import os
 import time
 import yaml
 from vectornav import *
-from datetime import datetime, timezone, timedelta
-from vectornav.Registers import *
 from vectornav.Commands import *
+from vectornav.Registers import *
+from datetime import datetime, timezone, timedelta
 
 def setup_logging():
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
