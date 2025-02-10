@@ -10,9 +10,13 @@ addpath('functions/');
 
 viewPtCloud_orig = 0; % display original ptCloud?
 
-depth = [0, 30];
-xbounds = [-10, 10];
-ybounds = [-10, 10];
+% depth = [0, 30];
+% xbounds = [-10, 10];
+% ybounds = [-10, 10];
+
+depth = [0, 10];
+xbounds = [-2, 2];
+ybounds = [-2, 2];
 
 %% Filepath
 
