@@ -89,6 +89,7 @@ def config_vecnav(portName):
     binaryOutput1Register.imu.pressure = 1
     binaryOutput1Register.imu.accel = 1
     binaryOutput1Register.imu.mag = 1
+    binaryOutput1Register.imu.uncompGyro = 1
     binaryOutput1Register.attitude.ypr = 1
     binaryOutput1Register.attitude.quaternion = 1
     binaryOutput1Register.ins.posLla = 1
