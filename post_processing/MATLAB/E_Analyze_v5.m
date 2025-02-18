@@ -131,8 +131,6 @@ end
 
 %% Plot X-Y cross sections
 
-close all;
-
 shapesDir = fullfile(figDir, 'shapes');
 if ~exist(shapesDir, 'dir') && loadMats
     mkdir(shapesDir);  % Create shapes/ directory if it doesn't exist
@@ -148,7 +146,7 @@ for i = 1:length(matFilenames)
         %%%%%%%%%%%%%% Point cloud in camera reference frame %%%%%%%%%%%%%%
         xyz_cam = matData.points3D;
         
-        figure(1); hold on; axis equal; grid on; axis tight;
+        figure(21); hold on; axis equal; grid on; axis tight;
         title('Camera coordinates');
         % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
         scatter(xyz_cam(:,2), -xyz_cam(:,1), 1, xyz_cam(:,3));
@@ -169,7 +167,7 @@ for i = 1:length(matFilenames)
         % This should be right
         xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 1 0]; % XYZ_imu = +Z+X+Y_cam
 
-        figure(2); hold on; axis equal; grid on; axis tight;
+        figure(22); hold on; axis equal; grid on; axis tight;
         title('imu coord.');
         % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
         scatter(xyz_imu(:,1), xyz_imu(:,2), 1, xyz_imu(:,3));
@@ -183,7 +181,7 @@ for i = 1:length(matFilenames)
         % Rotate and transpose
         xyz_NED = (R * xyz_imu')';
 
-        figure(3); hold on; axis equal; grid on; axis tight;
+        figure(23); hold on; axis equal; grid on; axis tight;
         title('rotated into NED');
         xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('D world');
         % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
@@ -199,7 +197,7 @@ for i = 1:length(matFilenames)
         %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
         xyz_world = xyz_NED + cam_origin;
 
-        figure(4); hold on; axis equal; grid on; axis tight;
+        figure(24); hold on; axis equal; grid on; axis tight;
         title('World coordinates');
         
         scatter3(xyz_world(:,2), xyz_world(:,1), xyz_world(:,3),...
