@@ -24,6 +24,9 @@ while clipWaves
     % Save parsed VN-200 data to waveDir
     save(fullfile(waveFolder, [last_folder '.mat']), 'data2');
 
+    %%%%%%%% MAKE L1.MAT HOLD ORIGINAL CROPPED PTCLOUD DATA AND IMU STRUCT
+    %%%%%%%% L2.MAT WILL BE DOWNSIZED / SMOOTHED PTCLOUD AND CROSS SECTIONS
+
     if segment
         cam0Dir = fullfile(waveFolder, 'cam0');
         cam1Dir = fullfile(waveFolder, 'cam1');
