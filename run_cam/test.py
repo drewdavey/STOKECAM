@@ -27,6 +27,7 @@ write_queue = queue.Queue()
 
 def capture_continuous(dt):
     """Capture images continuously into RAM while the button is held."""
+    i = 1
     while right_button.is_pressed:
         timestamp = time.monotonic_ns() 
         img0 = cam0.capture_array("main")  # Capture to NumPy array
@@ -34,6 +35,7 @@ def capture_continuous(dt):
         image_buffer0.append((img0, timestamp))
         image_buffer1.append((img1, timestamp))
         timestamp_buffer.append(timestamp)
+        i = i + 1
         time.sleep(dt)  # Maintain 25Hz capture rate
 
 def write_images_to_sd():
@@ -68,34 +70,6 @@ def configure_cameras(fname_log, mode):
         log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
 
-
-def toggle_modes():
-    global cam0, cam1, config, mode, shooting_modes
-    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
-    time.sleep(3)
-    [led.off() for led in (red, green, yellow)]
-    cam0.close(), cam1.close()                      # Close the cameras
-    idx = shooting_modes.index(mode)                # Get the index of the current mode
-    while not (right_button.is_held and left_button.is_held):
-        if right_button.is_pressed and not left_button.is_pressed:
-            idx = (idx + 1) % len(shooting_modes)
-            mode = shooting_modes[idx]
-        if mode == shooting_modes[0]:
-            green.on(), yellow.off(), red.off()
-        elif mode == shooting_modes[1]:
-            yellow.on(), green.off(), red.off()
-        elif mode == shooting_modes[2]:
-            red.on(), green.off(), yellow.off()
-        time.sleep(0.2)
-    [led.off() for led in (red, green, yellow)]
-    config = get_config(mode)                       # Get the configuration for the cameras
-    cam0 = Picamera2(0)                             # Initialize cam0       
-    cam1 = Picamera2(1)                             # Initialize cam1
-    configure_cameras(fname_log, mode)              # Configure the cameras
-    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
-    time.sleep(3)
-    [led.off() for led in (red, green, yellow)]
-
 # def cap0(fdir_cam0, tnext, i):
 #     while time.monotonic_ns() < tnext:
 #         pass
@@ -115,7 +89,7 @@ def exit_standby(fname_log):
     time.sleep(1)
     standby = False
 
-def enter_standby(fdir, fname_log, dt, mode, portName):
+def enter_standby(fdir, fname_log, dt, mode):
     yellow.on()
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
@@ -124,14 +98,8 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
     time.sleep(1)
     while not (right_button.is_held and left_button.is_held): # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
-            i = 0
             red.on()
-            while right_button.is_pressed:
-                tnow = time.monotonic_ns()
-                tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
-                capture_continuous(dt)
-
-                i += 1
+            capture_continuous(dt)
             process_and_store()
             red.off()
         time.sleep(0.2)
@@ -177,14 +145,6 @@ try:
         if right_button.is_held and not standby and not left_button.is_pressed:
             standby = True
             enter_standby(fdir, fname_log, dt, mode)    
-        if (right_button.is_held and left_button.is_held) and not standby:
-            [led.on() for led in (red, green, yellow)]
-            left_button.wait_for_release()
-            time.sleep(1)
-            if right_button.is_held:
-                break
-            else:
-                toggle_modes()
         time.sleep(0.2)
 except Exception as e:
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
