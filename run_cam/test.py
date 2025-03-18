@@ -35,7 +35,7 @@ def capture_continuous(dt):
         image_buffer1.append((img1, filename))
         timestamp_buffer.append(timestamp)
         i = i + 1
-        time.sleep(dt)  # Maintain 25Hz capture rate
+        # time.sleep(dt)  # Maintain 25Hz capture rate
 
 def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
