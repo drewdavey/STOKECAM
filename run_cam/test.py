@@ -59,12 +59,12 @@ def toggle_modes():
 def cap0(fdir_cam0, tnext, i):
     while time.monotonic_ns() < tnext:
         pass
-    cam0.capture_file(f"{fdir_cam0}0_{str(time.monotonic_ns())}_{i+1:05}.jpg")
+    cam0.capture_array(f"{fdir_cam0}0_{str(time.monotonic_ns())}_{i+1:05}.jpg")
 
 def cap1(fdir_cam1, tnext, i):
     while time.monotonic_ns() < tnext:
         pass
-    cam1.capture_file(f"{fdir_cam1}1_{str(time.monotonic_ns())}_{i+1:05}.jpg")
+    cam1.capture_array(f"{fdir_cam1}1_{str(time.monotonic_ns())}_{i+1:05}.jpg")
 
 def exit_standby(fname_log):
     global standby
@@ -109,7 +109,7 @@ portName = '/dev/ttyUSB0'                 # Default port for VN-200
 config_vecnav(portName)                   # Config VN-200 output           
 
 fdir = '/home/drew/testing_drew/'
-fname_log = 'log.txt'
+fname_log = '/home/drew/testing_drew/log.txt'
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
 dt = inputs['dt']
 calib_dt = inputs['calib_dt']
