@@ -173,11 +173,10 @@ try:
     #                         - release left ONLY to exit script                   
     while True: 
         if (time.time() - tlast > 10) and not standby:
-            monitor_gps(portName)
             tlast = time.time()
         if right_button.is_held and not standby and not left_button.is_pressed:
             standby = True
-            enter_standby(fdir, fname_log, dt, mode, portName)    
+            enter_standby(fdir, fname_log, dt, mode)    
         if (right_button.is_held and left_button.is_held) and not standby:
             [led.on() for led in (red, green, yellow)]
             left_button.wait_for_release()
