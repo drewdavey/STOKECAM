@@ -63,7 +63,6 @@ def process_and_store():
 while True:
     if right_button.is_pressed:
         capture_continuous()
-    if right_button.is_released:
         process_and_store()
 
 
