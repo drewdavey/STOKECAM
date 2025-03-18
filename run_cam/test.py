@@ -96,10 +96,7 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
                 i += 1
             red.off()
         time.sleep(0.2)
-    csvExporter.stop()
-    s.disconnect()
     exit_standby(fname_log)
-    # monitor_gps(portName)
 
 ############################ Initialization ############################
 green = LED(12)                         # Green LED
@@ -128,7 +125,6 @@ configure_cameras(fname_log, mode)              # Configure the cameras
 
 standby = False
 tnow = time.time()
-monitor_gps(portName)
 tlast = time.time()
 #######################################################################
 
