@@ -28,8 +28,8 @@ def capture_continuous(dt):
     i = 1
     while right_button.is_pressed:
         timestamp = time.monotonic_ns() 
-        img0 = cam0.capture_array()  # Capture to NumPy array
-        img1 = cam1.capture_array()
+        img0 = cam0.capture_array('main')  # Capture to NumPy array
+        img1 = cam1.capture_array('main')
         filename = f"{timestamp}_{i+1:05}"
         image_buffer0.append((img0, filename))
         image_buffer1.append((img1, filename))
