@@ -28,13 +28,15 @@ def capture_continuous(dt):
     i = 1
     while right_button.is_pressed:
         timestamp = time.monotonic_ns() 
+        filename0 = f"{timestamp}_{i:05}"
         img0 = cam0.capture_array('main')  # Capture to NumPy array
+        timestamp = time.monotonic_ns() 
+        filename1 = f"{timestamp}_{i:05}"
         img1 = cam1.capture_array('main')
-        filename = f"{timestamp}_{i+1:05}"
-        image_buffer0.append((img0, filename))
-        image_buffer1.append((img1, filename))
+        image_buffer0.append((img0, filename0))
+        image_buffer1.append((img1, filename1))
         timestamp_buffer.append(timestamp)
-        i = i + 1
+        i += 1
         # time.sleep(dt)  # Maintain 25Hz capture rate
 
 def write_images_to_sd(fdir_cam0, fdir_cam1):
