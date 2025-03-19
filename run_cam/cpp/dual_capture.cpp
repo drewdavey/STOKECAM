@@ -117,8 +117,8 @@ bool configureCamera(MyCamera &mycam, int width, int height)
         return false;
     }
 
-    libcamera::StreamRoles streamRoles{ libcamera::StreamRole::StillCapture };
-    auto config = mycam.camera->generateConfiguration(streamRoles);
+    libcamera::StreamRole streamRole{ libcamera::StreamRole::StillCapture };
+    auto config = mycam.camera->generateConfiguration(streamRole);
     if (!config || config->size() == 0) {
         std::cerr << "Failed to generate configuration.\n";
         mycam.camera->release();
