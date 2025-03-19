@@ -10,7 +10,8 @@ from picamera2.encoders import MJPEGEncoder
 from gpiozero import Button, LED
 from datetime import datetime, timezone
 from collections import deque
-from utils import create_dirs, read_inputs_yaml, get_config
+from utils import *
+from settings import *
 
 # Base directory setup
 BASE_DIR = "/home/drew/testing_drew/"
