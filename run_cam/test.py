@@ -144,6 +144,7 @@ def capture_continuous(dt):
         filename1 = f"{timestamp1}_{i:05}"
         image_buffer0.append((img0, filename0))
         image_buffer1.append((img1, filename1))
+        time.sleeo(dt)
         i += 1
 
 def write_images_to_sd(fdir_cam0, fdir_cam1):
