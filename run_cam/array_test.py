@@ -10,7 +10,7 @@ from settings import *
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone, timedelta
-from picamera2.helpers import save
+from PIL import Image
 
 # Circular buffer and queue setup
 buffer_size = 1000  # Store last 100 images in memory
@@ -42,8 +42,12 @@ def write_images_to_sd(fdir_cam0, fdir_cam1):
             filename1 = f"{fdir_cam1}1_{filename1}.jpg"
             # cv2.imwrite(filename0, img0)  # Save images
             # cv2.imwrite(filename1, img1)
-            save(filename0, img0, format="jpeg")
-            save(filename1, img1, format="jpeg")
+            # Convert buffer to image using PIL and save
+            image0 = Image.open(io.BytesIO(img0.getvalue()))
+            image0.save(filename0, format="JPEG")
+
+            image1 = Image.open(io.BytesIO(img1.getvalue()))
+            image1.save(filename1, format="JPEG")
             print(f"Saved {filename0} and {filename1}")
         except queue.Empty:
             break
