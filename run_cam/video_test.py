@@ -1,119 +1,111 @@
 #!/usr/bin/python3
-#!/usr/bin/python3
 import sys
 import time
 import os
 import cv2
 import threading
 from picamera2 import Picamera2
-from picamera2.encoders import MJPEGEncoder
+from picamera2.encoders import H264Encoder
+from picamera2 import MappedArray, Picamera2
 from gpiozero import Button, LED
-from datetime import datetime, timezone
-from collections import deque
-from utils import *
-from settings import *
+from datetime import datetime
 
-# Base directory setup
+# Directories
 BASE_DIR = "/home/drew/testing_drew/"
-LOG_FILE = os.path.join(BASE_DIR, "log.txt")
+VIDEO_DIR = os.path.join(BASE_DIR, "videos/")
+CAM0_DIR = os.path.join(BASE_DIR, "cam0/")
+CAM1_DIR = os.path.join(BASE_DIR, "cam1/")
+
+# Ensure directories exist
+os.makedirs(VIDEO_DIR, exist_ok=True)
+os.makedirs(CAM0_DIR, exist_ok=True)
+os.makedirs(CAM1_DIR, exist_ok=True)
 
 # Setup GPIO buttons and LED
 right_button = Button(18)  # Hold to record
-left_button = Button(17)  # Other button for standby exit
 red_led = LED(24)
-
-# Load config from YAML
-inputs = read_inputs_yaml(LOG_FILE)
-dt = inputs["dt"]
-shooting_modes = [inputs["shooting_mode0"], inputs["shooting_mode1"], inputs["shooting_mode2"]]
-mode = shooting_modes[0]
 
 # Initialize cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
-config = get_config(mode)
 
+# Create video configuration
+config = cam0.create_video_configuration()
 cam0.configure(config)
 cam1.configure(config)
 
-# Use MJPEGEncoder for RAM buffering (no file saving)
-encoder0 = MJPEGEncoder()
-encoder1 = MJPEGEncoder()
+# Encoder settings
+encoder0 = H264Encoder(10000000)
+encoder1 = H264Encoder(10000000)
 
-# Circular buffer to store recent frames
-buffer_size = 1000  # Store up to 1000 frames
-image_buffer0 = deque(maxlen=buffer_size)
-image_buffer1 = deque(maxlen=buffer_size)
+colour = (0, 255, 0)
+origin = (0, 30)
+font = cv2.FONT_HERSHEY_SIMPLEX
+scale = 1
+thickness = 2
 
-def apply_timestamp(image):
-    """Overlay a timestamp on the image."""
-    timestamp = str(time.monotonic_ns())
-    cv2.putText(image, timestamp, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    return image
 
-def record_and_process(fdir_cam0, fdir_cam1):
-    """Capture video frames in RAM and save extracted frames to directories."""
+def apply_timestamp(request):
+    timestamp = time.strftime("%Y-%m-%d %X")
+    with MappedArray(request, "main") as m:
+        cv2.putText(m.array, timestamp, origin, font, scale, colour, thickness)
+
+cam0.pre_callback = apply_timestamp
+cam1.pre_callback = apply_timestamp
+
+def record_video():
+    """Starts recording video on both cameras while the button is held."""
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    video_path0 = os.path.join(VIDEO_DIR, f"cam0_{timestamp}.h264")
+    video_path1 = os.path.join(VIDEO_DIR, f"cam1_{timestamp}.h264")
+
     red_led.on()
     cam0.start()
     cam1.start()
 
+    cam0.start_recording(encoder0, video_path0)
+    cam1.start_recording(encoder1, video_path1)
+    
+    print(f"Recording started: {video_path0} and {video_path1}")
+
     try:
         while right_button.is_pressed:
-            timestamp0 = time.monotonic_ns()
-            img0 = cam0.capture_array("main")
-
-            timestamp1 = time.monotonic_ns()
-            img1 = cam1.capture_array("main")
-
-            img0 = apply_timestamp(img0)
-            img1 = apply_timestamp(img1)
-
-            image_buffer0.append((img0, timestamp0))
-            image_buffer1.append((img1, timestamp1))
-
-            time.sleep(0.03)  # ~30 FPS
-
+            time.sleep(0.1)
     finally:
+        cam0.stop_recording()
+        cam1.stop_recording()
         cam0.stop()
         cam1.stop()
         red_led.off()
-        save_frames(fdir_cam0, fdir_cam1)
 
-def save_frames(fdir_cam0, fdir_cam1):
-    """Save buffered frames as JPEGs."""
-    while image_buffer0:
-        img0, timestamp0 = image_buffer0.popleft()
-        img1, timestamp1 = image_buffer1.popleft()
+        print(f"Recording stopped. Extracting frames...")
+        extract_frames(video_path0, CAM0_DIR)
+        extract_frames(video_path1, CAM1_DIR)
 
-        filename0 = os.path.join(fdir_cam0, f"{timestamp0}.jpg")
-        filename1 = os.path.join(fdir_cam1, f"{timestamp1}.jpg")
+def extract_frames(video_path, output_dir):
+    """Extracts frames from a video file and saves them as JPEGs."""
+    cap = cv2.VideoCapture(video_path)
+    frame_count = 0
 
-        # Convert RGB to BGR for OpenCV
-        img0 = cv2.cvtColor(img0, cv2.COLOR_RGB2BGR)
-        img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2BGR)
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break  # Stop when video ends
 
-        cv2.imwrite(filename0, img0)
-        cv2.imwrite(filename1, img1)
-        print(f"Saved: {filename0} and {filename1}")
+        timestamp = time.monotonic_ns()
+        frame_filename = os.path.join(output_dir, f"{timestamp}_{frame_count:05}.jpg")
 
-def enter_standby():
-    """Handles session directory creation and standby logic."""
-    global mode
-    tstr = datetime.now(timezone.utc).strftime("%H%M%S%f")
-    
-    # Create session directories
-    fdir_out, fdir_cam0, fdir_cam1, _ = create_dirs(BASE_DIR, f"session_{mode}")
+        cv2.imwrite(frame_filename, frame)
+        frame_count += 1
 
-    while not (right_button.is_held and left_button.is_held):
-        if right_button.is_pressed and not left_button.is_pressed:
-            record_and_process(fdir_cam0, fdir_cam1)
-        time.sleep(0.2)
+    cap.release()
+    print(f"Frames saved in {output_dir}")
 
 # Main loop
 try:
     while True:
-        if right_button.is_held:
-            enter_standby()
+        if right_button.is_pressed:
+            record_video()
         time.sleep(0.2)
 except KeyboardInterrupt:
     print("Exiting.")
