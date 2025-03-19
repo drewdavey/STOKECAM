@@ -24,14 +24,11 @@ def capture_continuous(dt):
         timestamp0 = time.monotonic_ns()  # Timestamp before cam0 capture
         img0 = cam0.capture_array('main')  # Capture cam0
         filename0 = f"{timestamp0}_{i:05}"
-
         timestamp1 = time.monotonic_ns()  # Timestamp before cam1 capture
         img1 = cam1.capture_array('main')  # Capture cam1
         filename1 = f"{timestamp1}_{i:05}"
-
         image_buffer0.append((img0, filename0))
         image_buffer1.append((img1, filename1))
-        
         i += 1
 
 def write_images_to_sd(fdir_cam0, fdir_cam1):
@@ -40,13 +37,10 @@ def write_images_to_sd(fdir_cam0, fdir_cam1):
         try:
             img0, filename0 = write_queue.get(timeout=2)
             img1, filename1 = write_queue.get(timeout=2)
-
             filename0 = f"{fdir_cam0}0_{filename0}.jpg"
             filename1 = f"{fdir_cam1}1_{filename1}.jpg"
-
             cv2.imwrite(filename0, img0)  # Save images
             cv2.imwrite(filename1, img1)
-
             print(f"Saved {filename0} and {filename1}")
         except queue.Empty:
             break
@@ -56,7 +50,6 @@ def process_and_store(fdir_cam0, fdir_cam1):
     for i in range(len(image_buffer0)):
         write_queue.put(image_buffer0[i])
         write_queue.put(image_buffer1[i])
-    
     thread = threading.Thread(target=write_images_to_sd, args=[fdir_cam0, fdir_cam1])
     thread.start()
 

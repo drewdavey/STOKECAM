@@ -1,68 +1,154 @@
+import sys
 import time
-import threading
+import io
 import queue
 from collections import deque
-from datetime import datetime, timezone
+import threading
+import traceback
+from utils import *
+from settings import *
 from picamera2 import Picamera2
-from gpiozero import Button
-import numpy as np
-import cv2
-
-# Initialize Picamera2 for both cameras
-cam0 = Picamera2(0)
-cam1 = Picamera2(1)
-config0 = cam0.create_still_configuration(buffer_count=8)
-config1 = cam1.create_still_configuration(buffer_count=8)
-cam0.configure(config0)
-cam1.configure(config1)
-cam0.start()
-cam1.start()
+from gpiozero import Button, LED
+from datetime import datetime, timezone, timedelta
 
 # Circular buffer and queue setup
-buffer_size = 50  # Store last 50 images in memory
+buffer_size = 1000  # Store last 100 images in memory
 image_buffer0 = deque(maxlen=buffer_size)
 image_buffer1 = deque(maxlen=buffer_size)
-timestamp_buffer = deque(maxlen=buffer_size)
 write_queue = queue.Queue()
 
-dt = 1 / 25  # Capture at 25Hz (40ms interval)
-right_button = Button(18, hold_time=3)  # Right button
-
-def capture_continuous():
-    """Capture images continuously into RAM while the button is held."""
+def capture_continuous(dt):
+    """Capture images continuously into RAM buffer while the button is held."""
+    i = 1
     while right_button.is_pressed:
-        timestamp = time.monotonic_ns() 
-        img0 = cam0.capture_array("main")  # Capture to NumPy array
-        img1 = cam1.capture_array("main")
-        image_buffer0.append((img0, timestamp))
-        image_buffer1.append((img1, timestamp))
-        timestamp_buffer.append(timestamp)
-        time.sleep(dt)  # Maintain 25Hz capture rate
+        timestamp0 = time.monotonic_ns()
+        buffer0 = io.BytesIO()
+        cam0.capture_file(buffer0, format='jpeg')
+        filename0 = f"{timestamp0}_{i:05}"
 
-def write_images_to_sd():
-    """Background process to write images to SD card."""
-    while True:
+        timestamp1 = time.monotonic_ns()
+        buffer1 = io.BytesIO()
+        cam1.capture_file(buffer1, format='jpeg')
+        filename1 = f"{timestamp1}_{i:05}"
+
+        image_buffer0.append((buffer0, filename0))
+        image_buffer1.append((buffer1, filename1))
+        
+        i += 1
+
+def write_images_to_sd(fdir_cam0, fdir_cam1):
+    """Background process to write images from buffer to SD card."""
+    while not write_queue.empty():
         try:
-            img0, img1, timestamp = write_queue.get(timeout=2)
-            filename0 = f"/home/pi/cam0_{timestamp}.jpg"
-            filename1 = f"/home/pi/cam1_{timestamp}.jpg"
-            cv2.imwrite(filename0, img0)  # Save as full-resolution images
-            cv2.imwrite(filename1, img1)
+            buffer0, filename0 = write_queue.get(timeout=2)
+            buffer1, filename1 = write_queue.get(timeout=2)
+
+            filename0 = f"{fdir_cam0}0_{filename0}.jpg"
+            filename1 = f"{fdir_cam1}1_{filename1}.jpg"
+
+            with open(filename0, "wb") as f:
+                f.write(buffer0.getvalue())
+            with open(filename1, "wb") as f:
+                f.write(buffer1.getvalue())
+
             print(f"Saved {filename0} and {filename1}")
         except queue.Empty:
             break
 
-def process_and_store():
+def process_and_store(fdir_cam0, fdir_cam1):
     """Queue images for writing after button release."""
     for i in range(len(image_buffer0)):
-        write_queue.put((image_buffer0[i][0], image_buffer1[i][0], image_buffer0[i][1]))
-    thread = threading.Thread(target=write_images_to_sd)
+        write_queue.put(image_buffer0[i])
+        write_queue.put(image_buffer1[i])
+    
+    thread = threading.Thread(target=write_images_to_sd, args=[fdir_cam0, fdir_cam1])
     thread.start()
 
-# Main loop
-while True:
-    if right_button.is_pressed:
-        capture_continuous()
-        process_and_store()
+def configure_cameras(fname_log, mode):
+    global cam0, cam1, config 
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    log = open(fname_log, 'a')
+    log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
+    for idx, cam in enumerate([cam0, cam1]):
+        cam.configure(config)
+        cam.start()
+        log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
+        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+    log.write('\n'), log.close()
+
+def exit_standby(fname_log):
+    global standby
+    yellow.off(), red.off()
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    log = open(fname_log, 'a')
+    log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
+    time.sleep(1)
+    standby = False
+
+def enter_standby(fdir, fname_log, dt, mode):
+    yellow.on()
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    log = open(fname_log, 'a')
+    log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
+    time.sleep(1)
+    while not (right_button.is_held and left_button.is_held):
+        if right_button.is_pressed and not left_button.is_pressed:  
+            red.on()
+            capture_continuous(dt)
+            process_and_store(fdir_cam0, fdir_cam1)
+            red.off()
+        time.sleep(0.2)
+    exit_standby(fname_log)
+
+############################ Initialization ############################
+green = LED(12)
+yellow = LED(16)
+red = LED(24)
+right_button = Button(18, hold_time=3)
+left_button = Button(17, hold_time=3)
+
+fdir = '/home/drew/testing_drew/'
+fname_log = '/home/drew/testing_drew/log.txt'
+inputs = read_inputs_yaml(fname_log)
+dt = inputs['dt']
+
+global cam0, cam1, config, mode, standby, shooting_modes
+shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
+mode = shooting_modes[0]
+config = get_config(mode)
+
+cam0 = Picamera2(0)
+cam1 = Picamera2(1)
+configure_cameras(fname_log, mode)
+
+standby = False
+tlast = time.time()
+
+try:
+    while True:
+        if (time.time() - tlast > 10) and not standby:
+            tlast = time.time()
+        if right_button.is_held and not standby and not left_button.is_pressed:
+            standby = True
+            enter_standby(fdir, fname_log, dt, mode)    
+        time.sleep(0.2)
+except Exception as e:
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    with open(fname_log, 'a') as log:
+        log.write(f"{tstr}: ERROR: {str(e)}\n")
+        log.write("Traceback:\n")
+        log.write(traceback.format_exc() + "\n")
+finally:
+    cam0.stop()
+    cam1.stop()
+    cam0.close()
+    cam1.close()
+    green.close()
+    yellow.close()
+    red.close()
+    right_button.close()
+    left_button.close()
+    sys.exit(0)
 
 
