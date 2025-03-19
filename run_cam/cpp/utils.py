@@ -40,7 +40,7 @@ def setup_logging():
     return fdir, fname_log
 
 def read_inputs_yaml(fname_log):
-    inputs_path = '../inputs.yaml'
+    inputs_path = 'inputs.yaml'
     with open(fname_log, 'a') as log:
         try:
             with open(inputs_path, 'r') as file:

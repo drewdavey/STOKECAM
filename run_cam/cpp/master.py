@@ -6,28 +6,14 @@
 import sys
 import time
 import vectornav
-import threading
 import subprocess
 import traceback
 from utils import *
-from settings import *
 from vectornav import *
 from picamera2 import Picamera2
 from gpiozero import Button, LED
 from vectornav.Plugins import ExporterCsv
 from datetime import datetime, timezone, timedelta
-
-def configure_cameras(fname_log, mode):
-    global cam0, cam1, config 
-    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-    log = open(fname_log, 'a')
-    log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
-    for idx, cam in enumerate([cam0, cam1]):
-        cam.configure(config)
-        cam.start()
-        log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
-        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
-    log.write('\n'), log.close()
 
 def monitor_gps(portName):
     s = Sensor() # Create sensor object and connect to the VN-200 
@@ -53,33 +39,6 @@ def monitor_gps(portName):
         green.blink(1, 10) 
     s.disconnect()
 
-def toggle_modes():
-    global cam0, cam1, config, mode, shooting_modes
-    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
-    time.sleep(3)
-    [led.off() for led in (red, green, yellow)]
-    cam0.close(), cam1.close()                      # Close the cameras
-    idx = shooting_modes.index(mode)                # Get the index of the current mode
-    while not (right_button.is_held and left_button.is_held):
-        if right_button.is_pressed and not left_button.is_pressed:
-            idx = (idx + 1) % len(shooting_modes)
-            mode = shooting_modes[idx]
-        if mode == shooting_modes[0]:
-            green.on(), yellow.off(), red.off()
-        elif mode == shooting_modes[1]:
-            yellow.on(), green.off(), red.off()
-        elif mode == shooting_modes[2]:
-            red.on(), green.off(), yellow.off()
-        time.sleep(0.2)
-    [led.off() for led in (red, green, yellow)]
-    config = get_config(mode)                       # Get the configuration for the cameras
-    cam0 = Picamera2(0)                             # Initialize cam0       
-    cam1 = Picamera2(1)                             # Initialize cam1
-    configure_cameras(fname_log, mode)              # Configure the cameras
-    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
-    time.sleep(3)
-    [led.off() for led in (red, green, yellow)]
-
 def capture_in_parallel(num_frames, fdir_cam0, fdir_cam1):
     subprocess.run([
         "./dual_capture",
@@ -97,12 +56,12 @@ def exit_standby(fname_log):
     time.sleep(1)
     standby = False
 
-def enter_standby(fdir, fname_log, dt, mode, portName):
+def enter_standby(fdir, fname_log, dt, portName):
     yellow.on()
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
-    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_C_sub")
     s = Sensor() # Create sensor object and connect to the VN-200
     csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)
@@ -148,14 +107,6 @@ dt = inputs['dt']
 # Get IMU/GPS status. Print initial values to log.
 vecnav_status(portName, fname_log, gps_timeout)  
 
-global cam0, cam1, config, mode, standby, shooting_modes
-shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
-mode = shooting_modes[0]                        # Default to 'auto'
-config = get_config(mode)                       # Get the configuration for the cameras
-cam0 = Picamera2(0)                             # Initialize cam0       
-cam1 = Picamera2(1)                             # Initialize cam1
-configure_cameras(fname_log, mode)              # Configure the cameras
-
 standby = False
 tnow = time.time()
 monitor_gps(portName)
@@ -175,16 +126,7 @@ try:
             tlast = time.time()
         if right_button.is_held and not standby and not left_button.is_pressed:
             standby = True
-            enter_standby(fdir, fname_log, dt, mode, portName)    
-        if (right_button.is_held and left_button.is_held) and not standby:
-            [led.on() for led in (red, green, yellow)]
-            left_button.wait_for_release()
-            time.sleep(1)
-            if right_button.is_held:
-                break
-            else:
-                toggle_modes()
-                monitor_gps(portName)
+            enter_standby(fdir, fname_log, dt, portName)    
         time.sleep(0.2)
 except Exception as e:
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
