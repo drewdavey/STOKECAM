@@ -4,9 +4,8 @@ import time
 import os
 import cv2
 import threading
-from picamera2 import Picamera2
+from picamera2 import Picamera2, MappedArray
 from picamera2.encoders import H264Encoder
-from picamera2 import MappedArray, Picamera2
 from gpiozero import Button, LED
 from datetime import datetime
 
@@ -46,16 +45,14 @@ thickness = 2
 
 
 def apply_timestamp(request):
-    timestamp = time.strftime("%Y-%m-%d %X")
+    timestamp = str(time.monotonic_ns())
     with MappedArray(request, "main") as m:
         cv2.putText(m.array, timestamp, origin, font, scale, colour, thickness)
 
-cam0.pre_callback = apply_timestamp
-cam1.pre_callback = apply_timestamp
 
 def record_video():
     """Starts recording video on both cameras while the button is held."""
-    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    timestamp = str(time.monotonic_ns())
     video_path0 = os.path.join(VIDEO_DIR, f"cam0_{timestamp}.h264")
     video_path1 = os.path.join(VIDEO_DIR, f"cam1_{timestamp}.h264")
 
@@ -63,6 +60,8 @@ def record_video():
     cam0.start()
     cam1.start()
 
+    cam0.pre_callback = apply_timestamp
+    cam1.pre_callback = apply_timestamp
     cam0.start_recording(encoder0, video_path0)
     cam1.start_recording(encoder1, video_path1)
     
