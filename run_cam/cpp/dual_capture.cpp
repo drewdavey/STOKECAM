@@ -11,7 +11,7 @@
 // libcamera headers
 #include <libcamera/camera_manager.h>
 #include <libcamera/camera.h>
-#include <libcamera/camera_configuration.h>
+// #include <libcamera/camera_configuration.h>
 #include <libcamera/stream.h>
 #include <libcamera/framebuffer.h>
 #include <libcamera/framebuffer_allocator.h>
