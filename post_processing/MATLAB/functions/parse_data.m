@@ -21,7 +21,7 @@ function data2 = parse_data(mainDir, waveFolder)
     selectedFiles1 = struct('name', {cam1Images.name});
     
     % Get camera timestamps
-    for i = 1:length(selectedFiles0) 
+    for i = 1:length(selectedFiles0)
         [cameraID0, tstamp0, imageNum0] = parse_filename(selectedFiles0(i).name);
         tstamps0(i) = str2double(tstamp0);  % Convert to numeric nanoseconds
     end
@@ -31,7 +31,7 @@ function data2 = parse_data(mainDir, waveFolder)
     end
 
     % Calculate query times for IMU time series
-    for i = 1:length(tstamps0)
+    for i = 1:length(tstamps0)-3
         % Calculate the time difference in nanoseconds directly
         timeDiffNs(i) = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
 
