@@ -1,139 +1,297 @@
-#!/usr/bin/python3
+# Last updated: 2025-02-04
+##################################
+# This script allows the user to toggle through camera settings, launch standby mode, 
+# and capture images synchronously by holding right button.
+# The user can also calibrate the cameras by holding the left button for more than 5 seconds.
+##################################
 import sys
 import time
-import threading
-import queue
+import cv2
+import vectornav
 import traceback
-from collections import deque
-from datetime import datetime, timezone
+import threading
 from utils import *
 from settings import *
+from vectornav import *
+import queue
+import multiprocessing
+from collections import deque
 from picamera2 import Picamera2
 from gpiozero import Button, LED
+from vectornav.Plugins import ExporterCsv
+from datetime import datetime, timezone, timedelta
 
-# Circular buffer and queue setup (store in memory first)
-buffer_size = 1000  # Store last 1000 images in RAM before writing
-image_buffer0 = deque(maxlen=buffer_size)
-image_buffer1 = deque(maxlen=buffer_size)
-write_queue = queue.Queue()
+def configure_cameras(fname_log, mode):
+    global cam0, cam1, config 
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    log = open(fname_log, 'a')
+    log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
+    for idx, cam in enumerate([cam0, cam1]):
+        cam.configure(config)
+        cam.start()
+        log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
+        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+    log.write('\n'), log.close()
 
-# Setup GPIO buttons and LED
-right_button = Button(18, hold_time=3)  # Right button to capture
-left_button = Button(17, hold_time=3)   # Left button for standby exit
-green = LED(12)
-yellow = LED(16)
-red = LED(24)
+def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName):
+    [led.on() for led in (red, green, yellow)]
+    time.sleep(5)
+    [led.off() for led in (red, green, yellow)]
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"calib_{mode}")
+    log = open(fname_log, 'a')
+    tnow = datetime.now(timezone.utc)
+    tstr = tnow.strftime('%H%M%S%f')
+    log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n"), log.close()
 
-# Load config
-BASE_DIR = "/home/drew/testing_drew/"
-LOG_FILE = os.path.join(BASE_DIR, "log.txt")
-inputs = read_inputs_yaml(LOG_FILE)
-dt = inputs["dt"]
-shooting_modes = [inputs["shooting_mode0"], inputs["shooting_mode1"], inputs["shooting_mode2"]]
-mode = shooting_modes[0]
-config = get_config(mode)
-# Initialize cameras
-cam0 = Picamera2(0)
-cam1 = Picamera2(1)
+    s = Sensor()  # Create sensor object and connect to the VN-200 
+    csvExporter = ExporterCsv(fdir_out, True)
+    s.autoConnect(portName)
+    s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
+    csvExporter.start()
 
-cam0.configure(config)
-cam1.configure(config)
-
-def capture_image(cam, buffer, tnext):
-    """Capture an image from a camera and store it in RAM."""
-    while time.monotonic_ns() < tnext:
-        pass  # Wait until exact time for sync
-    timestamp = time.monotonic_ns()
-    img = cam.capture_array("main")  # Capture image into RAM
-    buffer.append((img, timestamp))  # Store image and timestamp
-
-def capture_thread(fdir_cam0, fdir_cam1):
-    """Threaded capture loop with watchdog-style timing."""
-    i = 0
-    red.on()
-    
-    while right_button.is_pressed:
+    for i in range(int(calib_frames)):
+        green.on(), time.sleep(0.5)
+        yellow.on(), time.sleep(0.5)
+        red.on(), time.sleep(0.5)
+        [led.on() for led in (red, green, yellow)]
         tnow = time.monotonic_ns()
-        tnext = tnow + int(dt * 1e9)  # Next capture time (nanoseconds)
+        tnext = tnow + int(calib_dt * 1e9)  # Convert seconds to nanoseconds
+        # Replaced threading.Thread with multiprocessing.Process
+        p0 = multiprocessing.Process(target=cap0, args=(tnext, i))
+        p1 = multiprocessing.Process(target=cap1, args=(tnext, i))
+        p0.start(), p1.start()
+        p0.join(), p1.join()
 
-        p0 = threading.Thread(target=capture_image, args=(cam0, image_buffer0, tnext))
-        p1 = threading.Thread(target=capture_image, args=(cam1, image_buffer1, tnext))
-
-        p0.start()
-        p1.start()
-        p0.join()
-        p1.join()
-
-        i += 1
-
-    red.off()
+        [led.off() for led in (red, green, yellow)]
+        time.sleep(calib_dt)
     process_and_store(fdir_cam0, fdir_cam1)
+    csvExporter.stop()
+    s.disconnect()
+
+def monitor_gps(portName):
+    s = Sensor()  # Create sensor object and connect to the VN-200 
+    s.autoConnect(portName)  
+    gnss = Registers.GnssSolLla()
+    s.readRegister(gnss)
+    gnssFix = gnss.gnss1Fix.name
+    if gnssFix == 'NoFix':                              
+        green.blink(0.25, 0.25)
+    elif gnssFix == 'TimeFix':
+        green.blink(1, 1)
+    elif gnssFix == 'Fix2D':
+        green.blink(2, 1)
+    elif gnssFix == 'Fix3D':
+        green.blink(3, 1)
+    elif gnssFix == 'SBAS':
+        green.on()
+    elif gnssFix == 'RtkFloat':
+        green.on()
+    elif gnssFix == 'RtkFix':
+        green.on()
+    else:
+        green.blink(1, 10) 
+    s.disconnect()
+
+def toggle_modes():
+    global cam0, cam1, config, mode, shooting_modes
+    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
+    time.sleep(3)
+    [led.off() for led in (red, green, yellow)]
+    cam0.close(), cam1.close()                      # Close the cameras
+    idx = shooting_modes.index(mode)                # Get the index of the current mode
+    while not (right_button.is_held and left_button.is_held):
+        if right_button.is_pressed and not left_button.is_pressed:
+            idx = (idx + 1) % len(shooting_modes)
+            mode = shooting_modes[idx]
+        if mode == shooting_modes[0]:
+            green.on(), yellow.off(), red.off()
+        elif mode == shooting_modes[1]:
+            yellow.on(), green.off(), red.off()
+        elif mode == shooting_modes[2]:
+            red.on(), green.off(), yellow.off()
+        time.sleep(0.2)
+    [led.off() for led in (red, green, yellow)]
+    config = get_config(mode)                       # Get the configuration for the cameras
+    cam0 = Picamera2(0)                             # Initialize cam0       
+    cam1 = Picamera2(1)                             # Initialize cam1
+    configure_cameras(fname_log, mode)              # Configure the cameras
+    [led.blink(0.1, 0.1) for led in (red, green, yellow)]
+    time.sleep(3)
+    [led.off() for led in (red, green, yellow)]
+
+def cap0(tnext, i):
+    while time.monotonic_ns() < tnext:
+        pass
+    img0 = cam0.capture_array('main')  # Capture cam0
+    filename0 = f"{time.monotonic_ns()}_{i:05}"
+    image_buffer0.append((img0, filename0))
+
+def cap1(tnext, i):
+    while time.monotonic_ns() < tnext:
+        pass
+    img1 = cam1.capture_array('main')  # Capture cam1
+    filename1 = f"{time.monotonic_ns()}_{i:05}"
+    image_buffer1.append((img1, filename1))
+
+def write_images_to_sd(fdir_cam0, fdir_cam1):
+    """Background process to write images to SD card."""
+    while not write_queue.empty():
+        try:
+            img0, filename0 = write_queue.get(timeout=2)
+            img1, filename1 = write_queue.get(timeout=2)
+            filename0 = f"{fdir_cam0}0_{filename0}.jpg"
+            filename1 = f"{fdir_cam1}1_{filename1}.jpg"
+            # Convert RGB to BGR for OpenCV
+            img0 = cv2.cvtColor(img0, cv2.COLOR_RGB2BGR)
+            img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2BGR)
+            cv2.imwrite(filename0, img0)  # Save images
+            cv2.imwrite(filename1, img1)
+            print(f"Saved {filename0} and {filename1}")
+        except queue.Empty:
+            break
 
 def process_and_store(fdir_cam0, fdir_cam1):
     """Queue images for writing after button release."""
     for i in range(len(image_buffer0)):
         write_queue.put(image_buffer0[i])
         write_queue.put(image_buffer1[i])
-    thread = threading.Thread(target=write_images_to_sd, args=(fdir_cam0, fdir_cam1))
+    thread = threading.Thread(target=write_images_to_sd, args=[fdir_cam0, fdir_cam1])
     thread.start()
 
-def write_images_to_sd(fdir_cam0, fdir_cam1):
-    """Background process to write images from RAM to SD card."""
-    while not write_queue.empty():
-        try:
-            img0, timestamp0 = write_queue.get(timeout=2)
-            img1, timestamp1 = write_queue.get(timeout=2)
+def exit_standby(fname_log):
+    global standby
+    yellow.off(), red.off() # Close the lights
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    log = open(fname_log, 'a')
+    log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
+    time.sleep(1)
+    standby = False
 
-            filename0 = os.path.join(fdir_cam0, f"{timestamp0}.jpg")
-            filename1 = os.path.join(fdir_cam1, f"{timestamp1}.jpg")
+def enter_standby(fdir, fname_log, dt, mode, portName):
+    yellow.on()
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    log = open(fname_log, 'a')
+    log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
+    s = Sensor()  # Create sensor object and connect to the VN-200
+    csvExporter = ExporterCsv(fdir_out, True)
+    s.autoConnect(portName)
+    s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
+    csvExporter.start()
+    time.sleep(1)
 
-            # Convert RGB to BGR for OpenCV
-            img0 = cv2.cvtColor(img0, cv2.COLOR_RGB2BGR)
-            img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2BGR)
-
-            cv2.imwrite(filename0, img0)
-            cv2.imwrite(filename1, img1)
-            print(f"Saved {filename0} and {filename1}")
-        except queue.Empty:
-            break
-
-def enter_standby():
-    """Handles session directory creation and standby mode."""
-    global mode
-    tstr = datetime.now(timezone.utc).strftime("%H%M%S%f")
-
-    # Create session directories following existing structure
-    fdir_out, fdir_cam0, fdir_cam1, _ = create_dirs(BASE_DIR, f"session_{mode}")
-
-    while not (right_button.is_held and left_button.is_held):
-        if right_button.is_pressed and not left_button.is_pressed:
-            capture_thread(fdir_cam0, fdir_cam1)
+    while not (right_button.is_held and left_button.is_held):  # Hold both buttons for 3 seconds to exit standby
+        if right_button.is_pressed and not left_button.is_pressed:  
+            i = 1
+            red.on()
+            while right_button.is_pressed:
+                tnow = time.monotonic_ns()
+                tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
+                p0 = multiprocessing.Process(target=cap0, args=(tnext, i))
+                p1 = multiprocessing.Process(target=cap1, args=(tnext, i))
+                p0.start(), p1.start()
+                p0.join(), p1.join()
+                i += 1
+            process_and_store(fdir_cam0, fdir_cam1)
+            red.off()
         time.sleep(0.2)
 
-def configure_cameras():
-    """Configures both cameras based on mode."""
-    global cam0, cam1, config
-    tstr = datetime.now(timezone.utc).strftime("%H%M%S%f")
-    
-    with open(LOG_FILE, 'a') as log:
-        log.write(f"{tstr}: Configuring cameras to {mode} mode...\n")
-    
-    for idx, cam in enumerate([cam0, cam1]):
-        cam.configure(config)
-        cam.start()
-    
-        with open(LOG_FILE, 'a') as log:
-            log.write(f"{tstr}: cam{idx} configuration: {cam.camera_configuration()}\n")
-            log.write(f"{tstr}: cam{idx} metadata: {cam.capture_metadata()}\n")
+    csvExporter.stop()
+    s.disconnect()
+    exit_standby(fname_log)
 
-# Main loop
+############################ Initialization ############################
+green = LED(12)                         # Green LED
+yellow = LED(16)                        # Yellow LED
+red = LED(24)                           # Red LED
+right_button = Button(18, hold_time=3)  # Right button
+left_button = Button(17, hold_time=3)   # Left button
+
+# Circular buffer and queue setup
+buffer_size = 1000  # Store last 100 images in memory
+image_buffer0 = deque(maxlen=buffer_size)
+image_buffer1 = deque(maxlen=buffer_size)
+write_queue = queue.Queue()
+
 try:
+    gps_timeout = yaml.safe_load(open('../inputs.yaml', 'r'))['gps_timeout']
+except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
+    gps_timeout = 60
+
+portName = '/dev/ttyUSB0'                 # Default port for VN-200
+config_vecnav(portName)                   # Config VN-200 output           
+
+# Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
+while not sync_clock(portName, gps_timeout):  
+    [led.on() for led in (red, green, yellow)]  
+    while not (right_button.is_held and left_button.is_held):
+        time.sleep(0.1)
+    [led.off() for led in (red, green, yellow)]
+
+fdir, fname_log = setup_logging()               # Setup logging
+inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
+dt = inputs['dt']
+calib_dt = inputs['calib_dt']
+calib_frames = inputs['calib_frames']
+
+# Get IMU/GPS status. Print initial values to log.
+vecnav_status(portName, fname_log, gps_timeout)
+
+global cam0, cam1, config, mode, standby, shooting_modes
+shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
+mode = shooting_modes[0]                        # Default to 'auto'
+config = get_config(mode)                       # Get the configuration for the cameras
+cam0 = Picamera2(0)                             # Initialize cam0       
+cam1 = Picamera2(1)                             # Initialize cam1
+configure_cameras(fname_log, mode)              # Configure the cameras
+
+standby = False
+tnow = time.time()
+monitor_gps(portName)
+tlast = time.time()
+#######################################################################
+
+try: 
+    ############################# Main loop ###############################
+    # Hold right button ONLY for 3 seconds to enter standby mode    
+    # Hold left button ONLY for 3 seconds to calibrate the cameras
+    # Hold both buttons for 3 seconds to toggle modes, then:
+    #     - release both to toggle modes
+    #     - release left ONLY to exit script
     while True:
-        if right_button.is_held:
-            enter_standby()
+        if (time.time() - tlast > 10) and not standby:
+            monitor_gps(portName)
+            tlast = time.time()
+        if right_button.is_held and not standby and not left_button.is_pressed:
+            standby = True
+            enter_standby(fdir, fname_log, dt, mode, portName)    
+        if left_button.is_held and not standby and not right_button.is_pressed:
+            calib(fdir, fname_log, calib_dt, calib_frames, mode, portName)
+            monitor_gps(portName)
+        if (right_button.is_held and left_button.is_held) and not standby:
+            [led.on() for led in (red, green, yellow)]
+            left_button.wait_for_release()
+            time.sleep(1)
+            if right_button.is_held:
+                break
+            else:
+                toggle_modes()
+                monitor_gps(portName)
         time.sleep(0.2)
-except KeyboardInterrupt:
-    print("Exiting.")
-    cam0.stop()
-    cam1.stop()
+
+except Exception as e:
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    with open(fname_log, 'a') as log:
+        log.write(f"{tstr}: ERROR: {str(e)}\n")
+        log.write("Traceback:\n")
+        log.write(traceback.format_exc() + "\n")  # Log the traceback
+
+finally:
+    ############################## Cleanup ###############################
+    cam0.stop(), cam1.stop()                   # Stop the cameras
+    cam0.close(), cam1.close()                 # Close the cameras
+    green.close(), yellow.close(), red.close() # Close the LEDs
+    right_button.close(), left_button.close()  # Close the buttons
     sys.exit(0)
+    #####################################################################
+
