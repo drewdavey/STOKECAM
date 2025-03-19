@@ -8,7 +8,7 @@ from picamera2 import Picamera2, MappedArray
 from picamera2.encoders import H264Encoder
 from gpiozero import Button, LED
 from datetime import datetime, timezone
-from utils import create_dirs, read_inputs_yaml, get_config
+from utils import create_dirs, read_inputs_yaml
 
 # Load configuration from YAML
 BASE_DIR = "/home/drew/testing_drew/"
