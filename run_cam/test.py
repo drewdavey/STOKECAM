@@ -56,7 +56,6 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName):
         [led.on() for led in (red, green, yellow)]
         tnow = time.monotonic_ns()
         tnext = tnow + int(calib_dt * 1e9)  # Convert seconds to nanoseconds
-        # Replaced threading.Thread with threading.Thread
         p0 = threading.Thread(target=cap0, args=(tnext, i))
         p1 = threading.Thread(target=cap1, args=(tnext, i))
         p0.start(), p1.start()
@@ -157,6 +156,9 @@ def process_and_store(fdir_cam0, fdir_cam1):
         write_queue.put(image_buffer1[i])
     thread = threading.Thread(target=write_images_to_sd, args=[fdir_cam0, fdir_cam1])
     thread.start()
+    # Clear out the buffers so the next burst starts fresh
+    image_buffer0.clear()
+    image_buffer1.clear()
 
 def exit_standby(fname_log):
     global standby
