@@ -1,8 +1,3 @@
-# Last updated: 2025-02-04
-##################################
-# This script allows the user to toggle through camera settings, launch standby mode, and capture images syncronously by holding right button.
-# The user can also calibrate the cameras by holding the left button for more than 5 seconds.
-##################################
 import sys
 import time
 import cv2
@@ -20,7 +15,6 @@ from datetime import datetime, timezone, timedelta
 buffer_size = 100  # Store last 100 images in memory
 image_buffer0 = deque(maxlen=buffer_size)
 image_buffer1 = deque(maxlen=buffer_size)
-timestamp_buffer = deque(maxlen=buffer_size)
 write_queue = queue.Queue()
 
 def capture_continuous(dt):
@@ -37,7 +31,6 @@ def capture_continuous(dt):
 
         image_buffer0.append((img0, filename0))
         image_buffer1.append((img1, filename1))
-        timestamp_buffer.append((timestamp0, timestamp1))  # Store both timestamps
         
         i += 1
 
@@ -45,21 +38,24 @@ def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
     while not write_queue.empty():
         try:
-            img0, img1, timestamp0, timestamp1 = write_queue.get(timeout=2)
-            filename0 = f"{fdir_cam0}0_{timestamp0}.jpg"
-            filename1 = f"{fdir_cam1}1_{timestamp1}.jpg"
+            img0, filename0 = write_queue.get(timeout=2)
+            img1, filename1 = write_queue.get(timeout=2)
+
+            filename0 = f"{fdir_cam0}0_{filename0}.jpg"
+            filename1 = f"{fdir_cam1}1_{filename1}.jpg"
 
             cv2.imwrite(filename0, img0)  # Save images
             cv2.imwrite(filename1, img1)
 
-            print(f"Saved {filename0} and {filename1} | Δt = {(timestamp1 - timestamp0)/1e6:.3f} ms")
+            print(f"Saved {filename0} and {filename1}")
         except queue.Empty:
             break
 
 def process_and_store(fdir_cam0, fdir_cam1):
     """Queue images for writing after button release."""
     for i in range(len(image_buffer0)):
-        write_queue.put((image_buffer0[i][0], image_buffer1[i][0], timestamp_buffer[i][0], timestamp_buffer[i][1]))
+        write_queue.put(image_buffer0[i])
+        write_queue.put(image_buffer1[i])
     
     thread = threading.Thread(target=write_images_to_sd, args=[fdir_cam0, fdir_cam1])
     thread.start()
