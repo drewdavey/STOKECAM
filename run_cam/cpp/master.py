@@ -137,8 +137,6 @@ except Exception as e:
     #######################################################################
 finally:
     ############################## Cleanup ###############################
-    cam0.stop(), cam1.stop()                   # Stop the cameras
-    cam0.close(), cam1.close()                 # Close the cameras
     green.close(), yellow.close(), red.close() # Close the LEDs
     right_button.close(), left_button.close()  # Close the buttons
     sys.exit(0)
