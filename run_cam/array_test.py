@@ -11,6 +11,7 @@ from picamera2 import Picamera2
 from gpiozero import Button, LED
 from datetime import datetime, timezone, timedelta
 from PIL import Image
+import io
 
 # Circular buffer and queue setup
 buffer_size = 1000  # Store last 100 images in memory
