@@ -56,9 +56,9 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName):
         [led.on() for led in (red, green, yellow)]
         tnow = time.monotonic_ns()
         tnext = tnow + int(calib_dt * 1e9)  # Convert seconds to nanoseconds
-        # Replaced threading.Thread with multiprocessing.Process
-        p0 = multiprocessing.Process(target=cap0, args=(tnext, i))
-        p1 = multiprocessing.Process(target=cap1, args=(tnext, i))
+        # Replaced threading.Thread with threading.Thread
+        p0 = threading.Thread(target=cap0, args=(tnext, i))
+        p1 = threading.Thread(target=cap1, args=(tnext, i))
         p0.start(), p1.start()
         p0.join(), p1.join()
 
@@ -187,8 +187,8 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             while right_button.is_pressed:
                 tnow = time.monotonic_ns()
                 tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
-                p0 = multiprocessing.Process(target=cap0, args=(tnext, i))
-                p1 = multiprocessing.Process(target=cap1, args=(tnext, i))
+                p0 = threading.Thread(target=cap0, args=(tnext, i))
+                p1 = threading.Thread(target=cap1, args=(tnext, i))
                 p0.start(), p1.start()
                 p0.join(), p1.join()
                 i += 1
