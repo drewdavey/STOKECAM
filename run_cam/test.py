@@ -31,11 +31,11 @@ inputs = read_inputs_yaml(LOG_FILE)
 dt = inputs["dt"]
 shooting_modes = [inputs["shooting_mode0"], inputs["shooting_mode1"], inputs["shooting_mode2"]]
 mode = shooting_modes[0]
-
+config = get_config(mode)
 # Initialize cameras
 cam0 = Picamera2(0)
 cam1 = Picamera2(1)
-config = get_config(mode)
+
 cam0.configure(config)
 cam1.configure(config)
 
