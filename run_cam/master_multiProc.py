@@ -125,7 +125,7 @@ def cap0(start_event, dt):
         tnow = time.monotonic_ns()
         filename0 = f"{tnow}_{i:05}"
         image_buffer0.append((img0, filename0))  ### manager list append
-        i += 1
+        # i += 1
         # Wait dt
         next_t = tnow + int(dt * 1e9)
         while time.monotonic_ns() < next_t:
@@ -140,8 +140,9 @@ def cap1(start_event, dt):
     The image_buffer1 list is a global manager list, so the child can append to it
     and the parent can see the results.
     """
+    
     cam1 = Picamera2(1)
-    cam1.configure(config)
+    # cam1.configure(config)
     cam1.start()
 
     start_event.wait()
@@ -153,7 +154,7 @@ def cap1(start_event, dt):
         tnow = time.monotonic_ns()
         filename1 = f"{tnow}_{i:05}"
         image_buffer1.append((img1, filename1))  ### manager list append
-        i += 1
+        # i += 1
         # Wait dt
         next_t = tnow + int(dt * 1e9)
         while time.monotonic_ns() < next_t:
@@ -240,7 +241,7 @@ shooting_modes = [inputs['shooting_mode0'],
                   inputs['shooting_mode1'],
                   inputs['shooting_mode2']]
 mode = shooting_modes[0]  # 'auto'
-config = get_config(mode)
+# config = get_config(mode)
 
 standby = False
 tnow = time.time()
