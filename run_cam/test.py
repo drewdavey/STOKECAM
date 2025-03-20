@@ -137,10 +137,10 @@ def capture_continuous(dt):
     i = 1
     while right_button.is_pressed:
         timestamp0 = time.monotonic_ns()  # Timestamp before cam0 capture
-        img0 = cam0.capture_array('main', wait=False) # Capture cam0
+        img0 = cam0.capture_array('main') # Capture cam0
         filename0 = f"{timestamp0}_{i:05}"
         timestamp1 = time.monotonic_ns()  # Timestamp before cam1 capture
-        img1 = cam1.capture_array('main', wait=False)  # Capture cam1
+        img1 = cam1.capture_array('main')  # Capture cam1
         filename1 = f"{timestamp1}_{i:05}"
         image_buffer0.append((img0, filename0))
         image_buffer1.append((img1, filename1))
