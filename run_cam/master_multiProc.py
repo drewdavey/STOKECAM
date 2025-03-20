@@ -111,8 +111,6 @@ def cap0(start_event, dt):
     The image_buffer0 list is a global manager list, so the child can append to it
     and the parent can see the results.
     """
-    # We define a local button here to check if it's still pressed
-    local_button = Button(18)
     cam0 = Picamera2(0)
     cam0.configure(config)
     cam0.start()
@@ -121,7 +119,7 @@ def cap0(start_event, dt):
     start_event.wait()
 
     i = 0
-    while local_button.is_pressed:
+    while Button(18).is_pressed:
         img0 = cam0.capture_array('main')
         tnow = time.monotonic_ns()
         filename0 = f"{tnow}_{i:05}"
@@ -141,7 +139,6 @@ def cap1(start_event, dt):
     The image_buffer1 list is a global manager list, so the child can append to it
     and the parent can see the results.
     """
-    local_button = Button(18)
     cam1 = Picamera2(1)
     cam1.configure(config)
     cam1.start()
@@ -149,7 +146,7 @@ def cap1(start_event, dt):
     start_event.wait()
 
     i = 0
-    while local_button.is_pressed:
+    while Button(18).is_pressed:
         img1 = cam1.capture_array('main')
         tnow = time.monotonic_ns()
         filename1 = f"{tnow}_{i:05}"
