@@ -7,9 +7,9 @@ from libcamera import ColorSpace, Transform
 
 def auto():
     cam = Picamera2()
-    config = cam.create_still_configuration()
+    config = cam.create_still_configuration(buffer_count=8)
     config['main']['size'] = (1440, 1080)
-    config['controls']['FrameDurationLimits'] = (0, 100)  
+    # config['controls']['FrameDurationLimits'] = (0, 100)  
     cam.close()
     return config
 
