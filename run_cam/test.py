@@ -236,10 +236,10 @@ image_buffer0 = deque(maxlen=buffer_size)
 image_buffer1 = deque(maxlen=buffer_size)
 write_queue = queue.Queue()
 
-try:
-    gps_timeout = yaml.safe_load(open('../inputs.yaml', 'r'))['gps_timeout']
-except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
-    gps_timeout = 60
+# try:
+#     gps_timeout = yaml.safe_load(open('../inputs.yaml', 'r'))['gps_timeout']
+# except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
+#     gps_timeout = 60
 
 portName = '/dev/ttyUSB0'                 # Default port for VN-200
 config_vecnav(portName)                   # Config VN-200 output           
@@ -257,8 +257,8 @@ dt = inputs['dt']
 calib_dt = inputs['calib_dt']
 calib_frames = inputs['calib_frames']
 
-# Get IMU/GPS status. Print initial values to log.
-vecnav_status(portName, fname_log, gps_timeout)
+# # Get IMU/GPS status. Print initial values to log.
+# vecnav_status(portName, fname_log, gps_timeout)
 
 global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
