@@ -119,17 +119,21 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
 
 def cap0(tnext, i):
-    while time.monotonic_ns() < tnext:
-        pass
-    img0 = cam0.capture_array('main', wait=False)  # Capture cam0
-    filename0 = f"{time.monotonic_ns()}_{i:05}"
+    # while time.monotonic_ns() < tnext:
+    #     pass
+    # img0 = cam0.capture_array('main', wait=False)  # Capture cam0
+    req0 = cam0.capture_request(flush=tnext)
+    img0 = req0.make_array()
+    filename0 = f"{req0.get_metadata()["SensorTimestamp"]}_{i:05}"
     image_buffer0.append((img0, filename0))
 
 def cap1(tnext, i):
-    while time.monotonic_ns() < tnext:
-        pass
-    img1 = cam1.capture_array('main', wait=False)  # Capture cam1
-    filename1 = f"{time.monotonic_ns()}_{i:05}"
+    # while time.monotonic_ns() < tnext:
+    #     pass
+    # img1 = cam1.capture_array('main', wait=False)  # Capture cam1
+    req1 = cam1.capture_request(flush=tnext)
+    img1 = req1.make_array()
+    filename1 = f"{req1.get_metadata()["SensorTimestamp"]}_{i:05}"
     image_buffer1.append((img1, filename1))
 
 def capture_continuous(dt):
@@ -206,15 +210,15 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 1
             red.on()
-            capture_continuous(dt)
-            # while right_button.is_pressed:
-            #     tnow = time.monotonic_ns()
-            #     tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
-            #     p0 = threading.Thread(target=cap0, args=(tnext, i))
-            #     p1 = threading.Thread(target=cap1, args=(tnext, i))
-            #     p0.start(), p1.start()
-            #     p0.join(), p1.join()
-            #     i += 1
+            # capture_continuous(dt)
+            while right_button.is_pressed:
+                tnow = time.monotonic_ns()
+                tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
+                p0 = threading.Thread(target=cap0, args=(tnext, i))
+                p1 = threading.Thread(target=cap1, args=(tnext, i))
+                p0.start(), p1.start()
+                p0.join(), p1.join()
+                i += 1
             process_and_store(fdir_cam0, fdir_cam1)
             red.off()
         time.sleep(0.2)
