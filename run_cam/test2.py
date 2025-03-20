@@ -26,13 +26,13 @@ if len(Picamera2.global_camera_info()) <= 1:
 # Primary (leads)
 picam2a = Picamera2(0)
 # need buffer_count > 1 because if a frame is skipped, there will be a jump in SensorTimestamp due to dropped frame which messes with the control
-config2a = picam2a.create_still_configuration(controls={"FrameRate": 10}, buffer_count=3)
+config2a = picam2a.create_still_configuration(controls={"FrameRate": 25}, buffer_count=3)
 picam2a.configure(config2a)
 
 # Secondary (follows)
 picam2b = Picamera2(1)
 # need buffer_count > 1 because if a frame is skipped, there will be a jump in SensorTimestamp due to dropped frame which messes with the control
-config2b = picam2b.create_still_configuration(controls={"FrameRate": 10}, buffer_count=3)
+config2b = picam2b.create_still_configuration(controls={"FrameRate": 25}, buffer_count=3)
 picam2b.configure(config2b)
 
 
