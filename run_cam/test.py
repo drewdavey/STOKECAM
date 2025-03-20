@@ -244,12 +244,12 @@ except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
 portName = '/dev/ttyUSB0'                 # Default port for VN-200
 config_vecnav(portName)                   # Config VN-200 output           
 
-# Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
-while not sync_clock(portName, gps_timeout):  
-    [led.on() for led in (red, green, yellow)]  
-    while not (right_button.is_held and left_button.is_held):
-        time.sleep(0.1)
-    [led.off() for led in (red, green, yellow)]
+# # Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
+# while not sync_clock(portName, gps_timeout):  
+#     [led.on() for led in (red, green, yellow)]  
+#     while not (right_button.is_held and left_button.is_held):
+#         time.sleep(0.1)
+#     [led.off() for led in (red, green, yellow)]
 
 fdir, fname_log = setup_logging()               # Setup logging
 inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
