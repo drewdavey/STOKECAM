@@ -206,15 +206,15 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 1
             red.on()
-            # capture_continuous(dt)
-            while right_button.is_pressed:
-                tnow = time.monotonic_ns()
-                tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
-                p0 = threading.Thread(target=cap0, args=(tnext, i))
-                p1 = threading.Thread(target=cap1, args=(tnext, i))
-                p0.start(), p1.start()
-                p0.join(), p1.join()
-                i += 1
+            capture_continuous(dt)
+            # while right_button.is_pressed:
+            #     tnow = time.monotonic_ns()
+            #     tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
+            #     p0 = threading.Thread(target=cap0, args=(tnext, i))
+            #     p1 = threading.Thread(target=cap1, args=(tnext, i))
+            #     p0.start(), p1.start()
+            #     p0.join(), p1.join()
+            #     i += 1
             process_and_store(fdir_cam0, fdir_cam1)
             red.off()
         time.sleep(0.2)
