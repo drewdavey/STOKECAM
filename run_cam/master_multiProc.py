@@ -18,7 +18,7 @@ from vectornav import *
 import queue
 import multiprocessing  ### CHANGED ###
 # from collections import deque   # <--- Removed since we won't use deque
-
+from picamera2 import Picamera2
 from gpiozero import Button, LED
 from vectornav.Plugins import ExporterCsv
 from datetime import datetime, timezone, timedelta
@@ -111,7 +111,6 @@ def cap0(start_event, dt):
     The image_buffer0 list is a global manager list, so the child can append to it
     and the parent can see the results.
     """
-    from picamera2 import Picamera2
     cam0 = Picamera2(0)
     # cam0.configure(config)
     cam0.start()
@@ -141,7 +140,7 @@ def cap1(start_event, dt):
     The image_buffer1 list is a global manager list, so the child can append to it
     and the parent can see the results.
     """
-    from picamera2 import Picamera2
+
     cam1 = Picamera2(1)
     # cam1.configure(config)
     cam1.start()
