@@ -118,8 +118,9 @@ def cap0(start_event, dt):
     # Wait for "go" signal from parent
     start_event.wait()
 
-    i = 0
-    while Button(18).is_pressed:
+    # i = 0
+    # while Button(18).is_pressed:
+    for i in range(25):
         img0 = cam0.capture_array('main')
         tnow = time.monotonic_ns()
         filename0 = f"{tnow}_{i:05}"
@@ -145,8 +146,9 @@ def cap1(start_event, dt):
 
     start_event.wait()
 
-    i = 0
-    while Button(18).is_pressed:
+    # i = 0
+    # while Button(18).is_pressed:
+    for i in range(25):
         img1 = cam1.capture_array('main')
         tnow = time.monotonic_ns()
         filename1 = f"{tnow}_{i:05}"
