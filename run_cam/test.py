@@ -119,23 +119,25 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
 
 def cap0(tnext, i):
-    while time.monotonic_ns() < tnext:
-        pass
+    # while time.monotonic_ns() < tnext:
+    #     pass
     # img0 = cam0.capture_array('main', wait=False)  # Capture cam0
     req0 = cam0.capture_request(flush=tnext)
+    met0 = req0.get_metadata()["SensorTimestamp"]
     img0 = req0.make_array('main')
-    met0 = req0.capture_metadata()["SensorTimestamp"]
+    req0.release()
     filename0 = f"{met0}_{i:05}"
     # filename0 = f"{time.monotonic_ns()}_{i:05}"
     image_buffer0.append((img0, filename0))
 
 def cap1(tnext, i):
-    while time.monotonic_ns() < tnext:
-        pass
+    # while time.monotonic_ns() < tnext:
+    #     pass
     # img1 = cam1.capture_array('main', wait=False)  # Capture cam1
     req1 = cam1.capture_request(flush=tnext)
+    met1 = req1.get_metadata()["SensorTimestamp"]
     img1 = req1.make_array('main')
-    met1 = req1.capture_metadata()["SensorTimestamp"]
+    req1.release()
     filename1 = f"{met1}_{i:05}"
     # filename1 = f"{time.monotonic_ns()}_{i:05}"
     image_buffer1.append((img1, filename1))
