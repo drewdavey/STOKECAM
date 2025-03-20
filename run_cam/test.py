@@ -164,9 +164,9 @@ def write_images_to_sd(fdir_cam0, fdir_cam1):
             img0, filename0 = write_queue.get(timeout=2)
             img1, filename1 = write_queue.get(timeout=2)
 
-            ### Wait on each request, then retrieve the image ###
-            img0 = cam0.wait(img0)            
-            img1 = cam1.wait(img1)
+            # ### Wait on each request, then retrieve the image ###
+            # img0 = cam0.wait(img0)            
+            # img1 = cam1.wait(img1)
 
             filename0 = f"{fdir_cam0}0_{filename0}.jpg"
             filename1 = f"{fdir_cam1}1_{filename1}.jpg"
