@@ -124,7 +124,8 @@ def cap0(tnext, i):
     # img0 = cam0.capture_array('main', wait=False)  # Capture cam0
     req0 = cam0.capture_request(flush=tnext)
     img0 = req0.make_array()
-    filename0 = f"{req0.get_metadata()["SensorTimestamp"]}_{i:05}"
+    met0 = req0.get_metadata()
+    filename0 = f"{met0["SensorTimestamp"]}_{i:05}"
     image_buffer0.append((img0, filename0))
 
 def cap1(tnext, i):
@@ -133,7 +134,8 @@ def cap1(tnext, i):
     # img1 = cam1.capture_array('main', wait=False)  # Capture cam1
     req1 = cam1.capture_request(flush=tnext)
     img1 = req1.make_array()
-    filename1 = f"{req1.get_metadata()["SensorTimestamp"]}_{i:05}"
+    met1 = req1.get_metadata()
+    filename1 = f"{met1["SensorTimestamp"]}_{i:05}"
     image_buffer1.append((img1, filename1))
 
 def capture_continuous(dt):
