@@ -112,7 +112,7 @@ def cap0(start_event, dt):
     and the parent can see the results.
     """
     cam0 = Picamera2(0)
-    cam0.configure(config)
+    # cam0.configure(config)
     cam0.start()
 
     # Wait for "go" signal from parent
