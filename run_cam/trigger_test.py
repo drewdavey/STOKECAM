@@ -24,7 +24,7 @@ TRIGGER_SUBDEV_0 = "/dev/v4l-subdev0"
 TRIGGER_SUBDEV_1 = "/dev/v4l-subdev1"
 
 # GPIO pin to pulse the hardware trigger line
-triggerPin = 3
+triggerPin = 26
 
 # Wrapper to run shell commands
 def run_cmd(cmd):
