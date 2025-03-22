@@ -1,35 +1,21 @@
+#!/usr/bin/env python3
+
 import time
-import threading
-import queue
-import cv2
 import subprocess
 from picamera2 import Picamera2
-from gpiozero import Button, LED, DigitalOutputDevice
-from datetime import datetime
+from gpiozero import DigitalOutputDevice
 
-# ------------------------------
-# HARDWARE PIN SETUP
-# ------------------------------
-TRIGGER_PIN      = 26   # Goes to GS camera XTR line (both cams)
-RIGHT_BUTTON_PIN = 18   # Press/hold to start capturing
-LEFT_BUTTON_PIN  = 17   # (Optional) for exit or other logic
-LED_PIN          = 24   # (Optional) LED to show capturing
+# GPIO pin that drives the cameras' XTR line.
+TRIGGER_PIN = 26
 
-# Using gpiozero's DigitalOutputDevice for the trigger line
+# Create a DigitalOutputDevice for the trigger line.
 trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=False)
-# Buttons and LED
-right_button = Button(RIGHT_BUTTON_PIN, hold_time=2)
-left_button  = Button(LEFT_BUTTON_PIN,  hold_time=2)
-capture_led  = LED(LED_PIN)
 
-# ------------------------------
-# ENABLE EXTERNAL TRIGGER MODE VIA PYTHON
-# ------------------------------
 def set_trigger_mode(enable: bool = True):
     """
-    Enables or disables external trigger mode by writing 1 or 0
-    to /sys/module/imx296/parameters/trigger_mode.
-    Requires 'sudo' privileges or that the Python script is run as root.
+    Write 1 or 0 to /sys/module/imx296/parameters/trigger_mode
+    to enable or disable external trigger for IMX296 sensors.
+    Requires root or passwordless sudo.
     """
     val = "1" if enable else "0"
     cmd = f"sudo sh -c 'echo {val} > /sys/module/imx296/parameters/trigger_mode'"
@@ -40,149 +26,70 @@ def set_trigger_mode(enable: bool = True):
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] Failed to set trigger mode: {e}")
 
-# Call once at the start to enable external trigger
-set_trigger_mode(True)
-
-# ------------------------------
-# CAMERA INITIALIZATION
-# ------------------------------
-cam0 = Picamera2(0)
-cam1 = Picamera2(1)
-
-# If needed, configure them:
-config0 = cam0.create_still_configuration()
-cam0.configure(config0)
-config1 = cam1.create_still_configuration()
-cam1.configure(config1)
-
-cam0.start()
-cam1.start()
-
-# ------------------------------
-# IMAGE BUFFERS & QUEUE
-# ------------------------------
-image_buffer0 = []
-image_buffer1 = []
-write_queue   = queue.Queue()
-
-# ------------------------------
-# HELPER FUNCTIONS
-# ------------------------------
-def hardware_trigger_pulse():
+def hardware_trigger_pulse(pulse_length=0.001):
     """
-    Send a ~1ms HIGH pulse on TRIGGER_PIN. Both cameras (cam0 & cam1) 
-    use this line in external trigger mode to expose/capture a frame.
+    Send a short pulse on TRIGGER_PIN (3.3V) to trigger the GS cameras.
+    Default is 1 ms.
     """
     trigger_output.on()
-    time.sleep(0.001)  # 1ms
+    time.sleep(pulse_length)
     trigger_output.off()
 
-def capture_both_cameras(i):
-    """
-    After pulsing the hardware trigger, wait briefly,
-    then capture from each camera, storing frames in memory buffers.
-    """
-    time.sleep(0.01)  # small delay for exposure & readout
+def main():
+    # 1) Enable external trigger mode
+    set_trigger_mode(True)
 
-    # Capture from cam0
-    frame0 = cam0.capture_array()
-    tnow0  = time.monotonic_ns()
-    filename0 = f"{tnow0}_{i:05}"
-    image_buffer0.append((frame0, filename0))
+    # 2) Initialize both cameras
+    cam0 = Picamera2(0)
+    cam1 = Picamera2(1)
 
-    # Capture from cam1
-    frame1 = cam1.capture_array()
-    tnow1  = time.monotonic_ns()
-    filename1 = f"{tnow1}_{i:05}"
-    image_buffer1.append((frame1, filename1))
+    # Optionally configure them if you want full control
+    config0 = cam0.create_still_configuration()
+    config1 = cam1.create_still_configuration()
+    cam0.configure(config0)
+    cam1.configure(config1)
 
-def write_images_to_disk(cam0_dir="./cam0", cam1_dir="./cam1"):
-    """
-    Pull frames off the write_queue in pairs (cam0, cam1) and write them to disk.
-    """
-    while not write_queue.empty():
-        try:
-            (frame0, filename0) = write_queue.get(timeout=1)
-            (frame1, filename1) = write_queue.get(timeout=1)
+    # 3) Start cameras
+    cam0.start()
+    cam1.start()
 
-            # Convert from RGB to BGR for OpenCV
-            frame0_bgr = cv2.cvtColor(frame0, cv2.COLOR_RGB2BGR)
-            frame1_bgr = cv2.cvtColor(frame1, cv2.COLOR_RGB2BGR)
+    # We wait a moment so the cameras can finish their initial setup
+    time.sleep(0.5)
 
-            path0 = f"{cam0_dir}/0_{filename0}.jpg"
-            path1 = f"{cam1_dir}/1_{filename1}.jpg"
+    # 4) Send an immediate “dummy” pulse to avoid initial timeouts
+    hardware_trigger_pulse(pulse_length=0.005)
+    time.sleep(0.01)
+    frame_test_0 = cam0.capture_array()
+    frame_test_1 = cam1.capture_array()
+    print("[INFO] Captured initial frames successfully (no timeout).")
 
-            cv2.imwrite(path0, frame0_bgr)
-            cv2.imwrite(path1, frame1_bgr)
-            print(f"[INFO] Saved {path0} and {path1}")
-        except queue.Empty:
-            break
+    # 5) Loop a few times to see if pulses produce new frames
+    print("[INFO] Sending pulses and capturing frames...")
+    for i in range(5):
+        hardware_trigger_pulse(pulse_length=0.001)
+        time.sleep(0.01)  # small delay for exposure/readout
 
-def flush_and_write():
-    """
-    Move all frames from memory buffers to the write_queue,
-    then start a background thread to write them asynchronously.
-    """
-    for i in range(len(image_buffer0)):
-        write_queue.put(image_buffer0[i])
-        write_queue.put(image_buffer1[i])
+        frame0 = cam0.capture_array()
+        frame1 = cam1.capture_array()
 
-    image_buffer0.clear()
-    image_buffer1.clear()
+        print(f"[INFO] Captured triggered frame pair #{i+1}")
 
-    writer_thread = threading.Thread(target=write_images_to_disk, args=("./cam0", "./cam1"))
-    writer_thread.start()
+        # If desired, do something with frame0, frame1 (e.g. check shape, print timestamps, etc.)
 
-# ------------------------------
-# MAIN LOOP / LOGIC
-# ------------------------------
-try:
-    print("[INFO] Ready. Press & hold Right Button to capture. Release -> write images. Ctrl+C to exit.")
-    i = 0
+        time.sleep(0.2)  # slow down loop a bit
 
-    while True:
-        # If right button is pressed (and not left), start capturing loop
-        if right_button.is_pressed and not left_button.is_pressed:
-            capture_led.on()
-            while right_button.is_pressed:
-                hardware_trigger_pulse()
-                capture_both_cameras(i)
-                i += 1
-                time.sleep(0.03)  # basic framerate delay
-            # On release
-            flush_and_write()
-            capture_led.off()
-
-        # If left button is pressed, exit
-        if left_button.is_pressed:
-            print("[INFO] Left button pressed - exiting.")
-            break
-
-        time.sleep(0.1)
-
-except KeyboardInterrupt:
-    print("[INFO] Interrupted by user.")
-
-finally:
-    print("[INFO] Cleaning up...")
-    # Optionally disable trigger mode
-    set_trigger_mode(False)
-
+    # 6) Clean up
     cam0.stop()
     cam1.stop()
-    cam0.close()
-    cam1.close()
-
-    capture_led.off()
-    capture_led.close()
+    set_trigger_mode(False)   # or leave it on if you prefer
 
     trigger_output.off()
     trigger_output.close()
+    print("[INFO] Done. If you saw 'Captured triggered frame pair' lines, the cameras got pulses.")
 
-    right_button.close()
-    left_button.close()
+if __name__ == "__main__":
+    main()
 
-    print("[INFO] Done.")
 
 
 
