@@ -42,8 +42,7 @@ def configure_cameras(fname_log, mode):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
-    # for idx, cam in enumerate([cam0, cam1]):
-    for idx, cam in enumerate([cam0]):
+    for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
@@ -196,11 +195,11 @@ def capture_both_cameras(i):
     filename0 = f"{tnow0}_{i:05}"
     image_buffer0.append((frame0, filename0))
 
-    # # Capture from cam1
-    # frame1 = cam1.capture_array()
-    # tnow1  = time.monotonic_ns()
-    # filename1 = f"{tnow1}_{i:05}"
-    # image_buffer1.append((frame1, filename1))
+    # Capture from cam1
+    frame1 = cam1.capture_array()
+    tnow1  = time.monotonic_ns()
+    filename1 = f"{tnow1}_{i:05}"
+    image_buffer1.append((frame1, filename1))
 
 def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
@@ -208,10 +207,6 @@ def write_images_to_sd(fdir_cam0, fdir_cam1):
         try:
             img0, filename0 = write_queue.get(timeout=2)
             img1, filename1 = write_queue.get(timeout=2)
-
-            # ### Wait on each request, then retrieve the image ###
-            # img0 = cam0.wait(img0)            
-            # img1 = cam1.wait(img1)
 
             filename0 = f"{fdir_cam0}0_{filename0}.jpg"
             filename1 = f"{fdir_cam1}1_{filename1}.jpg"
@@ -327,7 +322,7 @@ shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['sh
 mode = shooting_modes[0]                        # Default to 'auto'
 config = get_config(mode)                       # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
-# cam1 = Picamera2(1)                             # Initialize cam1
+cam1 = Picamera2(1)                             # Initialize cam1
 
 # Immediately give one trigger pulse so we avoid the time-out
 # while True:
