@@ -173,6 +173,16 @@ finally:
     cam0.close()
     cam1.close()
 
-    capture_led_
+    capture_led.off()
+    capture_led.close()
+
+    trigger_output.off()
+    trigger_output.close()
+
+    right_button.close()
+    left_button.close()
+
+    print("[INFO] Done.")
+
 
 
