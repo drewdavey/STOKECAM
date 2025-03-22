@@ -50,10 +50,10 @@ cam0 = Picamera2(0)
 cam1 = Picamera2(1)
 
 # If needed, configure them:
-# config0 = cam0.create_still_configuration()
-# cam0.configure(config0)
-# config1 = cam1.create_still_configuration()
-# cam1.configure(config1)
+config0 = cam0.create_still_configuration()
+cam0.configure(config0)
+config1 = cam1.create_still_configuration()
+cam1.configure(config1)
 
 cam0.start()
 cam1.start()
