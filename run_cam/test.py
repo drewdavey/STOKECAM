@@ -42,7 +42,8 @@ def configure_cameras(fname_log, mode):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
-    for idx, cam in enumerate([cam0, cam1]):
+    # for idx, cam in enumerate([cam0, cam1]):
+    for idx, cam in enumerate([cam0]):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
@@ -195,11 +196,11 @@ def capture_both_cameras(i):
     filename0 = f"{tnow0}_{i:05}"
     image_buffer0.append((frame0, filename0))
 
-    # Capture from cam1
-    frame1 = cam1.capture_array()
-    tnow1  = time.monotonic_ns()
-    filename1 = f"{tnow1}_{i:05}"
-    image_buffer1.append((frame1, filename1))
+    # # Capture from cam1
+    # frame1 = cam1.capture_array()
+    # tnow1  = time.monotonic_ns()
+    # filename1 = f"{tnow1}_{i:05}"
+    # image_buffer1.append((frame1, filename1))
 
 def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
