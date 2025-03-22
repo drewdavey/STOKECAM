@@ -10,6 +10,7 @@ import cv2
 import vectornav
 import traceback
 import threading
+import subprocess
 from utils import *
 from settings import *
 from vectornav import *
@@ -17,9 +18,24 @@ import queue
 import multiprocessing
 from collections import deque
 from picamera2 import Picamera2
-from gpiozero import Button, LED
+from gpiozero import Button, LED, DigitalOutputDevice
 from vectornav.Plugins import ExporterCsv
 from datetime import datetime, timezone, timedelta
+
+def set_trigger_mode(enable: bool = True):
+    """
+    Enables or disables external trigger mode by writing 1 or 0
+    to /sys/module/imx296/parameters/trigger_mode.
+    Requires 'sudo' privileges or that the Python script is run as root.
+    """
+    val = "1" if enable else "0"
+    cmd = f"sudo sh -c 'echo {val} > /sys/module/imx296/parameters/trigger_mode'"
+    print(f"[INFO] Setting IMX296 trigger_mode to: {val}")
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+        print("[INFO] Successfully set trigger mode.")
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Failed to set trigger mode: {e}")
 
 def configure_cameras(fname_log, mode):
     global cam0, cam1, config 
@@ -157,6 +173,34 @@ def capture_continuous(dt):
         time.sleep(dt)
         i += 1
 
+def hardware_trigger_pulse():
+    """
+    Send a ~1ms HIGH pulse on TRIGGER_PIN. Both cameras (cam0 & cam1) 
+    use this line in external trigger mode to expose/capture a frame.
+    """
+    trigger_output.on()
+    time.sleep(0.001)  # 1ms
+    trigger_output.off()
+
+def capture_both_cameras(i):
+    """
+    After pulsing the hardware trigger, wait briefly,
+    then capture from each camera, storing frames in memory buffers.
+    """
+    time.sleep(0.01)  # small delay for exposure & readout
+
+    # Capture from cam0
+    frame0 = cam0.capture_array()
+    tnow0  = time.monotonic_ns()
+    filename0 = f"{tnow0}_{i:05}"
+    image_buffer0.append((frame0, filename0))
+
+    # Capture from cam1
+    frame1 = cam1.capture_array()
+    tnow1  = time.monotonic_ns()
+    filename1 = f"{tnow1}_{i:05}"
+    image_buffer1.append((frame1, filename1))
+
 def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
     while not write_queue.empty():
@@ -218,12 +262,14 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             red.on()
             # capture_continuous(dt)
             while right_button.is_pressed:
-                tnow = time.monotonic_ns()
-                tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
-                p0 = threading.Thread(target=cap0, args=(tnext, i))
-                p1 = threading.Thread(target=cap1, args=(tnext, i))
-                p0.start(), p1.start()
-                p0.join(), p1.join()
+                hardware_trigger_pulse()
+                capture_both_cameras(i)
+            #     tnow = time.monotonic_ns()
+            #     tnext = tnow + int(dt * 1e9)  # Convert seconds to nanoseconds
+            #     p0 = threading.Thread(target=cap0, args=(tnext, i))
+            #     p1 = threading.Thread(target=cap1, args=(tnext, i))
+            #     p0.start(), p1.start()
+            #     p0.join(), p1.join()
                 i += 1
             process_and_store(fdir_cam0, fdir_cam1)
             red.off()
@@ -239,6 +285,11 @@ yellow = LED(16)                        # Yellow LED
 red = LED(24)                           # Red LED
 right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
+TRIGGER_PIN = 26                        # Hardware trigger
+trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=False)
+
+# Call once at the start to enable external trigger
+set_trigger_mode(True)
 
 # Circular buffer and queue setup
 buffer_size = 1000  # Store last 100 images in memory
@@ -325,6 +376,8 @@ finally:
     cam0.close(), cam1.close()                 # Close the cameras
     green.close(), yellow.close(), red.close() # Close the LEDs
     right_button.close(), left_button.close()  # Close the buttons
+    trigger_output.off()                       # Turn off the trigger output
+    trigger_output.close()                     # Close the trigger output
     sys.exit(0)
     #####################################################################
 
