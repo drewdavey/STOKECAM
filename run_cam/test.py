@@ -332,9 +332,9 @@ cam0 = Picamera2(0)                             # Initialize cam0
 # Immediately give one trigger pulse so we avoid the time-out
 # while True:
 trigger_output.on()
-time.sleep(0.5)
+time.sleep(0.1)
 trigger_output.off()
-time.sleep(0.5)
+time.sleep(0.1)
 
 configure_cameras(fname_log, mode)              # Configure the cameras
 
