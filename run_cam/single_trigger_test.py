@@ -120,9 +120,9 @@ def hardware_trigger_pulse():
     Send a ~1ms HIGH pulse on TRIGGER_PIN. Both cameras (cam0 & cam1) 
     use this line in external trigger mode to expose/capture a frame.
     """
-    trigger_output.on()
-    time.sleep(0.001)  # 1ms
     trigger_output.off()
+    time.sleep(0.001)  # 1ms
+    trigger_output.on()
 
 def capture_both_cameras(i):
     """
@@ -222,7 +222,7 @@ red = LED(24)                           # Red LED
 right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
 TRIGGER_PIN = 26                        # Hardware trigger
-trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=False)
+trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=True)
 
 # Call once at the start to enable external trigger
 set_trigger_mode(True)
@@ -265,11 +265,11 @@ cam0 = Picamera2(0)                             # Initialize cam0
 # cam1 = Picamera2(1)                             # Initialize cam1
 
 # Immediately give one trigger pulse so we avoid the time-out
-while True:
-    trigger_output.on()
-    time.sleep(0.5)
-    trigger_output.off()
-    time.sleep(0.5)
+# while True:
+    # trigger_output.on()
+    # time.sleep(0.5)
+    # trigger_output.off()
+    # time.sleep(0.5)
 
 configure_cameras(fname_log, mode)              # Configure the cameras
 
@@ -293,9 +293,6 @@ try:
         if right_button.is_held and not standby and not left_button.is_pressed:
             standby = True
             enter_standby(fdir, fname_log, dt, mode, portName)    
-        if left_button.is_held and not standby and not right_button.is_pressed:
-            calib(fdir, fname_log, calib_dt, calib_frames, mode, portName)
-            monitor_gps(portName)
         if (right_button.is_held and left_button.is_held) and not standby:
             [led.on() for led in (red, green, yellow)]
             left_button.wait_for_release()
