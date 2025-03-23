@@ -210,7 +210,7 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
                 cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
                 # capture_both_cameras(i)
                 i += 1
-                time.sleep(0.1) 
+                time.sleep(0.1)
             # process_and_store(fdir_cam0, fdir_cam1)
             red.off()
         time.sleep(0.2)
@@ -267,6 +267,11 @@ mode = shooting_modes[0]                        # Default to 'auto'
 # config = get_config(mode)                       # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 # cam1 = Picamera2(1)                             # Initialize cam1
+time.sleep(0.1)
+trigger_output.off()
+time.sleep(0.1)
+trigger_output.on()
+time.sleep(0.1)
 config = cam0.create_still_configuration(buffer_count=50)
 cam0.configure(config)
 cam0.start()
