@@ -115,14 +115,26 @@ def capture_continuous(dt):
         time.sleep(dt)
         i += 1
 
-def hardware_trigger_pulse(i):
+def hardware_trigger_pulse():
     """
     Send a ~1ms HIGH pulse on TRIGGER_PIN. Both cameras (cam0 & cam1) 
     use this line in external trigger mode to expose/capture a frame.
     """
     trigger_output.off()
-    time.sleep(0.001)  # 1ms
+    time.sleep(0.1)  # 1ms
     trigger_output.on()
+    
+    # Capture from cam0
+    frame0 = cam0.capture_array()
+    tnow0  = time.monotonic_ns()
+    filename0 = f"{tnow0}_{i:05}"
+    image_buffer0.append((frame0, filename0))
+
+def capture_both_cameras(i):
+    """
+    After pulsing the hardware trigger, wait briefly,
+    then capture from each camera, storing frames in memory buffers.
+    """
 
     # Capture from cam0
     frame0 = cam0.capture_array()
@@ -130,23 +142,11 @@ def hardware_trigger_pulse(i):
     filename0 = f"{tnow0}_{i:05}"
     image_buffer0.append((frame0, filename0))
 
-# def capture_both_cameras(i):
-#     """
-#     After pulsing the hardware trigger, wait briefly,
-#     then capture from each camera, storing frames in memory buffers.
-#     """
-
-#     # Capture from cam0
-#     frame0 = cam0.capture_array()
-#     tnow0  = time.monotonic_ns()
-#     filename0 = f"{tnow0}_{i:05}"
-#     image_buffer0.append((frame0, filename0))
-
-#     # # Capture from cam1
-#     # frame1 = cam1.capture_array()
-#     # tnow1  = time.monotonic_ns()
-#     # filename1 = f"{tnow1}_{i:05}"
-#     # image_buffer1.append((frame1, filename1))
+    # # Capture from cam1
+    # frame1 = cam1.capture_array()
+    # tnow1  = time.monotonic_ns()
+    # filename1 = f"{tnow1}_{i:05}"
+    # image_buffer1.append((frame1, filename1))
 
 def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
@@ -209,9 +209,13 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             red.on()
             # capture_continuous(dt)
             while right_button.is_pressed:
-                hardware_trigger_pulse(i)
-                time.sleep(0.01)  # small delay for exposure & readout
-                # capture_both_cameras(i)
+                hardware_trigger_pulse()
+                hardware_trigger_pulse()
+                hardware_trigger_pulse()
+                hardware_trigger_pulse()
+                hardware_trigger_pulse()
+                # time.sleep(0.01)  # small delay for exposure & readout
+                capture_both_cameras(i)
                 i += 1
             process_and_store(fdir_cam0, fdir_cam1)
             red.off()
