@@ -129,12 +129,12 @@ def capture_both_cameras(i):
     After pulsing the hardware trigger, wait briefly,
     then capture from each camera, storing frames in memory buffers.
     """
-
-    # Capture from cam0
-    frame0 = cam0.capture_array()
-    tnow0  = time.monotonic_ns()
-    filename0 = f"{tnow0}_{i:05}"
-    image_buffer0.append((frame0, filename0))
+    cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
+    # # Capture from cam0
+    # frame0 = cam0.capture_array()
+    # tnow0  = time.monotonic_ns()
+    # filename0 = f"{tnow0}_{i:05}"
+    # image_buffer0.append((frame0, filename0))
 
     # # Capture from cam1
     # frame1 = cam1.capture_array()
