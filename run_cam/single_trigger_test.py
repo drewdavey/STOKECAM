@@ -129,7 +129,6 @@ def capture_both_cameras(i):
     After pulsing the hardware trigger, wait briefly,
     then capture from each camera, storing frames in memory buffers.
     """
-    time.sleep(0.01)  # small delay for exposure & readout
 
     # Capture from cam0
     frame0 = cam0.capture_array()
@@ -205,6 +204,7 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             # capture_continuous(dt)
             while right_button.is_pressed:
                 hardware_trigger_pulse()
+                time.sleep(0.01)  # small delay for exposure & readout
                 capture_both_cameras(i)
                 i += 1
             process_and_store(fdir_cam0, fdir_cam1)
@@ -314,8 +314,8 @@ except Exception as e:
 
 finally:
     ############################## Cleanup ###############################
-    cam0.stop(), cam1.stop()                   # Stop the cameras
-    cam0.close(), cam1.close()                 # Close the cameras
+    cam0.stop()                # Stop the cameras
+    cam0.close()                # Close the cameras
     green.close(), yellow.close(), red.close() # Close the LEDs
     right_button.close(), left_button.close()  # Close the buttons
     trigger_output.off()                       # Turn off the trigger output
