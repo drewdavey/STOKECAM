@@ -272,7 +272,7 @@ time.sleep(0.1)
 trigger_output.on()
 time.sleep(0.1)
 
-configure_cameras(fname_log, mode)              # Configure the cameras
+# configure_cameras(fname_log, mode)              # Configure the cameras
 
 standby = False
 tnow = time.time()
