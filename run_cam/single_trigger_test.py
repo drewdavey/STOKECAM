@@ -123,12 +123,6 @@ def hardware_trigger_pulse():
     trigger_output.off()
     time.sleep(0.1)  # 1ms
     trigger_output.on()
-    
-    # Capture from cam0
-    frame0 = cam0.capture_array()
-    tnow0  = time.monotonic_ns()
-    filename0 = f"{tnow0}_{i:05}"
-    image_buffer0.append((frame0, filename0))
 
 def capture_both_cameras(i):
     """
