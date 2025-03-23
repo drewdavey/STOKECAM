@@ -204,16 +204,10 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             red.on()
             # capture_continuous(dt)
             while right_button.is_pressed:
-                hardware_trigger_pulse(i)
-                time.sleep(0.1) 
-                hardware_trigger_pulse(i)
-                time.sleep(0.1) 
-                hardware_trigger_pulse(i)
-                time.sleep(0.1) 
-                hardware_trigger_pulse(i)
-                time.sleep(0.1) 
-                hardware_trigger_pulse(i)
-                time.sleep(0.1)  
+                trigger_output.off()
+                time.sleep(0.001)  # 1ms
+                trigger_output.on() 
+                cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
                 # capture_both_cameras(i)
                 i += 1
                 time.sleep(0.1) 
