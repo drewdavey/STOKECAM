@@ -265,7 +265,7 @@ global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
 mode = shooting_modes[0]                        # Default to 'auto'
 # config = get_config(mode)                       # Get the configuration for the cameras
-cam0 = Picamera2(0)                             # Initialize cam0       
+cam0 = Picamera2(1)                             # Initialize cam0       
 # cam1 = Picamera2(1)                             # Initialize cam1
 
 # Immediately give one trigger pulse so we avoid the time-out
