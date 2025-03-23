@@ -115,13 +115,14 @@ def capture_continuous(dt):
         time.sleep(dt)
         i += 1
 
-def hardware_trigger_pulse():
+def hardware_trigger_pulse(i):
     """
     Send a ~1ms HIGH pulse on TRIGGER_PIN. Both cameras (cam0 & cam1) 
     use this line in external trigger mode to expose/capture a frame.
     """
     trigger_output.off()
-    time.sleep(0.1)  # 1ms
+    time.sleep(0.001)  # 1ms
+    cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
     trigger_output.on()
 
 def capture_both_cameras(i):
@@ -203,17 +204,17 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             red.on()
             # capture_continuous(dt)
             while right_button.is_pressed:
-                hardware_trigger_pulse()
+                hardware_trigger_pulse(i)
                 time.sleep(0.1) 
-                hardware_trigger_pulse()
+                hardware_trigger_pulse(i)
                 time.sleep(0.1) 
-                hardware_trigger_pulse()
+                hardware_trigger_pulse(i)
                 time.sleep(0.1) 
-                hardware_trigger_pulse()
+                hardware_trigger_pulse(i)
                 time.sleep(0.1) 
-                hardware_trigger_pulse()
+                hardware_trigger_pulse(i)
                 time.sleep(0.1)  
-                capture_both_cameras(i)
+                # capture_both_cameras(i)
                 i += 1
                 time.sleep(0.1) 
             # process_and_store(fdir_cam0, fdir_cam1)
