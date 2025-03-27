@@ -267,9 +267,9 @@ mode = shooting_modes[0]                        # Default to 'auto'
 # config = get_config(mode)                       # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 # cam1 = Picamera2(1)                             # Initialize cam1
-time.sleep(0.1)
+# time.sleep(0.1)
 trigger_output.off()
-time.sleep(0.1)
+# time.sleep(0.1)
 trigger_output.on()
 time.sleep(0.1)
 config = cam0.create_still_configuration(buffer_count=50)
