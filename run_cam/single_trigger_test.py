@@ -235,7 +235,11 @@ right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
 TRIGGER_PIN = 26                        # Hardware trigger
 trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=True)
-
+trigger_output.on()
+time.sleep(0.001)  # 1ms
+trigger_output.off()
+time.sleep(0.001)  # 1ms
+trigger_output.on()
 # Call once at the start to enable external trigger
 set_trigger_mode(True)
 
