@@ -21,7 +21,7 @@ import os
 os.environ["LIBCAMERA_RPI_CONFIG_FILE"] = "/usr/local/share/libcamera/pipeline/rpi/pisp/example.yaml"
 
 from picamera2 import Picamera2
-from gpiozero import Button, LED, DigitalOutputDevice
+from gpiozero import Button, LED, PWMOutputDevice
 from vectornav.Plugins import ExporterCsv
 from datetime import datetime, timezone
 
@@ -237,12 +237,18 @@ red = LED(24)                           # Red LED
 right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
 TRIGGER_PIN = 26                        # Hardware trigger
-trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=True)
-trigger_output.on()
-time.sleep(0.001)  # 1ms
-trigger_output.off()
-time.sleep(0.001)  # 1ms
-trigger_output.on()
+
+frame_rate = 25
+shutter_us = 6000
+shutter_sec = shutter_us / 1e6
+frame_length_sec = 1 / frame_rate
+
+duty_cycle = 1 - (shutter_sec / frame_length_sec)
+trigger_output = PWMOutputDevice(TRIGGER_PIN, frequency=frame_rate, initial_value=duty_cycle)
+
+# Start PWM
+trigger_output.value = duty_cycle
+
 # Call once at the start to enable external trigger
 set_trigger_mode(True)
 
