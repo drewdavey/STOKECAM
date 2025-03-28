@@ -120,9 +120,14 @@ def hardware_trigger_pulse(i):
     Send a ~1ms HIGH pulse on TRIGGER_PIN. Both cameras (cam0 & cam1) 
     use this line in external trigger mode to expose/capture a frame.
     """
+    TRIGGER_PIN = 26                        # Hardware trigger
+    trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=True)
+    trigger_output.on()                     # Set trigger pin HIGH
+
+
     trigger_output.off()
     time.sleep(0.001)  # 1ms
-    cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
+    
     trigger_output.on()
 
 def capture_both_cameras(i):
@@ -203,6 +208,9 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             i = 1
             red.on()
             # capture_continuous(dt)
+            trigger_output.off()
+            time.sleep(0.001)  # 1ms
+            trigger_output.on()
             while right_button.is_pressed:
                 cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
                 trigger_output.off()
@@ -211,7 +219,6 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
                 time.sleep(0.5)
                 # capture_both_cameras(i)
                 i += 1
-                time.sleep(0.1)
             # process_and_store(fdir_cam0, fdir_cam1)
             red.off()
         time.sleep(0.2)
@@ -265,26 +272,10 @@ calib_frames = inputs['calib_frames']
 global cam0, cam1, config, mode, standby, shooting_modes
 shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
 mode = shooting_modes[0]                        # Default to 'auto'
-# config = get_config(mode)                       # Get the configuration for the cameras
+config = get_config(mode)                       # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 cam1 = Picamera2(1)                             # Initialize cam1
-# time.sleep(0.1)
-trigger_output.off()
-# time.sleep(0.1)
-trigger_output.on()
-time.sleep(0.1)
-config = cam0.create_still_configuration(buffer_count=50)
-cam0.configure(config)
-cam0.start()
-# Immediately give one trigger pulse so we avoid the time-out
-# while True:
-time.sleep(0.1)
-trigger_output.off()
-time.sleep(0.1)
-trigger_output.on()
-time.sleep(0.1)
-
-# configure_cameras(fname_log, mode)              # Configure the cameras
+configure_cameras(fname_log, mode)              # Configure the cameras
 
 standby = False
 tnow = time.time()
@@ -330,7 +321,6 @@ finally:
     cam0.close(), cam1.close()                 # Close the cameras
     green.close(), yellow.close(), red.close() # Close the LEDs
     right_button.close(), left_button.close()  # Close the buttons
-    trigger_output.off()                       # Turn off the trigger output
     trigger_output.close()                     # Close the trigger output
     set_trigger_mode(False)                    # Disable external trigger mode 
     sys.exit(0)
