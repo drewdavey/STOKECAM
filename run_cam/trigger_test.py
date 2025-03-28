@@ -212,7 +212,7 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
 
                 # capture_both_cameras(i)
                 i += 1
-            # process_and_store(fdir_cam0, fdir_cam1)
+            process_and_store(fdir_cam0, fdir_cam1)
             red.off()
         time.sleep(0.2)
 
