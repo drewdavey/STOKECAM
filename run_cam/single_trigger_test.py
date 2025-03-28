@@ -126,12 +126,11 @@ def hardware_trigger_pulse(i):
     """
     TRIGGER_PIN = 26                        # Hardware trigger
     trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=True)
+    
     trigger_output.on()                     # Set trigger pin HIGH
-
-
+    time.sleep(0.001)  # 1ms
     trigger_output.off()
     time.sleep(0.001)  # 1ms
-    
     trigger_output.on()
 
 def capture_both_cameras(i):
