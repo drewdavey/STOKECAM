@@ -16,6 +16,10 @@ from settings import *
 from vectornav import *
 import queue
 from collections import deque
+
+import os
+os.environ["LIBCAMERA_RPI_CONFIG_FILE"] = "/usr/share/libcamera/pipeline/rpi/pisp/example.yaml"
+
 from picamera2 import Picamera2
 from gpiozero import Button, LED, DigitalOutputDevice
 from vectornav.Plugins import ExporterCsv
