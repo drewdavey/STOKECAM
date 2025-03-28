@@ -4,9 +4,13 @@
 # and capture images synchronously by holding right button.
 # The user can also calibrate the cameras by holding the left button for more than 5 seconds.
 ##################################
+import os
+os.environ["LIBCAMERA_RPI_CONFIG_FILE"] = "/usr/local/share/libcamera/pipeline/rpi/pisp/example.yaml"
+# os.environ["LIBCAMERA_LOG_LEVEL"] = "ERROR"  # Set log level to ERROR to suppress warnings
 import sys
-import time
 import cv2
+import time
+import queue
 import vectornav
 import traceback
 import threading
@@ -14,16 +18,11 @@ import subprocess
 from utils import *
 from settings import *
 from vectornav import *
-import queue
 from collections import deque
-
-import os
-os.environ["LIBCAMERA_RPI_CONFIG_FILE"] = "/usr/local/share/libcamera/pipeline/rpi/pisp/example.yaml"
-
 from picamera2 import Picamera2
-from gpiozero import Button, LED, PWMOutputDevice
-from vectornav.Plugins import ExporterCsv
 from datetime import datetime, timezone
+from vectornav.Plugins import ExporterCsv
+from gpiozero import Button, LED, DigitalOutputDevice
 
 def set_trigger_mode(enable: bool = True):
     """
@@ -45,12 +44,11 @@ def configure_cameras(fname_log, mode):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
-    # for idx, cam in enumerate([cam0, cam1]):
-    for idx, cam in enumerate([cam0]):
+    for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
-        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+        # log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
 
 def monitor_gps(portName):
@@ -98,7 +96,7 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
     config = get_config(mode)                       # Get the configuration for the cameras
     cam0 = Picamera2(0)                             # Initialize cam0       
-    # cam1 = Picamera2(1)                             # Initialize cam1
+    cam1 = Picamera2(1)                             # Initialize cam1
     configure_cameras(fname_log, mode)              # Configure the cameras
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     time.sleep(3)
@@ -119,19 +117,12 @@ def capture_continuous(dt):
         time.sleep(dt)
         i += 1
 
-def hardware_trigger_pulse(i):
-    """
-    Send a ~1ms HIGH pulse on TRIGGER_PIN. Both cameras (cam0 & cam1) 
-    use this line in external trigger mode to expose/capture a frame.
-    """
-    TRIGGER_PIN = 26                        # Hardware trigger
-    trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=True)
-    
-    trigger_output.on()                     # Set trigger pin HIGH
-    time.sleep(0.001)  # 1ms
-    trigger_output.off()
-    time.sleep(0.001)  # 1ms
-    trigger_output.on()
+def pulse_trigger(active: bool = True):
+    while active:
+        trigger_output.off()
+        time.sleep(exposure)  # Exposure time
+        trigger_output.on()
+        time.sleep(high_time)  
 
 def capture_both_cameras(i):
     """
@@ -211,15 +202,14 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             i = 1
             red.on()
             # capture_continuous(dt)
-            trigger_output.off()
-            time.sleep(0.001)  # 1ms
-            trigger_output.on()
             while right_button.is_pressed:
-                cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
-                trigger_output.off()
-                time.sleep(0.001)  # 1ms
-                trigger_output.on() 
-                time.sleep(0.5)
+                timestamp = time.monotonic_ns()  # Timestamp
+                filename = f"{timestamp}_{i:05}"
+                img0 = cam0.capture_array('main') # Capture cam0
+                img1 = cam1.capture_array('main')  # Capture cam1
+                image_buffer0.append((img0, filename))
+                image_buffer1.append((img1, filename))
+
                 # capture_both_cameras(i)
                 i += 1
             # process_and_store(fdir_cam0, fdir_cam1)
@@ -236,18 +226,22 @@ yellow = LED(16)                        # Yellow LED
 red = LED(24)                           # Red LED
 right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
-TRIGGER_PIN = 26                        # Hardware trigger
 
-frame_rate = 25
-shutter_us = 6000
-shutter_sec = shutter_us / 1e6
-frame_length_sec = 1 / frame_rate
+trigger_pin = 26                        # Hardware trigger
+trigger_output = DigitalOutputDevice(trigger_pin, active_high=True, initial_value=True)
+frame_rate = 25                         # Frame rate in Hz
+frame_period = 1 / frame_rate           # e.g. 0.04 sec
+exposure_ms = 5                         # Exposure time in milliseconds
+exposure_sec = exposure_ms / 1e3        # Exposure time in seconds
+latency = 14.26 / 1e6                   # Latency in seconds
+exposure = exposure_sec - latency       # True exposure time in seconds
+high_time = frame_period - exposure     # Time to wait before triggering the next frame
 
-duty_cycle = 1 - (shutter_sec / frame_length_sec)
-trigger_output = PWMOutputDevice(TRIGGER_PIN, frequency=frame_rate, initial_value=duty_cycle)
+trigger_event = threading.Event()
+trigger = threading.Thread(target=pulse_trigger, args=(trigger_event,))
 
-# Start PWM
-trigger_output.value = duty_cycle
+trigger_event.set()  # Set the event to start the thread    
+trigger.start()
 
 # Call once at the start to enable external trigger
 set_trigger_mode(True)
@@ -334,7 +328,8 @@ finally:
     cam0.close(), cam1.close()                 # Close the cameras
     green.close(), yellow.close(), red.close() # Close the LEDs
     right_button.close(), left_button.close()  # Close the buttons
-    trigger_output.close()                     # Close the trigger output
+    trigger_event.clear()                      # Clear the trigger event
+    trigger.join()                             # Wait for the thread to finish
     set_trigger_mode(False)                    # Disable external trigger mode 
     sys.exit(0)
     #####################################################################
