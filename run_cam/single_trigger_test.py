@@ -204,11 +204,11 @@ def enter_standby(fdir, fname_log, dt, mode, portName):
             red.on()
             # capture_continuous(dt)
             while right_button.is_pressed:
+                cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
                 trigger_output.off()
                 time.sleep(0.001)  # 1ms
                 trigger_output.on() 
                 time.sleep(0.5)
-                cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
                 # capture_both_cameras(i)
                 i += 1
                 time.sleep(0.1)
@@ -326,12 +326,13 @@ except Exception as e:
 
 finally:
     ############################## Cleanup ###############################
-    cam0.stop()                # Stop the cameras
-    cam0.close()                # Close the cameras
+    cam0.stop(), cam1.stop()                   # Stop the cameras
+    cam0.close(), cam1.close()                 # Close the cameras
     green.close(), yellow.close(), red.close() # Close the LEDs
     right_button.close(), left_button.close()  # Close the buttons
     trigger_output.off()                       # Turn off the trigger output
     trigger_output.close()                     # Close the trigger output
+    set_trigger_mode(False)                    # Disable external trigger mode 
     sys.exit(0)
     #####################################################################
 
