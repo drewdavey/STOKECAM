@@ -241,7 +241,7 @@ trigger_event = threading.Event()
 trigger = threading.Thread(target=pulse_trigger, args=(trigger_event,))
 
 trigger_event.set()  # Set the event to start the thread    
-trigger.start()
+# trigger.start()
 
 # Call once at the start to enable external trigger
 set_trigger_mode(True)
