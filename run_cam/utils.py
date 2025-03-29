@@ -89,7 +89,7 @@ def create_dirs(fdir, mode):
 def get_config(mode, exposure_ms):
     # Some common config
     cam = Picamera2()
-    cfg = cam.create_still_configuration()
+    cfg = cam.create_still_configuration(buffer_count=50)
     cfg['main']['size'] = (1440, 1080)
     cfg['main']['format'] = 'RGB888'
     cfg['controls']['ExposureTime'] = exposure_ms * 1000  # in microseconds
