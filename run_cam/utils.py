@@ -6,7 +6,9 @@
 import os
 import time
 import yaml
+from settings import *
 from vectornav import *
+from picamera2 import Picamera2
 from vectornav.Commands import *
 from vectornav.Registers import *
 from datetime import datetime, timezone, timedelta
@@ -52,7 +54,30 @@ def read_inputs_yaml(fname_log):
         except yaml.YAMLError as exc:
             log.write(f"Error parsing YAML file: {exc}")
             return None
-        
+
+def parse_inputs(fname_log):
+    inputs = read_inputs_yaml(fname_log)
+    if not inputs:
+        # Handle the error gracefully or return safe defaults
+        # e.g. return None, or raise an exception
+        return None
+    # Basic parameters
+    frame_rate = inputs['fps']         # e.g. 25 Hz
+    calib_dt = inputs['calib_dt']
+    calib_frames = inputs['calib_frames']
+    # Shooting modes & exposure times
+    shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
+    exposure_times = [inputs['exposure_ms0'], inputs['exposure_ms1'], inputs['exposure_ms2']]
+    return frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times
+
+def calc_dt(frame_rate=25, exposure_ms=2):
+    frame_period = 1.0 / frame_rate    # e.g. 0.04 s ~ 25 Hz
+    latency = 14.26e-6                 # 14.26 microseconds
+    exposure_sec = exposure_ms / 1e3   # ms -> sec
+    exposure = exposure_sec - latency  # hardware trigger offsets
+    dt = (frame_period - exposure) * 1e9  # remainder in nanoseconds
+    return exposure, dt
+
 def create_dirs(fdir, mode):
     session = datetime.now(timezone.utc).strftime('%H%M%S_' + mode)
     fdir_out = os.path.join(fdir, session + '/')
@@ -61,6 +86,25 @@ def create_dirs(fdir, mode):
     os.makedirs(fdir_cam0, exist_ok=True)
     os.makedirs(fdir_cam1, exist_ok=True)
     return fdir_out, fdir_cam0, fdir_cam1
+
+def get_config(mode, exposure_ms):
+    # Some common config
+    cam = Picamera2()
+    cfg = cam.create_still_configuration()
+    cfg['main']['size'] = (1440, 1080)
+    cfg['main']['format'] = 'RGB888'
+    cfg['controls']['ExposureTime'] = exposure_ms * 1000  # in microseconds
+    if mode == 'auto':
+        cfg['controls']['FrameDurationLimits'] = (0, 100)
+        # add other settings by mode here
+    elif mode == 'fast':
+        cfg['controls']['FrameDurationLimits'] = (0, 100)
+    elif mode == 'max':
+        cfg['controls']['FrameDurationLimits'] = (33333, 33333)
+    else:
+        raise ValueError(f"Invalid mode: {mode}")
+    cam.close()
+    return cfg
 
 def config_vecnav(portName):
     s = Sensor()                      # Create sensor object and connect to the VN-200 
