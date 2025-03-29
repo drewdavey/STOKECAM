@@ -102,6 +102,12 @@ def toggle_modes():
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
+def pulse_trigger(exposure):
+    """Pulses the trigger pin to generate a frame."""
+    trigger.off()
+    time.sleep(exposure)      # Exposure time
+    trigger.on()
+
 def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
     while not write_queue.empty():
@@ -158,9 +164,7 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
             red.on()
             while right_button.is_pressed:
                 t1 = time.monotonic_ns()  # Before exposure
-                trigger.off()
-                time.sleep(exposure)      # Exposure time
-                trigger.on()
+                pulse_trigger(exposure)
                 t2 = time.monotonic_ns()  # After exposure
                 timestamp = (t1 + t2) / 2 # Average timestamp  
 
@@ -192,8 +196,9 @@ trigger = DigitalOutputDevice(trigger_pin, active_high=True, initial_value=True)
 # Enable external trigger mode
 set_trigger_mode(True)
 
-# Pulse trigger to generate an initial frame
-trigger.off(), time.sleep(0.1), trigger.on()
+# Pulse trigger to generate a initial frames
+for _ in range(5):
+    pulse_trigger(0.1)  # Pulse trigger for 0.1 seconds
 
 # Circular buffer and queue setup
 buffer_size = 1000  # Store last 100 images in memory
