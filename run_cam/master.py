@@ -41,6 +41,10 @@ def set_trigger_mode(enable: bool = True, fname_log: str = "log.txt"):
     log.close()
 
 def configure_cameras(fname_log, mode, exposure_ms):
+    """
+    Configures the cameras with the specified mode and exposure time.
+    The cameras are initialized and started, and their configurations are logged.
+    """
     global cam0, cam1
     # Create the camera config for that default mode
     config = get_config(mode, exposure_ms) 
@@ -100,8 +104,8 @@ def toggle_modes():
             red.on(), green.off(), yellow.off()
         time.sleep(0.2)
     [led.off() for led in (red, green, yellow)]
-    exposure, dt = calc_dt(frame_rate, exposure_ms)
-    configure_cameras(fname_log, mode, exposure_ms) # Configure the cameras
+    exposure, dt = calc_dt(frame_rate, exposure_ms)   # Calculate dt
+    configure_cameras(fname_log, mode, exposure_ms)   # Configure the cameras
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
