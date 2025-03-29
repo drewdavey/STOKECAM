@@ -12,4 +12,4 @@ shooting_mode2: 'max'   # Shooting mode: 'standard', 'auto', 'bright', 'dark', '
 calib_frames: 50        # Number of frames to be captured by calib mode
 calib_dt: 2             # Time between frames in seconds (for calibration)
 
-dt: 0.5                # Time between frames in seconds
+fps: 25                 # Framerate in Hz (frames per second)

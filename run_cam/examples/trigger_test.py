@@ -48,7 +48,7 @@ def configure_cameras(fname_log, mode):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
-        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+        # log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
 
 def monitor_gps(portName):
@@ -102,12 +102,57 @@ def toggle_modes():
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
+def capture_continuous(dt):
+    """Capture images continuously into RAM while the button is held."""
+    i = 1
+    while right_button.is_pressed:
+        timestamp0 = time.monotonic_ns()  # Timestamp before cam0 capture
+        img0 = cam0.capture_array('main', wait=False) # Capture cam0
+        filename0 = f"{timestamp0}_{i:05}"
+        timestamp1 = time.monotonic_ns()  # Timestamp before cam1 capture
+        img1 = cam1.capture_array('main', wait=False)  # Capture cam1
+        filename1 = f"{timestamp1}_{i:05}"
+        image_buffer0.append((img0, filename0))
+        image_buffer1.append((img1, filename1))
+        time.sleep(dt)
+        i += 1
+
+# def pulse_trigger(active: bool = True):
+#     while active:
+#         trigger_output.off()
+#         time.sleep(exposure)  # Exposure time
+#         trigger_output.on()
+#         time.sleep(high_time)  
+
+def capture_both_cameras(i):
+    """
+    After pulsing the hardware trigger, wait briefly,
+    then capture from each camera, storing frames in memory buffers.
+    """
+    cam0.capture_file(f'home/drew/Desktop/test{i}.jpg')
+    # # Capture from cam0
+    # frame0 = cam0.capture_array()
+    # tnow0  = time.monotonic_ns()
+    # filename0 = f"{tnow0}_{i:05}"
+    # image_buffer0.append((frame0, filename0))
+
+    # # Capture from cam1
+    # frame1 = cam1.capture_array()
+    # tnow1  = time.monotonic_ns()
+    # filename1 = f"{tnow1}_{i:05}"
+    # image_buffer1.append((frame1, filename1))
+
 def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
     while not write_queue.empty():
         try:
             img0, filename0 = write_queue.get(timeout=2)
             img1, filename1 = write_queue.get(timeout=2)
+
+            # ### Wait on each request, then retrieve the image ###
+            # img0 = cam0.wait(img0)            
+            # img1 = cam1.wait(img1)
+
             filename0 = f"{fdir_cam0}0_{filename0}.jpg"
             filename1 = f"{fdir_cam1}1_{filename1}.jpg"
             # Convert RGB to BGR for OpenCV
@@ -139,12 +184,12 @@ def exit_standby(fname_log):
     time.sleep(1)
     standby = False
 
-def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
+def enter_standby(fdir, fname_log, dt, mode, portName):
     yellow.on()
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
-    fdir_out, fdir_cam0, fdir_cam1 = create_dirs(fdir, f"session_{mode}")
+    fdir_out, fdir_cam0, fdir_cam1, fname_imu = create_dirs(fdir, f"session_{mode}")
     s = Sensor()  # Create sensor object and connect to the VN-200
     csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)
@@ -156,21 +201,22 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 1
             red.on()
+            # capture_continuous(dt)
             while right_button.is_pressed:
-                t1 = time.monotonic_ns()  # Before exposure
+                t1 = time.monotonic_ns()  # Before
                 trigger.off()
-                time.sleep(exposure)      # Exposure time
+                time.sleep(exposure)  # Exposure time
                 trigger.on()
-                t2 = time.monotonic_ns()  # After exposure
+                t2 = time.monotonic_ns()  # After
                 timestamp = (t1 + t2) / 2 # Average timestamp  
-
+    
                 filename = f"{timestamp}_{i:05}"
-                img0 = cam0.capture_array('main')  # Capture cam0
+                img0 = cam0.capture_array('main') # Capture cam0
                 img1 = cam1.capture_array('main')  # Capture cam1
                 image_buffer0.append((img0, filename))
                 image_buffer1.append((img1, filename))
                 i += 1
-                while time.monotonic_ns() < (t2 + dt): # Wait for remainder of dt
+                while time.monotonic_ns() < t2 + 1e9 * spare_time:
                     pass
             process_and_store(fdir_cam0, fdir_cam1)
             red.off()
@@ -186,14 +232,25 @@ yellow = LED(16)                        # Yellow LED
 red = LED(24)                           # Red LED
 right_button = Button(18, hold_time=3)  # Right button
 left_button = Button(17, hold_time=3)   # Left button
+
 trigger_pin = 26                        # Hardware trigger
 trigger = DigitalOutputDevice(trigger_pin, active_high=True, initial_value=True)
+frame_rate = 25                         # Frame rate in Hz
+frame_period = 1 / frame_rate           # e.g. 0.04 sec
+exposure_ms = 5                         # Exposure time in milliseconds
+exposure_sec = exposure_ms / 1e3        # Exposure time in seconds
+latency = 14.26 / 1e6                   # Latency in seconds
+exposure = exposure_sec - latency       # True exposure time in seconds
+spare_time = frame_period - exposure    # Time to wait before triggering the next frame
 
-# Enable external trigger mode
+# trigger_event = threading.Event()
+# trigger = threading.Thread(target=pulse_trigger, args=(trigger_event,))
+
+# trigger_event.set()  # Set the event to start the thread    
+# trigger.start()
+
+# Call once at the start to enable external trigger
 set_trigger_mode(True)
-
-# Pulse trigger to generate an initial frame
-trigger.off(), time.sleep(0.1), trigger.on()
 
 # Circular buffer and queue setup
 buffer_size = 1000  # Store last 100 images in memory
@@ -201,32 +258,26 @@ image_buffer0 = deque(maxlen=buffer_size)
 image_buffer1 = deque(maxlen=buffer_size)
 write_queue = queue.Queue()
 
-try: # Get gps_timeout for syncing the clock
-    gps_timeout = yaml.safe_load(open('../inputs.yaml', 'r'))['gps_timeout']
-except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
-    gps_timeout = 60
+# try:
+#     gps_timeout = yaml.safe_load(open('../inputs.yaml', 'r'))['gps_timeout']
+# except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
+#     gps_timeout = 60
+
 portName = '/dev/ttyUSB0'                 # Default port for VN-200
 config_vecnav(portName)                   # Config VN-200 output           
+
 # # Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
 # while not sync_clock(portName, gps_timeout):  
 #     [led.on() for led in (red, green, yellow)]  
 #     while not (right_button.is_held and left_button.is_held):
 #         time.sleep(0.1)
 #     [led.off() for led in (red, green, yellow)]
-fdir, fname_log = setup_logging()       # Setup logging
 
-# Read camera parameters inputs.yaml 
-inputs = read_inputs_yaml(fname_log)    
-# calib_dt = inputs['calib_dt']
-# calib_frames = inputs['calib_frames']
-
-frame_rate = inputs['fps']              # Frame rate in Hz
-frame_period = 1 / frame_rate           # e.g. 0.04 sec
-exposure_ms = 5                         # Exposure time in milliseconds
-exposure_sec = exposure_ms / 1e3        # Exposure time in seconds
-latency = 14.26 / 1e6                   # Latency in seconds
-exposure = exposure_sec - latency       # True exposure time in seconds
-dt = (frame_period - exposure) * 1e9    # Time to wait before triggering the next frame
+fdir, fname_log = setup_logging()               # Setup logging
+inputs = read_inputs_yaml(fname_log)            # Read inputs from inputs.yaml
+dt = inputs['dt']
+calib_dt = inputs['calib_dt']
+calib_frames = inputs['calib_frames']
 
 # # Get IMU/GPS status. Print initial values to log.
 # vecnav_status(portName, fname_log, gps_timeout)
@@ -283,7 +334,8 @@ finally:
     cam0.close(), cam1.close()                 # Close the cameras
     green.close(), yellow.close(), red.close() # Close the LEDs
     right_button.close(), left_button.close()  # Close the buttons
-    trigger.close()                            # Close the trigger pin
+    trigger_event.clear()                      # Clear the trigger event
+    trigger.join()                             # Wait for the thread to finish
     set_trigger_mode(False)                    # Disable external trigger mode 
     sys.exit(0)
     #####################################################################
