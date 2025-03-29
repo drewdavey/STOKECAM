@@ -6,7 +6,6 @@
 import os
 import time
 import yaml
-from settings import *
 from vectornav import *
 from picamera2 import Picamera2
 from vectornav.Commands import *
