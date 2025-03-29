@@ -241,8 +241,9 @@ cam1 = Picamera2(1)                             # Initialize cam1
 configure_cameras(fname_log, mode)              # Configure the cameras
 
 # Pulse trigger to generate a initial frames
-for _ in range(10):
+for _ in range(5):
     pulse_trigger(0.1)  # Pulse trigger for 0.1 seconds
+    time.sleep(0.1)  # Wait for 0.1 seconds
 
 standby = False
 tnow = time.time()
