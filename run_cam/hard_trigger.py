@@ -11,6 +11,12 @@ TRIGGER_PIN = 26
 # Create a DigitalOutputDevice for the trigger line.
 trigger_output = DigitalOutputDevice(TRIGGER_PIN, active_high=True, initial_value=False)
 
+while True:
+    trigger_output.on()
+    time.sleep(0.5)
+    trigger_output.off()
+    time.sleep(0.5)  
+
 def set_trigger_mode(enable: bool = True):
     """
     Write 1 or 0 to /sys/module/imx296/parameters/trigger_mode
