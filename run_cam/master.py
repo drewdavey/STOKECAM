@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from vectornav.Plugins import ExporterCsv
 from gpiozero import Button, LED, DigitalOutputDevice
 
-def set_trigger_mode(enable: bool = True):
+def set_trigger_mode(enable: bool = True, fname_log: str = "log.txt"):
     """
     Enables or disables external trigger mode by writing 1 or 0
     to /sys/module/imx296/parameters/trigger_mode.
@@ -32,12 +32,12 @@ def set_trigger_mode(enable: bool = True):
     log = open(fname_log, 'a')
     val = "1" if enable else "0"
     cmd = f"sudo sh -c 'echo {val} > /sys/module/imx296/parameters/trigger_mode'"
-    log.write(f"[INFO] Setting IMX296 trigger_mode to: {val}")
+    log.write(f"[INFO] Setting IMX296 trigger_mode to: {val}\n")
     try:
         subprocess.run(cmd, shell=True, check=True)
-        log.write("[INFO] Successfully set trigger mode.")
+        log.write("[INFO] Successfully set trigger mode.\n")
     except subprocess.CalledProcessError as e:
-        log.write(f"[ERROR] Failed to set trigger mode: {e}")
+        log.write(f"[ERROR] Failed to set trigger mode: {e}\n")
     log.close()
 
 def configure_cameras(fname_log, mode, exposure_ms):
