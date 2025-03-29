@@ -167,13 +167,18 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 pulse_trigger(exposure)
                 t2 = time.monotonic_ns()  # After exposure
                 timestamp = (t1 + t2) / 2 # Average timestamp  
-                cam0.capture_file(f"{fdir_cam0}0_{str(time.monotonic_ns())}_{i+1:05}.jpg")
-                cam1.capture_file(f"{fdir_cam1}1_{str(time.monotonic_ns())}_{i+1:05}.jpg")
+
+                # Capture images and save them to the SD card
+                cam0.capture_file(f"{fdir_cam0}0_{timestamp}_{i:05}.jpg")
+                cam1.capture_file(f"{fdir_cam1}1_{timestamp}_{i:05}.jpg")
+
+                # Capture images and store them in the circular buffer
                 # filename = f"{timestamp}_{i:05}"
                 # img0 = cam0.capture_array('main')  # Capture cam0
                 # img1 = cam1.capture_array('main')  # Capture cam1
                 # image_buffer0.append((img0, filename))
                 # image_buffer1.append((img1, filename))
+                
                 i += 1
                 while time.monotonic_ns() < (t2 + dt): # Wait for remainder of dt
                     pass
@@ -224,7 +229,7 @@ inputs = read_inputs_yaml(fname_log)
 
 frame_rate = inputs['fps']              # Frame rate in Hz
 frame_period = 1 / frame_rate           # e.g. 0.04 sec
-exposure_ms = 5                         # Exposure time in milliseconds
+exposure_ms = 1                        # Exposure time in milliseconds
 exposure_sec = exposure_ms / 1e3        # Exposure time in seconds
 latency = 14.26 / 1e6                   # Latency in seconds
 exposure = exposure_sec - latency       # True exposure time in seconds
