@@ -229,7 +229,7 @@ inputs = read_inputs_yaml(fname_log)
 
 frame_rate = inputs['fps']              # Frame rate in Hz
 frame_period = 1 / frame_rate           # e.g. 0.04 sec
-exposure_ms = 1                        # Exposure time in milliseconds
+exposure_ms = 1                         # Exposure time in milliseconds
 exposure_sec = exposure_ms / 1e3        # Exposure time in seconds
 latency = 14.26 / 1e6                   # Latency in seconds
 exposure = exposure_sec - latency       # True exposure time in seconds
