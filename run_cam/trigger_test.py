@@ -48,7 +48,7 @@ def configure_cameras(fname_log, mode):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
-        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+        # log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
 
 def monitor_gps(portName):
