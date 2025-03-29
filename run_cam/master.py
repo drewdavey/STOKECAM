@@ -61,6 +61,7 @@ def configure_cameras(fname_log, mode, exposure_ms):
     log.write('\n'), log.close()
 
 def monitor_gps(portName):
+    """Monitor GPS status and blink the green LED based on the fix type."""
     s = Sensor()  # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)  
     gnss = Registers.GnssSolLla()
@@ -85,6 +86,7 @@ def monitor_gps(portName):
     s.disconnect()
 
 def toggle_modes():
+    """Toggle between shooting modes and configure the cameras accordingly."""
     global cam0, cam1, mode, exposure, dt
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     time.sleep(3)
@@ -111,6 +113,7 @@ def toggle_modes():
     [led.off() for led in (red, green, yellow)]
 
 def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
+    """Enter standby mode to capture images with external trigger."""
     yellow.on()
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
