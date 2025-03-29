@@ -196,10 +196,6 @@ trigger = DigitalOutputDevice(trigger_pin, active_high=True, initial_value=True)
 # Enable external trigger mode
 set_trigger_mode(True)
 
-# Pulse trigger to generate a initial frames
-for _ in range(500):
-    pulse_trigger(0.1)  # Pulse trigger for 0.1 seconds
-
 # Circular buffer and queue setup
 buffer_size = 1000  # Store last 100 images in memory
 image_buffer0 = deque(maxlen=buffer_size)
@@ -243,6 +239,10 @@ config = get_config(mode)                       # Get the configuration for the 
 cam0 = Picamera2(0)                             # Initialize cam0       
 cam1 = Picamera2(1)                             # Initialize cam1
 configure_cameras(fname_log, mode)              # Configure the cameras
+
+# Pulse trigger to generate a initial frames
+for _ in range(10):
+    pulse_trigger(0.1)  # Pulse trigger for 0.1 seconds
 
 standby = False
 tnow = time.time()
