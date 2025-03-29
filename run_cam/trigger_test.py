@@ -197,7 +197,7 @@ trigger = DigitalOutputDevice(trigger_pin, active_high=True, initial_value=True)
 set_trigger_mode(True)
 
 # Pulse trigger to generate a initial frames
-for _ in range(5):
+for _ in range(500):
     pulse_trigger(0.1)  # Pulse trigger for 0.1 seconds
 
 # Circular buffer and queue setup
