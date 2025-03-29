@@ -48,7 +48,7 @@ def configure_cameras(fname_log, mode):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
-        # log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
+        log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
 
 def monitor_gps(portName):
@@ -238,12 +238,13 @@ mode = shooting_modes[0]                        # Default to 'auto'
 config = get_config(mode)                       # Get the configuration for the cameras
 cam0 = Picamera2(0)                             # Initialize cam0       
 cam1 = Picamera2(1)                             # Initialize cam1
-configure_cameras(fname_log, mode)              # Configure the cameras
 
-# Pulse trigger to generate a initial frames
+# Pulse trigger to generate initial frames
 for _ in range(100):
-    pulse_trigger(0.1)  # Pulse trigger for 0.1 seconds
-    time.sleep(0.1)  # Wait for 0.1 seconds
+    pulse_trigger(0.01)
+    time.sleep(0.01)
+
+configure_cameras(fname_log, mode)              # Configure the cameras
 
 standby = False
 tnow = time.time()
