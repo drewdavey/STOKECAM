@@ -47,6 +47,8 @@ def configure_cameras(fname_log, mode, exposure_ms):
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
+    cam0 = Picamera2(0)                             # Initialize cam0
+    cam1 = Picamera2(1)                             # Initialize cam1
     for idx, cam in enumerate([cam0, cam1]):
         cam.configure(config)
         cam.start()
@@ -99,8 +101,6 @@ def toggle_modes():
         time.sleep(0.2)
     [led.off() for led in (red, green, yellow)]
     exposure, dt = calc_dt(frame_rate, exposure_ms)
-    cam0 = Picamera2(0)                             # Initialize cam0       
-    cam1 = Picamera2(1)                             # Initialize cam1
     configure_cameras(fname_log, mode, exposure_ms) # Configure the cameras
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     time.sleep(3)
@@ -236,8 +236,6 @@ global cam0, cam1, mode, standby, exposure, dt
 frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times = parse_inputs(fname_log)
 mode = shooting_modes[0]                        # Default mode
 exposure_ms = exposure_times[0]                 # Default exposure time
-cam0 = Picamera2(0)                             # Initialize cam0
-cam1 = Picamera2(1)                             # Initialize cam1
 configure_cameras(fname_log, mode, exposure_ms) # Configure the cameras
 exposure, dt = calc_dt(frame_rate, exposure_ms) # Calculate dt
 
