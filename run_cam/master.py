@@ -249,15 +249,23 @@ portName = '/dev/ttyUSB0'                 # Default port for VN-200
 config_vecnav(portName)                   # Config VN-200 output           
 
 ##### Sync the clock. If sync fails, turn on all LEDs. #####
-# Hold both buttons to retry.
-# Hold right button only to continue (if clock is accurate but no GPS fix).
-while not sync_clock(portName, gps_timeout):  
-    [led.on() for led in (red, green, yellow)]  
-    while not (right_button.is_held and left_button.is_held):
-        if right_button.is_held and not left_button.is_pressed:
-            gps_timeout = 1 # i.e. indoors ~ clock sync from ntp, no GPS fix
-            continue
-    [led.off() for led in (red, green, yellow)]
+# Hold right button only to try/retry syncing the clock.
+# Hold left button only to continue (if clock is accurate but no GPS signal).
+[led.on() for led in (red, green, yellow)]
+while True:
+    if right_button.is_held and not left_button.is_pressed:
+        [led.blink(0.5,0.5) for led in (red, green, yellow)]
+        if sync_clock(portName, gps_timeout):
+            [led.off() for led in (red, green, yellow)]
+            break   # Successful sync
+        else:
+            [led.on() for led in (red, green, yellow)]
+            pass # Sync failed, remain in this loop to try again or skip
+    if left_button.is_held and not right_button.is_pressed:
+        [led.off() for led in (red, green, yellow)]
+        gps_timeout = 0 # Don't wait for GPS fix in status check
+        break
+    time.sleep(0.1)
 
 # Setup log file and directories now that clock is synced
 fdir, fname_log = setup_logging()       
