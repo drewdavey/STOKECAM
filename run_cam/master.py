@@ -5,7 +5,7 @@
 # The user can also calibrate the cameras by holding the left button for more than 5 seconds.
 ##################################
 import os
-os.environ["LIBCAMERA_RPI_CONFIG_FILE"] = "/usr/local/share/libcamera/pipeline/rpi/pisp/example.yaml"
+os.environ["LIBCAMERA_RPI_CONFIG_FILE"] = "/usr/local/share/libcamera/pipeline/rpi/pisp/STOKECAM.yaml"
 # os.environ["LIBCAMERA_LOG_LEVEL"] = "ERROR"  # Set log level to ERROR to suppress warnings
 import sys
 import cv2
