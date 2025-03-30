@@ -178,8 +178,8 @@ def write_images_to_sd(fdir_cam0, fdir_cam1):
             filename0 = f"{fdir_cam0}0_{filename0}.jpg"
             filename1 = f"{fdir_cam1}1_{filename1}.jpg"
             # Convert RGB to BGR for OpenCV
-            img0 = cv2.cvtColor(img0, cv2.COLOR_RGB2BGR)
-            img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2BGR)
+            # img0 = cv2.cvtColor(img0, cv2.COLOR_RGB2BGR)
+            # img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2BGR)
             cv2.imwrite(filename0, img0)  # Save images
             cv2.imwrite(filename1, img1)
         except queue.Empty:
