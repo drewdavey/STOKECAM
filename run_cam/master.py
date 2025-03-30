@@ -126,6 +126,8 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
     csvExporter.start()
     time.sleep(1)
 
+    t_log = open('tictoc_capture_file.txt','w')
+    
     while not (right_button.is_held and left_button.is_held):  # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 1
@@ -136,7 +138,7 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 t2 = time.monotonic_ns()  # After exposure
                 timestamp = (t1 + t2) / 2 # Average timestamp  
 
-                t_log = open('tictoc_capture_file.txt','w')
+                
                 tick = time.monotonic_ns()  # Start time for the loop
                 
                 # Capture images and save them to the SD card
