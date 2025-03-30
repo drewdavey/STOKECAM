@@ -263,7 +263,7 @@ while True:
             pass # Sync failed, remain in this loop to try again or skip
     if left_button.is_held and not right_button.is_pressed:
         [led.off() for led in (red, green, yellow)]
-        gps_timeout = 0 # Don't wait for GPS fix in status check
+        gps_timeout = 1 # Don't wait for GPS fix in status check
         break
     time.sleep(0.1)
 
