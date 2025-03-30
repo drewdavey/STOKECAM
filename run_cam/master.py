@@ -134,11 +134,7 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 t1 = time.monotonic_ns()  # Before exposure
                 pulse_trigger(exposure)
                 t2 = time.monotonic_ns()  # After exposure
-                timestamp = (t1 + t2) / 2 # Average timestamp  
-                # # Capture images and save them to the SD card
-                # cam0.capture_file(f"{fdir_cam0}0_{timestamp}_{i:05}.jpg")
-                # cam1.capture_file(f"{fdir_cam1}1_{timestamp}_{i:05}.jpg")
-                
+                timestamp = round((t1 + t2) / 2) # Average timestamp  
                 # Capture images and store them in the circular buffer
                 filename = f"{timestamp}_{i:05}"
                 img0 = cam0.capture_array('main')  # Capture cam0
@@ -151,7 +147,6 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
             process_and_store(fdir_cam0, fdir_cam1)
             red.off()
         time.sleep(0.2)
-
     csvExporter.stop()
     s.disconnect()
     exit_standby(fname_log)
