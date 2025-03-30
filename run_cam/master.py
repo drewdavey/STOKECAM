@@ -126,8 +126,8 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
     csvExporter.start()
     time.sleep(1)
 
-    t_log = open('tictoc_capture_file.txt','w')
-    
+    t_log = open('tictoc_capture_file_ns.txt','w')
+
     while not (right_button.is_held and left_button.is_held):  # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 1
@@ -154,7 +154,7 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 
                 tock = time.monotonic_ns()  # End time for the loop
                 elapsed = (tock - tick)
-                t_log.write(f"Elapsed time: {elapsed} nanoseconds\n")
+                t_log.write(f"{elapsed}\n")
 
                 i += 1
                 while time.monotonic_ns() < (t2 + dt): # Wait for remainder of dt
