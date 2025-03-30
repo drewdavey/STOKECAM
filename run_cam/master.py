@@ -183,8 +183,9 @@ def write_images_to_sd(fdir_cam0, fdir_cam1):
             cv2.imwrite(filename1, img1)
         except queue.Empty:
             break
-        
+
 def exit_standby(fname_log):
+    """Exit standby mode and turn off the LEDs."""
     global standby
     yellow.off(), red.off() # Close the lights
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
