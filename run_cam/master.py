@@ -157,6 +157,17 @@ def pulse_trigger(exposure):
     time.sleep(exposure)      # Exposure time
     trigger.on()
 
+def process_and_store(fdir_cam0, fdir_cam1):
+    """Queue images for writing after button release."""
+    for i in range(len(image_buffer0)):
+        write_queue.put(image_buffer0[i])
+        write_queue.put(image_buffer1[i])
+    thread = threading.Thread(target=write_images_to_sd, args=[fdir_cam0, fdir_cam1])
+    thread.start()
+    # Clear out the buffers so the next burst starts fresh
+    image_buffer0.clear()
+    image_buffer1.clear()
+
 def write_images_to_sd(fdir_cam0, fdir_cam1):
     """Background process to write images to SD card."""
     while not write_queue.empty():
@@ -170,21 +181,9 @@ def write_images_to_sd(fdir_cam0, fdir_cam1):
             img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2BGR)
             cv2.imwrite(filename0, img0)  # Save images
             cv2.imwrite(filename1, img1)
-            print(f"Saved {filename0} and {filename1}")
         except queue.Empty:
             break
-
-def process_and_store(fdir_cam0, fdir_cam1):
-    """Queue images for writing after button release."""
-    for i in range(len(image_buffer0)):
-        write_queue.put(image_buffer0[i])
-        write_queue.put(image_buffer1[i])
-    thread = threading.Thread(target=write_images_to_sd, args=[fdir_cam0, fdir_cam1])
-    thread.start()
-    # Clear out the buffers so the next burst starts fresh
-    image_buffer0.clear()
-    image_buffer1.clear()
-
+        
 def exit_standby(fname_log):
     global standby
     yellow.off(), red.off() # Close the lights
