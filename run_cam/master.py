@@ -77,7 +77,7 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName, exposure):
         yellow.on(), time.sleep(0.5)
         red.on(), time.sleep(0.5)
         [led.blink(0.5,0.5) for led in (red, green, yellow)], time.sleep(3)
-        [led.on() for led in (red, green, yellow)]
+        [led.on() for led in (red, green, yellow)], time.sleep(1)
         t1 = time.monotonic_ns()  # Before exposure
         pulse_trigger(exposure)
         t2 = time.monotonic_ns()  # After exposure
