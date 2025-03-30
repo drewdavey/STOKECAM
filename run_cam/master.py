@@ -247,18 +247,18 @@ except (FileNotFoundError, yaml.YAMLError, KeyError) as exc:
     gps_timeout = 60
 portName = '/dev/ttyUSB0'                 # Default port for VN-200
 config_vecnav(portName)                   # Config VN-200 output           
-# # Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
-# while not sync_clock(portName, gps_timeout):  
-#     [led.on() for led in (red, green, yellow)]  
-#     while not (right_button.is_held and left_button.is_held):
-#         time.sleep(0.1)
-#     [led.off() for led in (red, green, yellow)]
+# Sync the clock. If sync fails, turn on all LEDs. Hold both buttons to retry.
+while not sync_clock(portName, gps_timeout):  
+    [led.on() for led in (red, green, yellow)]  
+    while not (right_button.is_held and left_button.is_held):
+        pass
+    [led.off() for led in (red, green, yellow)]
 
 # Setup log file and directories now that clock is synced
 fdir, fname_log = setup_logging()       
 
-# # Get IMU/GPS status. Print initial values to log.
-# vecnav_status(portName, fname_log, gps_timeout)
+# Get IMU/GPS status. Print initial values to log.
+vecnav_status(portName, fname_log, gps_timeout)
 
 # Enable IMX 296 external trigger mode
 set_trigger_mode(True, fname_log)
