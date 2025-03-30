@@ -237,11 +237,6 @@ exposure_ms = exposure_times[0]                 # Default exposure time
 configure_cameras(fname_log, mode, exposure_ms) # Configure the cameras
 exposure, dt = calc_dt(frame_rate, exposure_ms) # Calculate dt
 
-# # Pulse trigger to generate initial frames
-# for _ in range(10):
-#     pulse_trigger(0.01)
-#     time.sleep(0.01)
-
 standby = False         # Flag to indicate standby mode 
 monitor_gps(portName)   # Monitor GPS status
 tlast = time.time()     # Last time GPS was checked
