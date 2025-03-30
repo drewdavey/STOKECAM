@@ -126,8 +126,6 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
     csvExporter.start()
     time.sleep(1)
 
-    t_log = open('tictoc_capture_array_ns.txt','w')
-
     while not (right_button.is_held and left_button.is_held):  # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 1
@@ -137,30 +135,20 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 pulse_trigger(exposure)
                 t2 = time.monotonic_ns()  # After exposure
                 timestamp = (t1 + t2) / 2 # Average timestamp  
-
-                
-                tick = time.monotonic_ns()  # Start time for the loop
-                
                 # # Capture images and save them to the SD card
                 # cam0.capture_file(f"{fdir_cam0}0_{timestamp}_{i:05}.jpg")
                 # cam1.capture_file(f"{fdir_cam1}1_{timestamp}_{i:05}.jpg")
-
+                
                 # Capture images and store them in the circular buffer
                 filename = f"{timestamp}_{i:05}"
                 img0 = cam0.capture_array('main')  # Capture cam0
                 img1 = cam1.capture_array('main')  # Capture cam1
                 image_buffer0.append((img0, filename))
                 image_buffer1.append((img1, filename))
-                
-                tock = time.monotonic_ns()  # End time for the loop
-                elapsed = (tock - tick)
-                t_log.write(f"{elapsed}\n")
-
                 i += 1
                 while time.monotonic_ns() < (t2 + dt): # Wait for remainder of dt
                     pass
             process_and_store(fdir_cam0, fdir_cam1)
-            t_log.close()
             red.off()
         time.sleep(0.2)
 
