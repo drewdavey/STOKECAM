@@ -92,7 +92,7 @@ def get_config(mode, exposure_ms):
     cfg = cam.create_still_configuration(buffer_count=50)
     cfg['main']['size'] = (1440, 1080)
     cfg['main']['format'] = 'RGB888'
-    cfg['controls']['ExposureTime'] = exposure_ms * 1e3   # exposure in microseconds
+    cfg['controls']['ExposureTime'] = exposure_ms * 1000  # exposure in microseconds
     cfg['controls']['AeEnable'] = False                   # disable auto exposure
     cfg['controls']['AwbEnable'] = False                  # disable auto white balance
     # Select parameters
