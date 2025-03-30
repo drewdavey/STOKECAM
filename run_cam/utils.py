@@ -57,8 +57,7 @@ def read_inputs_yaml(fname_log):
 def parse_inputs(fname_log):
     inputs = read_inputs_yaml(fname_log)
     if not inputs:
-        # Handle the error gracefully or return safe defaults
-        # e.g. return None, or raise an exception
+        # add error handling here
         return None
     # Basic parameters
     frame_rate = inputs['fps']         # e.g. 25 Hz
