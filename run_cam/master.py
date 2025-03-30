@@ -6,8 +6,6 @@
 ##################################
 import os
 os.environ["LIBCAMERA_RPI_CONFIG_FILE"] = "../STOKECAM.yaml"
-# os.environ["LIBCAMERA_LOG_LEVEL"] = "ERROR"  # Set log level to ERROR to suppress warnings
-
 import sys
 import cv2
 import time
@@ -60,6 +58,43 @@ def configure_cameras(fname_log, mode, exposure_ms):
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
         # log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
+
+def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName, exposure):
+    [led.on() for led in (red, green, yellow)]
+    time.sleep(5)
+    [led.off() for led in (red, green, yellow)]
+    fdir_out, fdir_cam0, fdir_cam1 = create_dirs(fdir, f"calib_{mode}")
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+    log = open(fname_log, 'a')
+    log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n"), log.close()
+    s = Sensor() # Create sensor object and connect to the VN-200 
+    csvExporter = ExporterCsv(fdir_out, True)
+    s.autoConnect(portName)
+    s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
+    csvExporter.start()
+    for i in range(int(calib_frames)):
+        green.on(), time.sleep(0.5)
+        yellow.on(), time.sleep(0.5)
+        red.on(), time.sleep(0.5)
+        [led.blink(0.5,0.5) for led in (red, green, yellow)], time.sleep(3)
+        [led.on() for led in (red, green, yellow)]
+        t1 = time.monotonic_ns()  # Before exposure
+        pulse_trigger(exposure)
+        t2 = time.monotonic_ns()  # After exposure
+        timestamp = round((t1 + t2) / 2) # Average timestamp  
+        # Capture images and store them in the circular buffer
+        filename = f"{timestamp}_{i:05}"
+        img0 = cam0.capture_array('main')  # Capture cam0
+        img1 = cam1.capture_array('main')  # Capture cam1
+        image_buffer0.append((img0, filename))
+        image_buffer1.append((img1, filename))
+        i += 1
+        [led.off() for led in (red, green, yellow)]
+        while time.monotonic_ns() < (t2 + calib_dt): # Wait for remainder of dt
+            pass
+    process_and_store(fdir_cam0, fdir_cam1)
+    csvExporter.stop()
+    s.disconnect()
 
 def monitor_gps(portName):
     """Monitor GPS status and blink the green LED based on the fix type."""
@@ -255,7 +290,10 @@ try:
             tlast = time.time()
         if right_button.is_held and not standby and not left_button.is_pressed:
             standby = True
-            enter_standby(fdir, fname_log, mode, portName, exposure, dt)    
+            enter_standby(fdir, fname_log, mode, portName, exposure, dt)   
+        if left_button.is_held and not standby and not right_button.is_pressed:
+            calib(fdir, fname_log, calib_dt, calib_frames, mode, portName, exposure)
+            monitor_gps(portName) 
         if (right_button.is_held and left_button.is_held) and not standby:
             [led.on() for led in (red, green, yellow)]
             left_button.wait_for_release()

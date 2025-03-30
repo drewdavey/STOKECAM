@@ -3,7 +3,7 @@
 # Inputs for STOKE
 ##################################
 
-fps: 25                 # Framerate in Hz (frames per second)
+fps: 25                 # Framerate/Hz (do not exceed 40 fps...max file writing capability without skipping frames) 
 
 shooting_mode0: 'auto'  # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
 exposure_ms0: 4         # Exposure time in milliseconds (for shooting mode 0) 
@@ -12,7 +12,7 @@ exposure_ms1: 2         # Exposure time in milliseconds (for shooting mode 1)
 shooting_mode2: 'max'   # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
 exposure_ms2: 1         # Exposure time in milliseconds (for shooting mode 2)
 
-calib_frames: 50        # Number of frames to be captured by calib mode
 calib_dt: 2             # Time between frames in seconds (for calibration)
+calib_frames: 50        # Number of frames to be captured by calib mode
 
 gps_timeout: 60         # Time to wait for GPS lock in seconds (during startup)
