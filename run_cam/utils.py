@@ -60,8 +60,8 @@ def parse_inputs(fname_log):
         # add error handling here
         return None
     # Basic parameters
-    frame_rate = inputs['fps']         # e.g. 25 Hz
-    calib_dt = inputs['calib_dt']
+    frame_rate = inputs['fps']              # e.g. 25 Hz
+    calib_dt = inputs['calib_dt'] * 1e9     # code logic uses ns
     calib_frames = inputs['calib_frames']
     # Shooting modes & exposure times
     shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
@@ -69,10 +69,10 @@ def parse_inputs(fname_log):
     return frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times
 
 def calc_dt(frame_rate=25, exposure_ms=2):
-    frame_period = 1.0 / frame_rate    # e.g. 0.04 s ~ 25 Hz
-    latency = 14.26e-6                 # 14.26 microseconds
-    exposure_sec = exposure_ms / 1e3   # ms -> sec
-    exposure = exposure_sec - latency  # hardware trigger offsets
+    frame_period = 1.0 / frame_rate       # e.g. 0.04 s ~ 25 Hz
+    latency = 14.26e-6                    # 14.26 microseconds
+    exposure_sec = exposure_ms / 1e3      # ms -> sec
+    exposure = exposure_sec - latency     # hardware trigger offsets
     dt = (frame_period - exposure) * 1e9  # remainder in nanoseconds
     return exposure, dt
 

@@ -83,12 +83,11 @@ def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName, exposure):
         t2 = time.monotonic_ns()  # After exposure
         timestamp = round((t1 + t2) / 2) # Average timestamp  
         # Capture images and store them in the circular buffer
-        filename = f"{timestamp}_{i:05}"
+        filename = f"{timestamp}_{i+1:05}"
         img0 = cam0.capture_array('main')  # Capture cam0
         img1 = cam1.capture_array('main')  # Capture cam1
         image_buffer0.append((img0, filename))
         image_buffer1.append((img1, filename))
-        i += 1
         [led.off() for led in (red, green, yellow)]
         while time.monotonic_ns() < (t2 + calib_dt): # Wait for remainder of dt
             pass

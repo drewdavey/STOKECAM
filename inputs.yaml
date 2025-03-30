@@ -12,7 +12,7 @@ exposure_ms1: 2         # Exposure time in milliseconds (for shooting mode 1)
 shooting_mode2: 'max'   # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
 exposure_ms2: 1         # Exposure time in milliseconds (for shooting mode 2)
 
-calib_dt: 2             # Time between frames in seconds (for calibration)
+calib_dt: 2            # Time between frames in seconds (for calibration)
 calib_frames: 5        # Number of frames to be captured by calib mode
 
 gps_timeout: 60         # Time to wait for GPS lock in seconds (during startup)
