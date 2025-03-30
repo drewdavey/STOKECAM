@@ -136,6 +136,8 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 t2 = time.monotonic_ns()  # After exposure
                 timestamp = (t1 + t2) / 2 # Average timestamp  
 
+                tick = time.monotonic_ns()  # Start time for the loop
+                
                 # Capture images and save them to the SD card
                 cam0.capture_file(f"{fdir_cam0}0_{timestamp}_{i:05}.jpg")
                 cam1.capture_file(f"{fdir_cam1}1_{timestamp}_{i:05}.jpg")
@@ -146,6 +148,10 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 # img1 = cam1.capture_array('main')  # Capture cam1
                 # image_buffer0.append((img0, filename))
                 # image_buffer1.append((img1, filename))
+                
+                tock = time.monotonic_ns()  # End time for the loop
+                elapsed = (tock - tick)
+                print(f"Elapsed time: {elapsed} nanoseconds")
                 
                 i += 1
                 while time.monotonic_ns() < (t2 + dt): # Wait for remainder of dt
