@@ -136,6 +136,7 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 t2 = time.monotonic_ns()  # After exposure
                 timestamp = (t1 + t2) / 2 # Average timestamp  
 
+                t_log = open('tictoc_capture_file.txt','w')
                 tick = time.monotonic_ns()  # Start time for the loop
                 
                 # Capture images and save them to the SD card
@@ -151,12 +152,13 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
                 
                 tock = time.monotonic_ns()  # End time for the loop
                 elapsed = (tock - tick)
-                print(f"Elapsed time: {elapsed} nanoseconds")
-                
+                t_log.write(f"Elapsed time: {elapsed} nanoseconds\n")
+
                 i += 1
                 while time.monotonic_ns() < (t2 + dt): # Wait for remainder of dt
                     pass
             # process_and_store(fdir_cam0, fdir_cam1)
+            t_log.close()
             red.off()
         time.sleep(0.2)
 
