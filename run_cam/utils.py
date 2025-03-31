@@ -52,7 +52,7 @@ def write_inputs_yaml(fname_log):
         config['main']['format'] = 'RGB888'
         config['controls']['AeEnable'] = True
         config['controls']['AwbEnable'] = True
-        config['controls']['AeExposureMode'] = "short"
+        config['controls']['AeExposureMode']["AeExposureModeEnum"] = "short"
         cam.configure(config)
         cam.start()
         # Start with a fallback default of 1000 µs
