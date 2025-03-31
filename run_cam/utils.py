@@ -55,7 +55,7 @@ def write_inputs_yaml(fname_log):
         cam.start()
         # Allow time for auto-exposure to converge
         t0 = time.time()
-        while (time.time() - t0 < 10):
+        while (time.time() - t0 < 5):
             # Read the auto-chosen exposure time in microseconds from metadata
             metadata = cam.capture_metadata()
         auto_exposure_us = metadata.get("ExposureTime", 1000)  # fallback if not present
