@@ -58,6 +58,7 @@ def write_inputs_yaml(fname_log):
         while (time.time() - t0 < 10):
             # Read the auto-chosen exposure time in microseconds from metadata
             metadata = cam.capture_metadata()
+            time.sleep(0.1)
         auto_exposure_us = metadata.get("ExposureTime", 1000)  # fallback if not present
         auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
         log.write("[INFO] ========== write_inputs_yaml() ==========\n")
