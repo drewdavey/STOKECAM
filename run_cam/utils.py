@@ -13,6 +13,7 @@ from vectornav.Registers import *
 from datetime import datetime, timezone, timedelta
 
 def setup_logging():
+    """Set up logging directory and file"""
     fdir = f"../../DATA/{datetime.now(timezone.utc).strftime('%Y%m%d')}/"
     if not os.path.exists(fdir):
         os.makedirs(fdir)
@@ -40,7 +41,43 @@ def setup_logging():
             log.write("\n\n\n")
     return fdir, fname_log
 
+def write_inputs_yaml(fname_log):
+    """Write exposure times to inputs.yaml file"""
+    # Create a camera instance with auto exposure turned on
+    cam = Picamera2()
+    config = cam.create_still_configuration()
+    config["controls"]["AeEnable"] = True
+    # (also let AWB run, or force AwbEnable=False)
+    cam.configure(config)
+    cam.start()
+    # Allow time for auto-exposure to converge
+    time.sleep(2)
+    # Read the auto-chosen exposure time in microseconds from metadata
+    metadata = cam.capture_metadata()
+    auto_exposure_us = metadata.get("ExposureTime", 4000)  # default to 4000 µs if not found
+    auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
+    # Define brighter/darker exposures; e.g. double and half
+    brighter_ms = max(auto_exposure_ms * 2, 1)  # ensure not <1
+    darker_ms   = max(auto_exposure_ms / 2, 1)
+    cam.stop()
+    cam.close()
+    yaml_path = "../inputs.yaml"
+    if not os.path.isfile(yaml_path):
+        data = {} # If inputs.yaml doesn't exist, create a minimal structure
+    else:
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f) or {}
+    data["shooting_mode0"] = "auto"
+    data["exposure_ms0"]   = round(auto_exposure_ms)
+    data["shooting_mode1"] = "bright"
+    data["exposure_ms1"]   = round(brighter_ms)
+    data["shooting_mode2"] = "dark"
+    data["exposure_ms2"]   = round(darker_ms)
+    with open(yaml_path, "w") as f:
+        yaml.safe_dump(data, f)
+
 def read_inputs_yaml(fname_log):
+    """Read inputs.yaml file and return parameters"""
     inputs_path = '../inputs.yaml'
     with open(fname_log, 'a') as log:
         try:
@@ -55,6 +92,7 @@ def read_inputs_yaml(fname_log):
             return None
 
 def parse_inputs(fname_log):
+    """Parse inputs.yaml file and return parameters"""
     inputs = read_inputs_yaml(fname_log)
     if not inputs:
         # add error handling here
@@ -69,6 +107,7 @@ def parse_inputs(fname_log):
     return frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times
 
 def calc_dt(frame_rate=25, exposure_ms=2):
+    """Calculate the time difference between camera and VN-200"""
     frame_period = 1.0 / frame_rate       # e.g. 0.04 s ~ 25 Hz
     latency = 14.26e-6                    # 14.26 microseconds
     exposure_sec = exposure_ms / 1e3      # ms -> sec
@@ -77,6 +116,7 @@ def calc_dt(frame_rate=25, exposure_ms=2):
     return exposure, dt
 
 def create_dirs(fdir, mode):
+    """Create directories for storing images"""
     session = datetime.now(timezone.utc).strftime('%H%M%S_' + mode)
     fdir_out = os.path.join(fdir, session + '/')
     fdir_cam0 = os.path.join(fdir_out, 'cam0/')
@@ -86,7 +126,7 @@ def create_dirs(fdir, mode):
     return fdir_out, fdir_cam0, fdir_cam1
 
 def get_config(mode, exposure_ms):
-    # Default parameters
+    """Get camera configuration based on mode and exposure time"""
     cam = Picamera2()
     cfg = cam.create_still_configuration(buffer_count=50)
     cfg['main']['size'] = (1440, 1080)
@@ -108,6 +148,7 @@ def get_config(mode, exposure_ms):
     return cfg
 
 def config_vecnav(portName):
+    """Configure the VN-200 sensor"""
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
 
@@ -149,6 +190,7 @@ def config_vecnav(portName):
     s.disconnect()
 
 def sync_clock(portName, gps_timeout):
+    """Sync system clock with VN-200"""
     s = Sensor() # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)
     gnss = Registers.GnssSolLla()
@@ -198,6 +240,7 @@ def sync_clock(portName, gps_timeout):
     return False  # Sync failed
 
 def vecnav_status(portName, fname_log, gps_timeout):
+    """Check the status of the VN-200 sensor"""
     s = Sensor()                      # Create sensor object and connect to the VN-200 
     s.autoConnect(portName)           # at the baud rate of 115200 (115,200 bytes/s) 
     # Write connection status

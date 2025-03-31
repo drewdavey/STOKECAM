@@ -1,6 +1,6 @@
-# Last updated: 2025-02-04
+# Last updated: 2025-04-01
 ##################################
-# Inputs for STOKE
+# Inputs for STOKECAM
 ##################################
 
 fps: 25                 # Framerate/Hz (do not exceed 40 fps...max file writing capability without skipping frames) 

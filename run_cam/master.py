@@ -60,6 +60,7 @@ def configure_cameras(fname_log, mode, exposure_ms):
     log.write('\n'), log.close()
 
 def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName, exposure):
+    """Collect set of calibration images with indicator lights."""
     [led.on() for led in (red, green, yellow)]
     time.sleep(5)
     [led.off() for led in (red, green, yellow)]
@@ -160,7 +161,6 @@ def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
     s.subscribeToMessage(csvExporter.getQueuePtr(), vectornav.Registers.BinaryOutputMeasurements(), vectornav.FaPacketDispatcher.SubscriberFilterType.AnyMatch)
     csvExporter.start()
     time.sleep(1)
-
     while not (right_button.is_held and left_button.is_held):  # Hold both buttons for 3 seconds to exit standby
         if right_button.is_pressed and not left_button.is_pressed:  
             i = 1
@@ -250,7 +250,7 @@ config_vecnav(portName)                   # Config VN-200 output
 
 ##### Sync the clock. If sync fails, turn on all LEDs. #####
 # Hold right button only to try/retry syncing the clock.
-# Hold left button only to continue (if clock is accurate but no GPS signal).
+# Hold left button only to continue (if clock is synced but no GPS signal).
 [led.on() for led in (red, green, yellow)]
 while True:
     if right_button.is_held and not left_button.is_pressed:
@@ -263,7 +263,7 @@ while True:
             pass # Sync failed, remain in this loop to try again or skip
     if left_button.is_held and not right_button.is_pressed:
         [led.off() for led in (red, green, yellow)]
-        gps_timeout = 1 # Don't wait for GPS fix in status check
+        gps_timeout = 5 # Don't wait for GPS fix in status check
         break
     time.sleep(0.1)
 
@@ -272,6 +272,9 @@ fdir, fname_log = setup_logging()
 
 # Get IMU/GPS status. Print initial values to log.
 vecnav_status(portName, fname_log, gps_timeout)
+
+# Write exposure times to inputs.yaml
+write_inputs_yaml(fname_log)
 
 # Enable IMX 296 external trigger mode
 set_trigger_mode(True, fname_log)
