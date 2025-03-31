@@ -48,9 +48,10 @@ def write_inputs_yaml(fname_log):
         # Create a camera instance with auto exposure turned on
         cam = Picamera2()
         config = cam.create_still_configuration()
+        config['main']['size'] = (1440, 1080)
+        config['main']['format'] = 'RGB888'
         config['controls']['AeEnable'] = True
-        # AWB can be on or off as needed:
-        # config['controls']['AwbEnable'] = True
+        config['controls']['AwbEnable'] = True
         cam.configure(config)
         cam.start()
         # Start with a fallback default of 1000 µs
