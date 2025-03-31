@@ -53,13 +53,17 @@ def write_inputs_yaml(fname_log):
         # config['controls']['AwbEnable'] = True
         cam.configure(config)
         cam.start()
+        # Start with a fallback default of 1000 µs
+        auto_exposure_us = 1000
         # Allow time for auto-exposure to converge
         t0 = time.time()
         while (time.time() - t0 < 10):
             # Read the auto-chosen exposure time in microseconds from metadata
-            metadata = cam.capture_metadata(wait=False)
+            min_exp, max_exp, def_exposure_us = cam.camera_controls["ExposureTime"]
+            # Only overwrite if the camera actually has a valid new value
+            if def_exposure_us is not None and def_exposure_us > 0:
+                auto_exposure_us = def_exposure_us
             time.sleep(0.1)
-        auto_exposure_us = metadata.get("ExposureTime", 1000)  # fallback if not present
         auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
         log.write("[INFO] ========== write_inputs_yaml() ==========\n")
         log.write(f"[INFO] Measured auto exposure from metadata: {auto_exposure_us} µs ({auto_exposure_ms:.3f} ms)\n")
