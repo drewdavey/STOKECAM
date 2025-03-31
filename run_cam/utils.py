@@ -273,24 +273,17 @@ def vecnav_status(portName, fname_log, gps_timeout):
     log.write(f"{tstr}:     Connected to {portName} at {s.connectedBaudRate().name}\n")
     model_num = None
     model = Registers.Model()
-    try:
-        s.readRegister(model)
-        model_num = model.model
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        log.write(f"{tstr}:     VN-200 Model: {model_num}\n")
-    except Exception as e:
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        log.write(f"{tstr}:     ERROR reading VN-200 Model register: {str(e)}\n")
     serial_num = None
     serial = Registers.Serial()
     try:
+        s.readRegister(model)
+        model_num = model.model
         s.readRegister(serial)
         serial_num = serial.serialNum
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        log.write(f"{tstr}:     VN-200 Model: {model_num}\n")
         log.write(f"{tstr}:     VN-200 Serial: {serial_num}\n")
     except Exception as e:
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        log.write(f"{tstr}:     ERROR reading VN-200 Serial register: {str(e)}\n")
+        log.write(f"{tstr}:     ERROR reading VN-200 Model/Serial register: {str(e)}\n")
     # Write KnownMagneticDisturbance and VpeBasicControl
     kmd = KnownMagneticDisturbance(KnownMagneticDisturbance.State.Present)  
     vpeBasicControl = VpeBasicControl()
