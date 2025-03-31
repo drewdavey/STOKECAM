@@ -31,7 +31,7 @@ function data2 = parse_data(mainDir, waveFolder)
     end
 
     % Calculate query times for IMU time series
-    for i = 1:length(tstamps0)-100
+    for i = 1:length(tstamps0)
         % Calculate the time difference in nanoseconds directly
         timeDiffNs(i) = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
 
