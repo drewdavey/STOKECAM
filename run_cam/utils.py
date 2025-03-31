@@ -7,6 +7,7 @@ import os
 import time
 import yaml
 from vectornav import *
+from ruamel.yaml import YAML
 from picamera2 import Picamera2
 from vectornav.Commands import *
 from vectornav.Registers import *
@@ -41,109 +42,33 @@ def setup_logging():
             log.write("\n\n\n")
     return fdir, fname_log
 
-# def write_inputs_yaml(fname_log):
-#     """Write exposure times to inputs.yaml file"""
-#     # Create a camera instance with auto exposure turned on
-#     cam = Picamera2()
-#     config = cam.create_still_configuration()
-#     config["controls"]["AeEnable"] = True
-#     # (also let AWB run, or force AwbEnable=False)
-#     cam.configure(config)
-#     cam.start()
-#     # Allow time for auto-exposure to converge
-#     time.sleep(5)
-#     # Read the auto-chosen exposure time in microseconds from metadata
-#     metadata = cam.capture_metadata()
-#     auto_exposure_us = metadata.get("ExposureTime", 1000)  # default to 1000 µs if not found
-#     auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
-#     # Define brighter/darker exposures; e.g. half and double
-#     brighter_ms = max(auto_exposure_ms / 2, 1)  # ensure not <1
-#     darker_ms   = max(auto_exposure_ms * 2, 1)
-#     cam.stop()
-#     cam.close()
-#     yaml_path = "../inputs.yaml"
-#     if not os.path.isfile(yaml_path):
-#         data = {} # If inputs.yaml doesn't exist, create a minimal structure
-#         data["fps"] = 25
-#         data["calib_dt"] = 2
-#         data["calib_frames"] = 50
-#     else:
-#         with open(yaml_path, "r") as f:
-#             data = yaml.safe_load(f) or {}
-#     data["shooting_mode0"] = "auto"
-#     data["exposure_ms0"]   = round(auto_exposure_ms)
-#     data["shooting_mode1"] = "bright"
-#     data["exposure_ms1"]   = round(brighter_ms)
-#     data["shooting_mode2"] = "dark"
-#     data["exposure_ms2"]   = round(darker_ms)
-#     with open(yaml_path, "w") as f:
-#         yaml.safe_dump(data, f)
-
-import os
-import time
-import yaml
-from ruamel.yaml import YAML  # <-- for preserving comments
-from vectornav import *
-from picamera2 import Picamera2
-from vectornav.Commands import *
-from vectornav.Registers import *
-from datetime import datetime, timezone, timedelta
-
 def write_inputs_yaml(fname_log):
-    """
-    1) Start camera with auto-exposure enabled.
-    2) Wait for it to settle, then read the chosen exposure time from metadata (in µs).
-    3) Write to the log.
-    4) Overwrite only the relevant keys in inputs.yaml with:
-       - shooting_mode0 = "auto", exposure_ms0 = measured
-       - shooting_mode1 = "bright", exposure_ms1 = half (for bigger brightness)
-       - shooting_mode2 = "dark",   exposure_ms2 = double (for smaller brightness)
-    5) Preserve the users existing file format and comments.
-    """
-
-    # Open log
+    """Write exposure times to inputs.yaml file"""
     with open(fname_log, 'a') as log:
-
-        # --- STEP 1: Start the camera in auto-exposure mode ---
+        # Create a camera instance with auto exposure turned on
         cam = Picamera2()
         config = cam.create_still_configuration()
         config['controls']['AeEnable'] = True
         # AWB can be on or off as needed:
         # config['controls']['AwbEnable'] = True
-
         cam.configure(config)
         cam.start()
-
         # Allow time for auto-exposure to converge
         time.sleep(3)
-
-        # --- STEP 2: Read the final exposure time from metadata (µs) ---
+        # Read the auto-chosen exposure time in microseconds from metadata
         metadata = cam.capture_metadata()
         auto_exposure_us = metadata.get("ExposureTime", 1000)  # fallback if not present
-        auto_exposure_ms = auto_exposure_us / 1000.0
-
-        # --- STEP 3: Write to the log ---
+        auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
         log.write("[INFO] ========== write_inputs_yaml() ==========\n")
         log.write(f"[INFO] Measured auto exposure from metadata: {auto_exposure_us} µs ({auto_exposure_ms:.3f} ms)\n")
-
-        # Stop/close camera
         cam.stop()
         cam.close()
-
-        # --- STEP 4: Compute new exposures for bright/dark modes ---
-        # (If you prefer the opposite direction, just swap them.)
-        # "bright" => bigger exposure -> let's do x2
-        # "dark"   => shorter exposure -> let's do x0.5
-        bright_ms = max(auto_exposure_ms * 2.0, 1) 
-        dark_ms   = max(auto_exposure_ms * 0.5, 1)
-
+        # Define brighter/darker exposures; e.g. half and double
+        bright_ms = max(auto_exposure_ms / 2, 1) 
+        dark_ms   = max(auto_exposure_ms * 2, 1)
         log.write(f"[INFO] Setting bright mode = {bright_ms:.3f} ms, dark mode = {dark_ms:.3f} ms\n")
-
-        # --- STEP 5: Round‐trip edit inputs.yaml to preserve format/comments ---
-
         yaml_path = "../inputs.yaml"
         if not os.path.exists(yaml_path):
-            # If file truly doesn't exist, you might choose to create it from scratch.
             log.write("[WARN] inputs.yaml not found, creating minimal file...\n")
             with open(yaml_path, "w") as fh:
                 fh.write("# Minimal inputs.yaml created by write_inputs_yaml\n")
@@ -151,36 +76,21 @@ def write_inputs_yaml(fname_log):
                 fh.write("shooting_mode0: auto\nexposure_ms0: 1\n")
                 fh.write("shooting_mode1: bright\nexposure_ms1: 2\n")
                 fh.write("shooting_mode2: dark\nexposure_ms2: 4\n")
-
-        # Load using ruamel.yaml for comment/format preservation
         ry = YAML()
         ry.preserve_quotes = True
-
         with open(yaml_path, "r") as f:
-            # If file has YAML errors, you may get an exception here
             yaml_data = ry.load(f)
-
-        # If the file was empty or invalid, might become None
         if not yaml_data:
             yaml_data = {}
-
-        # Overwrite only the relevant keys
-        # This ensures your comments & ordering remain
         yaml_data["shooting_mode0"] = "auto"
         yaml_data["exposure_ms0"]   = int(round(auto_exposure_ms))
-
         yaml_data["shooting_mode1"] = "bright"
         yaml_data["exposure_ms1"]   = int(round(bright_ms))
-
         yaml_data["shooting_mode2"] = "dark"
         yaml_data["exposure_ms2"]   = int(round(dark_ms))
-
-        # Save it back out
         with open(yaml_path, "w") as f:
             ry.dump(yaml_data, f)
-
         log.write("[INFO] Successfully updated inputs.yaml.\n\n")
-
 
 def read_inputs_yaml(fname_log):
     """Read inputs.yaml file and return parameters"""
