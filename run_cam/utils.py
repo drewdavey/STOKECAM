@@ -311,10 +311,16 @@ def vecnav_status(portName, fname_log, gps_timeout):
     
     # Wait for GPS
     log.write(f"{tstr}:     Waiting for VN-200 to acquire GPS fix...\n")
+    gnssFix = None
+    num_sats = None
     gnss = Registers.GnssSolLla()
-    s.readRegister(gnss)
-    gnssFix = gnss.gnss1Fix.name
-    num_sats = gnss.gnss1NumSats
+    try:
+        s.readRegister(gnss)
+        gnssFix = gnss.gnss1Fix.name
+        num_sats = gnss.gnss1NumSats
+    except Exception as e:
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        log.write(f"{tstr}:     ERROR reading VN-200 GNSS register: {str(e)}\n")
     valid_fixes = {'TimeFix', 'Fix2D', 'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
     t0 = time.time()
     while gnssFix not in valid_fixes and (time.time() - t0 < gps_timeout):
