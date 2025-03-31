@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 from vectornav.Plugins import ExporterCsv
 from gpiozero import Button, LED, DigitalOutputDevice
 
-def set_trigger_mode(enable: bool = True, fname_log: str = "log.txt"):
+def set_trigger_mode(enable, fname_log):
     """
     Enables or disables external trigger mode by writing 1 or 0
     to /sys/module/imx296/parameters/trigger_mode.
@@ -263,7 +263,7 @@ while True:
             pass # Sync failed, remain in this loop to try again or skip
     if left_button.is_held and not right_button.is_pressed:
         [led.off() for led in (red, green, yellow)]
-        gps_timeout = 5 # Don't wait for GPS fix in status check
+        gps_timeout = 3 # Don't wait for GPS fix in status check
         break
     time.sleep(0.1)
 
