@@ -65,17 +65,18 @@ def write_inputs_yaml(fname_log):
                 auto_exposure_us = def_exposure_us
             time.sleep(0.1)
         auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
-        log.write("[INFO] ========== write_inputs_yaml() ==========\n")
-        log.write(f"[INFO] Measured auto exposure from metadata: {auto_exposure_us} µs ({auto_exposure_ms:.3f} ms)\n")
+        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+        log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
+        log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs ({auto_exposure_ms:.3f} ms)\n")
         cam.stop()
         cam.close()
         # Define brighter/darker exposures; e.g. half and double
         bright_ms = max(auto_exposure_ms / 2, 1) 
         dark_ms   = max(auto_exposure_ms * 2, 1)
-        log.write(f"[INFO] Setting bright mode = {bright_ms:.3f} ms, dark mode = {dark_ms:.3f} ms\n")
+        log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_ms:.3f} ms, dark mode = {dark_ms:.3f} ms\n")
         yaml_path = "../inputs.yaml"
         if not os.path.exists(yaml_path):
-            log.write("[WARN] inputs.yaml not found, creating minimal file...\n")
+            log.write(f"{tstr}:     [WARN] inputs.yaml not found, creating minimal file...\n")
             with open(yaml_path, "w") as fh:
                 fh.write("# Minimal inputs.yaml created by write_inputs_yaml\n")
                 fh.write("fps: 25\ncalib_dt: 2\ncalib_frames: 50\ngps_timeout: 60\n")
@@ -96,21 +97,22 @@ def write_inputs_yaml(fname_log):
         yaml_data["exposure_ms2"]   = int(round(dark_ms))
         with open(yaml_path, "w") as f:
             ry.dump(yaml_data, f)
-        log.write("[INFO] Successfully updated inputs.yaml.\n\n")
+        log.write(f"{tstr}:     [INFO] Successfully updated inputs.yaml.\n\n")
 
 def read_inputs_yaml(fname_log):
     """Read inputs.yaml file and return parameters"""
     inputs_path = '../inputs.yaml'
+    tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     with open(fname_log, 'a') as log:
         try:
             with open(inputs_path, 'r') as file:
                 inputs = yaml.safe_load(file)
             return inputs
         except FileNotFoundError:
-            log.write(f"Error: The file {inputs_path} was not found.")
+            log.write(f"{tstr}:     Error: The file {inputs_path} was not found.")
             return None
         except yaml.YAMLError as exc:
-            log.write(f"Error parsing YAML file: {exc}")
+            log.write(f"{tstr}:     Error parsing YAML file: {exc}")
             return None
 
 def parse_inputs(fname_log):
