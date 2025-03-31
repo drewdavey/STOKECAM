@@ -51,7 +51,7 @@ def write_inputs_yaml(fname_log):
     cam.configure(config)
     cam.start()
     # Allow time for auto-exposure to converge
-    time.sleep(2)
+    time.sleep(5)
     # Read the auto-chosen exposure time in microseconds from metadata
     metadata = cam.capture_metadata()
     auto_exposure_us = metadata.get("ExposureTime", 4000)  # default to 4000 µs if not found
@@ -64,6 +64,9 @@ def write_inputs_yaml(fname_log):
     yaml_path = "../inputs.yaml"
     if not os.path.isfile(yaml_path):
         data = {} # If inputs.yaml doesn't exist, create a minimal structure
+        data["fps"] = 25
+        data["calib_dt"] = 2
+        data["calib_frames"] = 50
     else:
         with open(yaml_path, "r") as f:
             data = yaml.safe_load(f) or {}
