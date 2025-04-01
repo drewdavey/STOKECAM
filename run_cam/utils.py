@@ -58,7 +58,7 @@ def write_inputs_yaml(fname_log):
         time.sleep(5)
         # Get auto exposure time from metadata 
         while not (auto_exposure_us := cam.capture_metadata()['ExposureTime']):
-            pass                                                           
+            time.sleep(0.1)                                                          
         auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
