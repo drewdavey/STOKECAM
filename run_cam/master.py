@@ -39,14 +39,14 @@ def set_trigger_mode(enable, fname_log):
         log.write(f"[ERROR] Failed to set trigger mode: {e}\n")
     log.close()
 
-def configure_cameras(fname_log, mode, exposure_ms):
+def configure_cameras(fname_log, mode, exposure_us):
     """
     Configures the cameras with the specified mode and exposure time.
     The cameras are initialized and started, and their configurations are logged.
     """
     global cam0, cam1
     # Create the camera config for that default mode
-    config = get_config(mode, exposure_ms) 
+    config = get_config(mode, exposure_us) 
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Configuring cameras to {mode} mode...\n")
@@ -133,7 +133,7 @@ def toggle_modes():
         if right_button.is_pressed and not left_button.is_pressed:
             idx = (idx + 1) % len(shooting_modes)
             mode = shooting_modes[idx]
-            exposure_ms = exposure_times[idx]
+            exposure_us = exposure_times[idx]
         if mode == shooting_modes[0]:
             green.on(), yellow.off(), red.off()
         elif mode == shooting_modes[1]:
@@ -142,8 +142,8 @@ def toggle_modes():
             red.on(), green.off(), yellow.off()
         time.sleep(0.2)
     [led.off() for led in (red, green, yellow)]
-    exposure, dt = calc_dt(frame_rate, exposure_ms)   # Calculate dt
-    configure_cameras(fname_log, mode, exposure_ms)   # Configure the cameras
+    exposure, dt = calc_dt(frame_rate, exposure_us)   # Calculate dt
+    configure_cameras(fname_log, mode, exposure_us)   # Configure the cameras
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
@@ -286,9 +286,9 @@ set_trigger_mode(True, fname_log)
 global cam0, cam1, mode, standby, exposure, dt
 frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times = parse_inputs(fname_log)
 mode = shooting_modes[0]                        # Default mode
-exposure_ms = exposure_times[0]                 # Default exposure time
-configure_cameras(fname_log, mode, exposure_ms) # Configure the cameras
-exposure, dt = calc_dt(frame_rate, exposure_ms) # Calculate dt
+exposure_us = exposure_times[0]                 # Default exposure time
+configure_cameras(fname_log, mode, exposure_us) # Configure the cameras
+exposure, dt = calc_dt(frame_rate, exposure_us) # Calculate dt
 
 standby = False         # Flag to indicate standby mode 
 monitor_gps(portName)   # Monitor GPS status

@@ -57,28 +57,26 @@ def write_inputs_yaml(fname_log):
         # Allow time for auto-exposure to converge
         time.sleep(5)
         while (auto_exposure_us := cam.capture_metadata()['ExposureTime']) <= 0:
-            time.sleep(0.1)                                       
-        auto_exposure_ms = auto_exposure_us / 1e3 # convert to ms
+            time.sleep(0.1)   
+        auto_exposure_us = round(auto_exposure_us)                                    
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
-        log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs ({auto_exposure_ms:.3f} ms)\n")
+        log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs \n")
         cam.stop()
         cam.close()
         # Define brighter/darker exposures; e.g. half and double
-        bright_us = max(auto_exposure_us / 2, 1)
-        dark_us   = max(auto_exposure_us * 2, 1)
-        bright_ms = bright_us / 1e3 # convert to ms
-        dark_ms   = dark_us / 1e3 # convert to ms
-        log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_ms:.3f} ms, dark mode = {dark_ms:.3f} ms\n")
+        bright_us = round(max(auto_exposure_us / 2, 1))
+        dark_us   = round(max(auto_exposure_us * 2, 1))
+        log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_us:.3f} us, dark mode = {dark_us:.3f} us\n")
         yaml_path = "../inputs.yaml"
         if not os.path.exists(yaml_path):
             log.write(f"{tstr}:     [WARN] inputs.yaml not found, creating minimal file...\n")
             with open(yaml_path, "w") as fh:
                 fh.write("# Minimal inputs.yaml created by write_inputs_yaml\n")
                 fh.write("fps: 25\ncalib_dt: 2\ncalib_frames: 50\ngps_timeout: 60\n")
-                fh.write("shooting_mode0: auto\nexposure_ms0: 1\n")
-                fh.write("shooting_mode1: bright\nexposure_ms1: 2\n")
-                fh.write("shooting_mode2: dark\nexposure_ms2: 4\n")
+                fh.write("shooting_mode0: auto\nexposure_us0: 1\n")
+                fh.write("shooting_mode1: bright\nexposure_us1: 2\n")
+                fh.write("shooting_mode2: dark\nexposure_us2: 4\n")
         ry = YAML()
         ry.preserve_quotes = True
         with open(yaml_path, "r") as f:
@@ -86,11 +84,11 @@ def write_inputs_yaml(fname_log):
         if not yaml_data:
             yaml_data = {}
         yaml_data["shooting_mode0"] = "auto"
-        yaml_data["exposure_ms0"]   = auto_exposure_ms
+        yaml_data["exposure_us0"]   = auto_exposure_us
         yaml_data["shooting_mode1"] = "bright"
-        yaml_data["exposure_ms1"]   = bright_ms
+        yaml_data["exposure_us1"]   = bright_us
         yaml_data["shooting_mode2"] = "dark"
-        yaml_data["exposure_ms2"]   = dark_ms
+        yaml_data["exposure_us2"]   = dark_us
         with open(yaml_path, "w") as f:
             ry.dump(yaml_data, f)
         log.write(f"{tstr}:     [INFO] Successfully updated inputs.yaml.\n\n")
@@ -123,14 +121,14 @@ def parse_inputs(fname_log):
     calib_frames = inputs['calib_frames']
     # Shooting modes & exposure times
     shooting_modes = [inputs['shooting_mode0'], inputs['shooting_mode1'], inputs['shooting_mode2']]
-    exposure_times = [inputs['exposure_ms0'], inputs['exposure_ms1'], inputs['exposure_ms2']]
+    exposure_times = [inputs['exposure_us0'], inputs['exposure_us1'], inputs['exposure_us2']]
     return frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times
 
-def calc_dt(frame_rate, exposure_ms):
+def calc_dt(frame_rate, exposure_us):
     """Calculate the time difference between camera and VN-200"""
     frame_period = 1.0 / frame_rate       # e.g. 0.04 s ~ 25 Hz
-    latency = 14.26e-6                    # 14.26 microseconds
-    exposure_sec = exposure_ms / 1e3      # ms -> sec
+    latency = 14.26e-6                    # 14.26 microseconds -> sec
+    exposure_sec = exposure_us / 1e6      # microseconds -> sec
     exposure = exposure_sec - latency     # hardware trigger offsets
     dt = (frame_period - exposure) * 1e9  # remainder in nanoseconds
     return exposure, dt
@@ -145,13 +143,13 @@ def create_dirs(fdir, mode):
     os.makedirs(fdir_cam1, exist_ok=True)
     return fdir_out, fdir_cam0, fdir_cam1
 
-def get_config(mode, exposure_ms):
+def get_config(mode, exposure_us):
     """Get camera configuration based on mode and exposure time"""
     cam = Picamera2()
     cfg = cam.create_still_configuration(buffer_count=50)
     cfg['main']['size'] = (1440, 1080)
     cfg['main']['format'] = 'RGB888'
-    cfg['controls']['ExposureTime'] = exposure_ms * 1000  # exposure in microseconds
+    cfg['controls']['ExposureTime'] = exposure_us         # exposure in microseconds
     cfg['controls']['AeEnable'] = False                   # disable auto exposure
     cfg['controls']['AwbEnable'] = False                  # disable auto white balance
     # Select parameters
