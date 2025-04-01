@@ -273,6 +273,9 @@ fdir, fname_log = setup_logging()
 # Get IMU/GPS status. Print initial values to log.
 vecnav_status(portName, fname_log, gps_timeout)
 
+# Disable IMX 296 external trigger mode for auto exposure
+set_trigger_mode(False, fname_log)
+
 # Write exposure times to inputs.yaml
 write_inputs_yaml(fname_log)
 

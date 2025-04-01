@@ -56,9 +56,6 @@ def write_inputs_yaml(fname_log):
         cam.start()
         # Allow time for auto-exposure to converge
         time.sleep(5)
-        # Capture a single frame to trigger auto exposure
-        cam.capture_file('../auto_exposure.jpg')
-        # Get auto exposure time from metadata 
         auto_exposure_us = cam.capture_metadata()['ExposureTime']                                                      
         auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
