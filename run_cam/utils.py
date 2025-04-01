@@ -47,25 +47,30 @@ def write_inputs_yaml(fname_log):
     with open(fname_log, 'a') as log:
         # Create a camera instance with auto exposure turned on
         cam = Picamera2()
-        config = cam.create_still_configuration(buffer_count=50)
-        # config['main']['size'] = (1440, 1080)
-        # config['main']['format'] = 'RGB888'
-        # config['controls']['AeEnable'] = True
-        # config['controls']['AwbEnable'] = True
+        config = cam.create_still_configuration()
+        config['main']['size'] = (1440, 1080)
+        config['main']['format'] = 'RGB888'
+        config['controls']['AeEnable'] = True
+        config['controls']['AwbEnable'] = True
         cam.configure(config)
         cam.start()
-        # Start with a fallback default of 1000 µs
-        auto_exposure_us = 1000
         # Allow time for auto-exposure to converge
-        t0 = time.time()
-        while (time.time() - t0 < 10):
-            # Read the auto-chosen exposure time in microseconds from metadata
-            min_exp, max_exp, def_exposure_us = cam.camera_controls["ExposureTime"]
-            # Only overwrite if the camera actually has a valid new value
-            if def_exposure_us is not None and def_exposure_us > 0:
-                auto_exposure_us = def_exposure_us
-            time.sleep(0.1)
-        auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
+        time.sleep(5)
+        auto_exposure_ms = cam.capture_metadata(wait=10)['ExposureTime'] / 1000.0  # convert to ms
+        # # Start with a fallback default of 1000 µs
+        # auto_exposure_us = 1000
+        # t0 = time.time()
+        # while (time.time() - t0 < 10):
+        #     # Read the auto-chosen exposure time in microseconds from metadata
+        #     min_exp, max_exp, def_exposure_us = cam.camera_controls["ExposureTime"]
+        #     # Only overwrite if the camera actually has a valid new value
+        #     if def_exposure_us is not None and def_exposure_us > 0:
+        #         auto_exposure_us = def_exposure_us
+        #     time.sleep(0.1)
+        
+        
+        
+        # auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
         log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs ({auto_exposure_ms:.3f} ms)\n")
