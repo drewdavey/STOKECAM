@@ -57,7 +57,7 @@ def write_inputs_yaml(fname_log):
         # Allow time for auto-exposure to converge
         time.sleep(5)
         auto_exposure_us = cam.capture_metadata()['ExposureTime']                                                      
-        auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
+        auto_exposure_ms = auto_exposure_us / 1e3 # convert to ms
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
         log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs ({auto_exposure_ms:.3f} ms)\n")
@@ -66,8 +66,8 @@ def write_inputs_yaml(fname_log):
         # Define brighter/darker exposures; e.g. half and double
         bright_us = max(auto_exposure_us / 2, 1)
         dark_us   = max(auto_exposure_us * 2, 1)
-        bright_ms = bright_us / 1000.0 # convert to ms
-        dark_ms   = dark_us / 1000.0 # convert to ms
+        bright_ms = bright_us / 1e3 # convert to ms
+        dark_ms   = dark_us / 1e3 # convert to ms
         log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_ms:.3f} ms, dark mode = {dark_ms:.3f} ms\n")
         yaml_path = "../inputs.yaml"
         if not os.path.exists(yaml_path):
