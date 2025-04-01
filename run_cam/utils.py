@@ -64,8 +64,10 @@ def write_inputs_yaml(fname_log):
         cam.stop()
         cam.close()
         # Define brighter/darker exposures; e.g. half and double
-        bright_ms = max(auto_exposure_ms / 2, 1)
-        dark_ms   = max(auto_exposure_ms * 2, 1)
+        bright_us = max(auto_exposure_us / 2, 1)
+        dark_us   = max(auto_exposure_us * 2, 1)
+        bright_ms = bright_us / 1000.0 # convert to ms
+        dark_ms   = dark_us / 1000.0 # convert to ms
         log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_ms:.3f} ms, dark mode = {dark_ms:.3f} ms\n")
         yaml_path = "../inputs.yaml"
         if not os.path.exists(yaml_path):
