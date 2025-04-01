@@ -123,7 +123,7 @@ def parse_inputs(fname_log):
     exposure_times = [inputs['exposure_ms0'], inputs['exposure_ms1'], inputs['exposure_ms2']]
     return frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times
 
-def calc_dt(frame_rate=25, exposure_ms=2):
+def calc_dt(frame_rate, exposure_ms):
     """Calculate the time difference between camera and VN-200"""
     frame_period = 1.0 / frame_rate       # e.g. 0.04 s ~ 25 Hz
     latency = 14.26e-6                    # 14.26 microseconds

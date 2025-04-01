@@ -336,5 +336,4 @@ finally:
     trigger.close()                            # Close the trigger pin
     set_trigger_mode(False, fname_log)         # Disable external trigger mode 
     sys.exit(0)
-    #####################################################################
-
+    #######################################################################
