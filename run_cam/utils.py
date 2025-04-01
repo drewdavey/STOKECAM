@@ -46,8 +46,11 @@ def write_inputs_yaml(fname_log):
     """Write exposure times to inputs.yaml file"""
     with open(fname_log, 'a') as log:
         # Create a camera instance with auto exposure turned on
-        cam = Picamera2(), cam.configure(cam.create_still_configuration())
-        cam.start(), cam.stop(), cam.close()
+        cam = Picamera2()
+        cam.configure(cam.create_still_configuration())
+        cam.start()
+        cam.stop()
+        cam.close()
         cam = Picamera2()
         config = cam.create_still_configuration()
         config['main']['size'] = (1440, 1080)
