@@ -47,7 +47,7 @@ def write_inputs_yaml(fname_log):
     with open(fname_log, 'a') as log:
         # Create a camera instance with auto exposure turned on
         cam = Picamera2()
-        config = cam.create_still_configuration()
+        config = cam.create_still_configuration(buffer_count=10)
         config['main']['size'] = (1440, 1080)
         config['main']['format'] = 'RGB888'
         config['controls']['AeEnable'] = True
