@@ -56,7 +56,7 @@ def write_inputs_yaml(fname_log):
         cam.start()
         # Allow time for auto-exposure to converge
         time.sleep(5)
-        auto_exposure_ms = cam.capture_metadata(wait=10)['ExposureTime'] / 1000.0  # convert to ms
+        auto_exposure_us = cam.capture_metadata(wait=10)['ExposureTime']
         # # Start with a fallback default of 1000 µs
         # auto_exposure_us = 1000
         # t0 = time.time()
@@ -70,7 +70,7 @@ def write_inputs_yaml(fname_log):
         
         
         
-        # auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
+        auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
         log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs ({auto_exposure_ms:.3f} ms)\n")
