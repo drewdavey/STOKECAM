@@ -56,7 +56,7 @@ def write_inputs_yaml(fname_log):
         cam.start()
         # Allow time for auto-exposure to converge
         time.sleep(5)
-        while not (auto_exposure_us := cam.capture_metadata()['ExposureTime']) and auto_exposure_us > 0:
+        while (auto_exposure_us := cam.capture_metadata()['ExposureTime']) <= 0:
             time.sleep(0.1)                                       
         auto_exposure_ms = auto_exposure_us / 1e3 # convert to ms
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
@@ -86,11 +86,11 @@ def write_inputs_yaml(fname_log):
         if not yaml_data:
             yaml_data = {}
         yaml_data["shooting_mode0"] = "auto"
-        yaml_data["exposure_ms0"]   = int(round(auto_exposure_ms))
+        yaml_data["exposure_ms0"]   = auto_exposure_ms
         yaml_data["shooting_mode1"] = "bright"
-        yaml_data["exposure_ms1"]   = int(round(bright_ms))
+        yaml_data["exposure_ms1"]   = bright_ms
         yaml_data["shooting_mode2"] = "dark"
-        yaml_data["exposure_ms2"]   = int(round(dark_ms))
+        yaml_data["exposure_ms2"]   = dark_ms
         with open(yaml_path, "w") as f:
             ry.dump(yaml_data, f)
         log.write(f"{tstr}:     [INFO] Successfully updated inputs.yaml.\n\n")
