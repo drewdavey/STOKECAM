@@ -46,6 +46,7 @@ def write_inputs_yaml(fname_log):
     """Write exposure times to inputs.yaml file"""
     with open(fname_log, 'a') as log:
         # Create a camera instance with auto exposure turned on
+        cam = Picamera2(), cam.start(), cam.stop(), cam.close()
         cam = Picamera2()
         config = cam.create_still_configuration()
         config['main']['size'] = (1440, 1080)
@@ -57,8 +58,7 @@ def write_inputs_yaml(fname_log):
         # Allow time for auto-exposure to converge
         time.sleep(5)
         # Get auto exposure time from metadata 
-        while not (auto_exposure_us := cam.capture_metadata(wait=10)['ExposureTime']):
-            time.sleep(0.1)                                                          
+        auto_exposure_us = cam.capture_metadata(wait=True)['ExposureTime']                                                      
         auto_exposure_ms = auto_exposure_us / 1000.0 # convert to ms
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
