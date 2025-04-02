@@ -1,4 +1,4 @@
-# Last updated: 2025-02-04
+# Last updated: 2025-04-01
 ##################################
 # This script allows the user to toggle through camera settings, launch standby mode, 
 # and capture images synchronously by holding right button.

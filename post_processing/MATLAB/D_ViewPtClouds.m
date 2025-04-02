@@ -14,9 +14,9 @@ viewPtCloud_orig = 0; % display original ptCloud?
 % xbounds = [-10, 10];
 % ybounds = [-10, 10];
 
-depth = [0, 10];
-xbounds = [-2, 2];
-ybounds = [-2, 2];
+depth = [0, 50];
+xbounds = [-50, 50];
+ybounds = [-50, 50];
 
 %% Filepath
 
