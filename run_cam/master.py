@@ -341,3 +341,5 @@ finally:
     set_trigger_mode(False, fname_log)         # Disable external trigger mode 
     sys.exit(0)
     #######################################################################
+
+    subprocess.run(["python", "OLDmaster.py"])
