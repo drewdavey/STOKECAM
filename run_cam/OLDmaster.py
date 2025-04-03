@@ -205,7 +205,7 @@ vecnav_status(portName, fname_log, gps_timeout)
 
 ######### MODIFIED TO RUN OLD THREADING METHOD ########
 global cam0, cam1, config, mode, standby, shooting_modes
-mode = 'auto'                             # Default mode
+mode = 'THREADING'                             # threading method
 cam = Picamera2()
 config = cam.create_still_configuration(buffer_count=50)
 config['main']['size'] = (1440, 1080)
