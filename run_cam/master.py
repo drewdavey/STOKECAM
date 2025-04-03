@@ -339,7 +339,9 @@ finally:
     right_button.close(), left_button.close()  # Close the buttons
     trigger.close()                            # Close the trigger pin
     set_trigger_mode(False, fname_log)         # Disable external trigger mode 
+    
+    subprocess.run(["python", "OLDmaster.py"])
+    
     sys.exit(0)
     #######################################################################
 
-    subprocess.run(["python", "OLDmaster.py"])
