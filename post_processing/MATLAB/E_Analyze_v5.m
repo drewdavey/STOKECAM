@@ -149,7 +149,7 @@ for i = 1:length(matFilenames)
         figure(21); hold on; axis equal; grid on; axis tight;
         title('Camera coordinates');
         % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
-        scatter(xyz_cam(:,2), -xyz_cam(:,1), 1, xyz_cam(:,3));
+        scatter(xyz_cam(:,2), xyz_cam(:,1), 1, xyz_cam(:,3));
         xlabel('X_{cam} (m)');
         ylabel('Y_{cam} (m)');
         zlabel('Z_{cam} (m)');
@@ -161,11 +161,11 @@ for i = 1:length(matFilenames)
         %%%%%%%%%%%%%% Reorder to X, Z, Y for NED convention %%%%%%%%%%%%%%
         % xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 -1 0]; % Swap Y and Z and flip Y
 
-        % % % This is what works
-        % xyz_imu = xyz_cam * [0 1 0; 0 0 -1; -1 0 0]; % XYZ_imu = +Y-Z+X_cam
+        % % This is what works
+        xyz_imu = xyz_cam * [0 1 0; 0 0 -1; -1 0 0]; % XYZ_imu = +Y-Z+X_cam
 
-        % This should be right
-        xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 1 0]; % XYZ_imu = +Z+X+Y_cam
+        % % This should be right
+        % xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 1 0]; % XYZ_imu = +Z+X+Y_cam
 
         figure(22); hold on; axis equal; grid on; axis tight;
         title('imu coord.');
@@ -186,13 +186,13 @@ for i = 1:length(matFilenames)
         xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('D world');
         % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
         %     1, double(matData.colors) / 255, 'filled');
-        scatter3(xyz_NED(:,2), xyz_NED(:,1), -xyz_NED(:,3), 1);
+        scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3), 1);
 
         % Origin
         % imu_origin = [xm(i), ym(i), zm(i)];
         % cam_origin = [E(i), N(i), U(i)]; % ENU?
-        % cam_origin = [N(i), E(i), -U(i)]; % NED?
-        cam_origin = [ySIO(i), xSIO(i), -zm(i)]; % XY_SIO and Up 
+        cam_origin = [N(i), E(i), -U(i)]; % NED?
+        % cam_origin = [ySIO(i), xSIO(i), -zm(i)]; % XY_SIO and Up 
 
         %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
         xyz_world = xyz_NED + cam_origin;

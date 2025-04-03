@@ -67,7 +67,7 @@ def write_inputs_yaml(fname_log):
         # Define brighter/darker exposures; e.g. half and double
         bright_us = round(max(auto_exposure_us / 2, 1))
         dark_us   = round(max(auto_exposure_us * 2, 1))
-        log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_us:.3f} us, dark mode = {dark_us:.3f} us\n")
+        log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_us:.3f} µs, dark mode = {dark_us:.3f} µs\n")
         yaml_path = "../inputs.yaml"
         if not os.path.exists(yaml_path):
             log.write(f"{tstr}:     [WARN] inputs.yaml not found, creating minimal file...\n")
