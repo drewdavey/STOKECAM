@@ -31,6 +31,7 @@ function data2 = parse_data(mainDir, waveFolder)
     end
 
     % Calculate query times for IMU time series
+    % Avgtimestamp will be same if using hardware trigger
     for i = 1:length(tstamps0)
         % Calculate the time difference in nanoseconds directly
         timeDiffNs(i) = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds

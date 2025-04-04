@@ -15,7 +15,8 @@ segment = 0;        % Segment images?
 clipWaves = 1;
 while clipWaves
     mainDir = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session'); % load path to session
-    waveFolder = organize_images(mainDir); % wave* directory containing 'cam0' and 'cam1' folders
+    WasteMgmtAuto(mainDir); % clean out deleted images from both cam dirs
+    waveFolder = organize_images(mainDir); % create wave* directory containing 'cam0' and 'cam1' folders
     data2 = parse_data(mainDir, waveFolder);
 
     % Extract the last folder name
