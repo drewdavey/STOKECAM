@@ -23,7 +23,7 @@ function waveFolder = organize_images(mainDir)
         selectedFile = selectedFiles(i);        
         
         % Extract timestamp and image number from selected file
-        [cameraID, timestamp, ~] = parse_filename(selectedFile.name);        
+        [cameraID, timestamp, imageNum] = parse_filename(selectedFile.name);        
         
         % Convert the selected timestamp to numeric (nanoseconds)
         targetTimeNs = str2double(timestamp);
@@ -36,9 +36,9 @@ function waveFolder = organize_images(mainDir)
         end
 
         % Find the nearest timestamp match in the other camera's file list
-        nearestFile = find_nearest_file(otherFiles, targetTimeNs);
+        matchingFile = find_matching_file(otherFiles, targetTimeNs, imageNum);
         
-        if isempty(nearestFile)
+        if isempty(matchingFile)
             warning(['Corresponding file not found for ', selectedFile.name]);
             continue;  % Skip to the next file if no match is found
         end        
@@ -46,10 +46,10 @@ function waveFolder = organize_images(mainDir)
         % Copy the files into the wave folder
         if folderIndex == 1
             copyfile(fullfile(cam0Dir, selectedFile.name), fullfile(waveFolder, 'cam0', selectedFile.name));
-            copyfile(fullfile(cam1Dir, nearestFile.name), fullfile(waveFolder, 'cam1', nearestFile.name));
+            copyfile(fullfile(cam1Dir, matchingFile.name), fullfile(waveFolder, 'cam1', matchingFile.name));
         else
             copyfile(fullfile(cam1Dir, selectedFile.name), fullfile(waveFolder, 'cam1', selectedFile.name));
-            copyfile(fullfile(cam0Dir, nearestFile.name), fullfile(waveFolder, 'cam0', nearestFile.name));
+            copyfile(fullfile(cam0Dir, matchingFile.name), fullfile(waveFolder, 'cam0', matchingFile.name));
         end
     end    
     disp(['Files successfully copied to ', waveFolder]);
