@@ -2,7 +2,7 @@
 % Drew Davey
 % Last updated: 2024-12-16
 
-function data2 = parse_data(mainDir, waveFolder)
+function data2 = parse_imu(mainDir, waveFolder)
 
     % Load IMU/GPS
     vn_tmp = dir(fullfile(mainDir, '*.csv'));

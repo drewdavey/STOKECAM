@@ -8,10 +8,10 @@ addpath('functions/');
 
 %% Inputs
 
-default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
-% default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calibHQ_SIO';
+% Define calibration path
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
+load([calib_path '/calib.mat']); 
 
-def_calib = 0;   % default calib (0) or select calib (1)
 BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1)
 specs = 0;       % default specs (0) or input specs (1)
 plys = 0;        % save .plys seperate in a 'ptCloud' directory?
@@ -28,29 +28,28 @@ TextureThreshold = 0.00002;    % only applied if specs
 
 %% Filepath
 
-% Initialize paths array
-paths = {};
+% Load path to dir to reconstruct
+session = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session containing wave subfolders'); 
 
-path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for reconstruction'); % load path to dir to reconstruct
-paths{end + 1} = path;  % Add selected session to paths array
+% Find subfolders that start with "wave"
+waveSubfolders = dir(fullfile(session, 'wave*'));
 
-% Queue up additional sessions?
-while true
-    answer = questdlg('Queue another session?', ...
-    'Queue another session?', ...
-    'Yes','No','Yes');
-    switch answer
-        case 'Yes'
-            path = uigetdir([path '/../'],'Select path to session for reconstruction');
-        case 'No' 
-            break;
+% Initialize waves array
+waves = {};
+
+% Loop over each matching entry
+for i = 1:numel(waveSubfolders)
+    if waveSubfolders(i).isdir
+        % Build full path to subfolder
+        wavePath = fullfile(session, waveSubfolders(i).name);
+        % Append to the cell array
+        waves{end + 1} = wavePath;
     end
-    paths{end + 1} = path;  % Add selected directory to paths array
 end
 
 % Process each selected path
-for m = 1:length(paths)
-    path = paths{m};
+for m = 1:length(waves)
+    path = waves{m};
 
     % WasteMgmtAuto(path); % Run WasteMgmt on path
 
@@ -59,28 +58,18 @@ for m = 1:length(paths)
     % dir1 = dir([path '/cam1/*.jpg']); % THESE ARE FLIPPED
     % dir2 = dir([path '/cam0/*.jpg']); % THESE ARE FLIPPED
     
-    %% Load calibration and create dirs
+    %% Create dirs
     
-    if def_calib
-        calib_path = uigetdir('../../../FSR/stereo_cam/DATA/calibrations/', 'Select path to calibration session'); % load path to calibration session
-    else
-        calib_path = default_calib; 
+    L1Dir = [path '/L1'];
+    matDir = [L1Dir '/mats'];
+    rectifiedImagesDir = [L1Dir '/Rectified_Images']; 
+    
+    if ~exist(L1Dir, 'dir')
+        mkdir(L1Dir); % mkdir for L1
     end
-    
-    load([calib_path '/calib.mat']); 
-    pause(2); close(gcf); pause(2); close(gcf);
-    % uiwait(gcf); uiwait(gcf); 
-    
-    matDir = [path '/mats'];
-    rectifiedImagesDir = [path '/Rectified_Images']; 
-    ptCloudDir = [path '/ptClouds'];
-    
+
     if ~exist(rectifiedImagesDir, 'dir')
         mkdir(rectifiedImagesDir); % mkdir for rectified images
-    end
-    
-    if plys && ~exist(ptCloudDir, 'dir')
-        mkdir(ptCloudDir); % mkdir for ptClouds
     end
 
     if ~exist(matDir, 'dir')
@@ -88,13 +77,13 @@ for m = 1:length(paths)
     else 
         t = timer('StartDelay',10,'TimerFcn',@(~,~)delete(findall(groot,'WindowStyle','modal')));
         start(t); [~, lastDir] = fileparts(path);
-        answer = questdlg(['Overwrite ' lastDir  ' products?'], ...
-        'Overwrite?', ...
+        answer = questdlg(['Overwrite L1' lastDir  ' products?'], ...
+        'Overwrite L1?', ...
         'Yes','No','Yes');
         if isempty(answer); answer = 'Yes'; end  % default action
         switch answer
             case 'Yes'
-                disp(['Overwriting ' lastDir ' previous files.']); 
+                disp(['Overwriting ' lastDir ' L1 files.']); 
             case 'No'
                 disp(['Skipping ' lastDir '.']); 
                 continue;
@@ -197,13 +186,6 @@ for m = 1:length(paths)
     
         % Send clean flag
         data.clean = 0; 
-    
-        % Save ptCloud as .ply
-        if plys 
-            filename = [timestamp '_' imageNum];
-            fullFilePath = fullfile(ptCloudDir, filename);
-            pcwrite(ptCloud_orig, fullFilePath); 
-        end 
     
         % Save .mat
         filename = [timestamp '_' imageNum];
