@@ -14,16 +14,12 @@ segment = 0;        % Segment images?
 
 clipWaves = 1;
 while clipWaves
+    
     mainDir = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session'); % load path to session
+    
     WasteMgmtAuto(mainDir); % clean out deleted images from both cam dirs
+    
     waveFolder = organize_images(mainDir); % create wave* directory containing 'cam0' and 'cam1' folders
-    data2 = parse_imu(mainDir, waveFolder);
-
-    % Extract the last folder name
-    [~, last_folder] = fileparts(waveFolder);
-
-    % Save parsed VN-200 data to waveDir
-    save(fullfile(waveFolder, [last_folder '.mat']), 'data2');
 
     %%%%%%%% MAKE L1.MAT HOLD ORIGINAL CROPPED PTCLOUD DATA AND IMU STRUCT
     %%%%%%%% L2.MAT WILL BE DOWNSIZED / SMOOTHED PTCLOUD AND CROSS SECTIONS

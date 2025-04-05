@@ -2,7 +2,7 @@
 % Drew Davey
 % Last updated: 2024-12-16
 
-function data2 = parse_imu(mainDir, waveFolder)
+function imu = parse_imu(mainDir, waveFolder)
 
     % Load IMU/GPS
     vn_tmp = dir(fullfile(mainDir, '*.csv'));
@@ -16,22 +16,22 @@ function data2 = parse_imu(mainDir, waveFolder)
     cam0Images = dir(fullfile(cam0Dir, '*.jpg'));
     cam1Images = dir(fullfile(cam1Dir, '*.jpg'));
     
-    % Convert filenames into struct arrays same as select_files output
-    selectedFiles0 = struct('name', {cam0Images.name});
-    selectedFiles1 = struct('name', {cam1Images.name});
+    % Convert filenames into struct arrays
+    files0 = struct('name', {cam0Images.name});
+    files1 = struct('name', {cam1Images.name});
     
     % Get camera timestamps
-    for i = 1:length(selectedFiles0)
-        [cameraID0, tstamp0, imageNum0] = parse_filename(selectedFiles0(i).name);
+    for i = 1:length(files0)
+        [~, tstamp0, ~] = parse_filename(files0(i).name);
         tstamps0(i) = str2double(tstamp0);  % Convert to numeric nanoseconds
     end
-    for i = 1:length(selectedFiles1)
-        [cameraID1, tstamp1, imageNum1] = parse_filename(selectedFiles1(i).name);
+    for i = 1:length(files1)
+        [~, tstamp1, ~] = parse_filename(files1(i).name);
         tstamps1(i) = str2double(tstamp1);  % Convert to numeric nanoseconds
     end
 
     % Calculate query times for IMU time series
-    % Avgtimestamp will be same if using hardware trigger
+    %%% Avgtimestamp will be same if using hardware trigger %%%
     for i = 1:length(tstamps0)
         % Calculate the time difference in nanoseconds directly
         timeDiffNs(i) = tstamps1(i) - tstamps0(i);  % Difference in nanoseconds
@@ -44,7 +44,7 @@ function data2 = parse_imu(mainDir, waveFolder)
     end
 
     % Initialize new struct
-    data2 = struct();
+    imu = struct();
 
     % Fields to interpolate
     fields = vn.Properties.VariableNames;  % Get all column names of the vn table
@@ -56,16 +56,16 @@ function data2 = parse_imu(mainDir, waveFolder)
         interp_values = interp1(vn{:,1}, vn{:,i}, queryTime, 'linear', 'extrap');
 
         % Store results in struct with same field names
-        data2.(fields{i}) = interp_values;
+        imu.(fields{i}) = interp_values;
     end
 
     % Store query times as well
-    data2.queryTime = queryTime; % in nanoseconds
+    imu.queryTime = queryTime; % in nanoseconds
 
     % Create relative time
-    data2.t0 = (queryTime - queryTime(1)) * 1e-9; % relative time in seconds
+    imu.t0 = (queryTime - queryTime(1)) * 1e-9; % relative time in seconds
 
     % Save cam delays
-    data2.camDiffs = timeDiffNs * 10^-9;  % cam delay in seconds
+    imu.camDiffs = timeDiffNs * 10^-9;  % cam delay in seconds
 
 end
