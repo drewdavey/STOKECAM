@@ -60,15 +60,15 @@ def configure_cameras(fname_log, mode, exposure_us):
         # log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
 
-def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName, exposure):
+def calib(fdir, fname_log, calib_dt, calib_frames, portName, exposure):
     """Collect set of calibration images with indicator lights."""
     [led.on() for led in (red, green, yellow)]
     time.sleep(5)
     [led.off() for led in (red, green, yellow)]
-    fdir_out, fdir_cam0, fdir_cam1 = create_dirs(fdir, f"calib_{mode}")
+    fdir_out, fdir_cam0, fdir_cam1 = create_dirs(fdir, f"calib_{exposure*1e6:.0f}")
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
-    log.write(f"{tstr}:     calibration_{mode} session: {fdir_out}\n"), log.close()
+    log.write(f"{tstr}:     calibration_{exposure*1e6:.0f} session: {fdir_out}\n"), log.close()
     s = Sensor() # Create sensor object and connect to the VN-200 
     csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)
@@ -149,13 +149,13 @@ def toggle_modes():
     time.sleep(3)
     [led.off() for led in (red, green, yellow)]
 
-def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
+def enter_standby(fdir, fname_log, portName, exposure, dt):
     """Enter standby mode to capture images with external trigger."""
     yellow.on()
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
     log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
-    fdir_out, fdir_cam0, fdir_cam1 = create_dirs(fdir, f"session_{mode}")
+    fdir_out, fdir_cam0, fdir_cam1 = create_dirs(fdir, f"session_{exposure*1e6:.0f}")
     s = Sensor()  # Create sensor object and connect to the VN-200
     csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)
@@ -309,9 +309,9 @@ try:
             tlast = time.time()
         if right_button.is_held and not standby and not left_button.is_pressed:
             standby = True
-            enter_standby(fdir, fname_log, mode, portName, exposure, dt)   
+            enter_standby(fdir, fname_log, portName, exposure, dt)   
         if left_button.is_held and not standby and not right_button.is_pressed:
-            calib(fdir, fname_log, calib_dt, calib_frames, mode, portName, exposure)
+            calib(fdir, fname_log, calib_dt, calib_frames, portName, exposure)
             monitor_gps(portName) 
         if (right_button.is_held and left_button.is_held) and not standby:
             [led.on() for led in (red, green, yellow)]

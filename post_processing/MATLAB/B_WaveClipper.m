@@ -17,9 +17,6 @@ while clipWaves
     
     waveFolder = organize_images(mainDir); % create wave* directory containing 'cam0' and 'cam1' folders
 
-    %%%%%%%% MAKE L1.MAT HOLD ORIGINAL CROPPED PTCLOUD DATA AND IMU STRUCT
-    %%%%%%%% L2.MAT WILL BE DOWNSIZED / SMOOTHED PTCLOUD AND CROSS SECTIONS
-
     answer = questdlg('Clip another wave?', ...
     'Clip another wave?', ...
     'Yes','No','Yes');

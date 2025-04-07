@@ -8,9 +8,6 @@ addpath('functions/');
 
 %% Inputs
 
-% Default resolution for figures
-res = 600; % dpng
-
 % Define calibration path
 calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
 load([calib_path '/calib.mat']); 
@@ -29,8 +26,19 @@ ContrastThreshold = 0.25;       % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
 TextureThreshold = 0.00002;    % only applied if specs
 
-% Bounds for trimming point clouds (meters)
+% Bounds for trimBounds (meters)
 bounds = [-10 10 -10 10 0 30];   % [xmin xmax ymin ymax zmin zmax] 
+
+% Default resolution for figures
+res = 600; % dpng
+
+% Image regions for RGB and HSV thresholding
+topFraction = 0.25;
+bottomFraction = 0.5;
+Nstd = 2; % std from RGB or HSV values
+
+% Nstd from centroid for refinedTrim
+Nstd2 = 3;
 
 %% Filepath
 
@@ -188,8 +196,16 @@ for m = 1:length(waves)
     
         %% L1 cleaning of point clouds
 
-        [points3D, colors] = trimBounds(points3D, colors, bounds); 
-        
+        [points3D, colors] = trimBounds(points3D, colors, bounds);
+
+        [points3D, colors] = colorThreshHSV(points3D, colors, J1, ...
+                                      topFraction, bottomFraction, Nstd);
+
+        [points3D, colors] = colorThreshRGB(points3D, colors, J1, ...
+                                      topFraction, bottomFraction, Nstd);
+
+        [points3D, colors] = refinedTrim(points3D, colors, Nstd2);
+
         % Remove rows where any of the columns in points3D have NaNs
         validRows = all(~isnan(points3D), 2);  % Find rows where all x, y, z values are non-NaN
         
