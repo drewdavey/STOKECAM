@@ -8,6 +8,9 @@ addpath('functions/');
 
 %% Inputs
 
+% Default resolution for figures
+res = 600; % dpng
+
 % Define calibration path
 calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
 load([calib_path '/calib.mat']); 
@@ -65,8 +68,9 @@ for m = 1:length(waves)
 
     %%%%% THIS WILL OVERWRITE PREVIOUS L1 DATA IF IT EXISTS %%%%%
     L1Dir = [wave '/L1'];
+    figDir = [wave '/figs'];
     matDir = [L1Dir '/mats'];
-    rectifiedImagesDir = [L1Dir '/Rectified_Images']; 
+    rectifiedImagesDir = [figDir '/Rectified_Images']; 
     
     if ~exist(L1Dir, 'dir')
         mkdir(L1Dir); % mkdir for L1
@@ -80,12 +84,19 @@ for m = 1:length(waves)
         mkdir(matDir); % mkdir for mats
     end
 
+    if ~exist(figDir, 'dir')
+        mkdir(figDir); % mkdir for figs
+    end
+
     %% Parse Vectornav data
 
-    imu = parse_imu(session, wave);
+    imu = parse_imu(session, wave); % Parse imu data into struct
 
-    % Save parsed VN-200 data to L1
-    save(fullfile(L1Dir, 'imu.mat'), 'imu');
+    basicQCplots(imu, figDir, res); % Plot basic QC figs
+
+    save(fullfile(L1Dir, 'imu.mat'), 'imu'); % Save VN-200 data to L1
+
+    close all; % Close QC figs
 
     %% Rectify images
      
@@ -147,12 +158,12 @@ for m = 1:length(waves)
         % filename = [timestamp '_' imageNum '_rect.png'];
         % fullFilePath = fullfile(rectifiedImagesDir, filename);
         % exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
-        f2 = figure(2); 
+        f10 = figure; 
         imshow(disparityMap, [0, 64]); % Display disparity map
         colormap jet; colorbar;
         filename = [timestamp '_' imageNum '_disp.png'];
         fullFilePath = fullfile(rectifiedImagesDir, filename);
-        exportgraphics(f2,fullFilePath,'Resolution',600); % Save disparity map as PNG
+        exportgraphics(f10,fullFilePath,'Resolution',res); % Save disparity map as PNG
     
         % Create points3D
         points3D = reconstructScene(disparityMap, reprojectionMatrix);
