@@ -158,12 +158,12 @@ for m = 1:length(waves)
         % filename = [timestamp '_' imageNum '_rect.png'];
         % fullFilePath = fullfile(rectifiedImagesDir, filename);
         % exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
-        f10 = figure; 
+        figure; 
         imshow(disparityMap, [0, 64]); % Display disparity map
         colormap jet; colorbar;
         filename = [timestamp '_' imageNum '_disp.png'];
         fullFilePath = fullfile(rectifiedImagesDir, filename);
-        exportgraphics(f10,fullFilePath,'Resolution',res); % Save disparity map as PNG
+        exportgraphics(gcf,fullFilePath,'Resolution',res); % Save disparity map as PNG
     
         % Create points3D
         points3D = reconstructScene(disparityMap, reprojectionMatrix);
