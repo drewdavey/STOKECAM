@@ -22,15 +22,15 @@ UniquenessThreshold = 0;       % only applied if specs
 % Applied to BM only
 DisparityRange = [0 64];       % only applied if specs
 BlockSize = 25;                % only applied if specs
-ContrastThreshold = 0.25;       % only applied if specs
+ContrastThreshold = 0.25;      % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
 TextureThreshold = 0.00002;    % only applied if specs
 
-% Bounds for trimBounds (meters)
-bounds = [-10 10 -10 10 0 30];   % [xmin xmax ymin ymax zmin zmax] 
-
 % Default resolution for figures
 res = 600; % dpng
+
+% Bounds for trimBounds (meters)
+bounds = [-10 10 -10 10 0 30];   % [xmin xmax ymin ymax zmin zmax] 
 
 % Image regions for RGB and HSV thresholding
 topFraction = 0.25;
@@ -196,14 +196,17 @@ for m = 1:length(waves)
     
         %% L1 cleaning of point clouds
 
+        % Trim to bounding box
         [points3D, colors] = trimBounds(points3D, colors, bounds);
 
+        % Threshold foreground/background by HSV
         [points3D, colors] = colorThreshHSV(points3D, colors, J1, ...
                                       topFraction, bottomFraction, Nstd);
-
+        % Threshold foreground/background by RGB
         [points3D, colors] = colorThreshRGB(points3D, colors, J1, ...
                                       topFraction, bottomFraction, Nstd);
 
+        % Trim points >= Nstd from centroid
         [points3D, colors] = refinedTrim(points3D, colors, Nstd2);
 
         % Remove rows where any of the columns in points3D have NaNs

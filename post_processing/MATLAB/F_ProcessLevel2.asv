@@ -111,14 +111,14 @@ for m = 1:length(waves)
     for i = 1:length(matFilenames)
         matData = load(fullfile(matDir, matFilenames{i}));
         if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
-
+            
             %%%%%%%%%%%%%% Point cloud in camera reference frame %%%%%%%%%%%%%%
             xyz_cam = matData.points3D;
             
             figure(21); hold on; axis equal; grid on; axis tight;
             title('Camera coordinates');
             % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
-            scatter(xyz_cam(:,1), xyz_cam(:,2), 1, xyz_cam(:,3));
+            scatter(xyz_cam(:,2), xyz_cam(:,1), 1, xyz_cam(:,3));
             xlabel('X_{cam} (m)');
             ylabel('Y_{cam} (m)');
             zlabel('Z_{cam} (m)');
