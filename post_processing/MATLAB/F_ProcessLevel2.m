@@ -115,17 +115,17 @@ for m = 1:length(waves)
             %%%%%%%%%%%%%% Point cloud in camera reference frame %%%%%%%%%%%%%%
             xyz_cam = matData.points3D;
             
-            figure(21); hold on; axis equal; grid on; axis tight;
-            title('Camera coordinates');
-            % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
-            scatter(xyz_cam(:,1), xyz_cam(:,2), 1, xyz_cam(:,3));
-            xlabel('X_{cam} (m)');
-            ylabel('Y_{cam} (m)');
-            zlabel('Z_{cam} (m)');
-    
-            % Add colorbar and set its label
-            cbar = colorbar;
-            cbar.Label.String = 'Z_{cam} (m)';  % Label for the colorbar
+            % figure(21); hold on; axis equal; grid on; axis tight;
+            % title('Camera coordinates');
+            % % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
+            % scatter(xyz_cam(:,1), xyz_cam(:,2), 1, xyz_cam(:,3));
+            % xlabel('X_{cam} (m)');
+            % ylabel('Y_{cam} (m)');
+            % zlabel('Z_{cam} (m)');
+            % 
+            % % Add colorbar and set its label
+            % cbar = colorbar;
+            % cbar.Label.String = 'Z_{cam} (m)';  % Label for the colorbar
     
             %%%%%%%%%%%%%% Reorder to X, Z, Y for NED convention %%%%%%%%%%%%%%
             % xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 -1 0]; % Swap Y and Z and flip Y
@@ -136,13 +136,13 @@ for m = 1:length(waves)
             % % This should be right
             % xyz_imu = xyz_cam * [0 0 1; 1 0 0; 0 1 0]; % XYZ_imu = +Z+X+Y_cam
     
-            figure(22); hold on; axis equal; grid on; axis tight;
-            title('imu coord.');
-            % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
-            scatter(xyz_imu(:,1), xyz_imu(:,2), 1, xyz_imu(:,3));
-            xlabel('X imu');
-            ylabel('Y imu');
-            zlabel('Z imu');
+            % figure(22); hold on; axis equal; grid on; axis tight;
+            % title('imu coord.');
+            % % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
+            % scatter(xyz_imu(:,1), xyz_imu(:,2), 1, xyz_imu(:,3));
+            % xlabel('X imu');
+            % ylabel('Y imu');
+            % zlabel('Z imu');
     
             %%%%%%%%%%%%%%%%%%%%%% Rotation matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%
             R = rotationMatrices(:, :, i);
@@ -150,12 +150,12 @@ for m = 1:length(waves)
             % Rotate and transpose
             xyz_NED = (R * xyz_imu')';
     
-            figure(23); hold on; axis equal; grid on; axis tight;
-            title('rotated into NED');
-            xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('D world');
-            % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
-            %     1, double(matData.colors) / 255, 'filled');
-            scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3), 1);
+            % figure(23); hold on; axis equal; grid on; axis tight;
+            % title('rotated into NED');
+            % xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('D world');
+            % % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
+            % %     1, double(matData.colors) / 255, 'filled');
+            % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3), 1);
     
             % Origin
             % imu_origin = [xm(i), ym(i), zm(i)];
@@ -184,5 +184,5 @@ for m = 1:length(waves)
         end
     end
 
-    close all; % close figs before next wave
+    % close all; % close figs before next wave
 end
