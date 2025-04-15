@@ -150,8 +150,8 @@ def get_config(mode, exposure_us):
     cfg['main']['size'] = (1440, 1080)
     cfg['main']['format'] = 'RGB888'
     cfg['controls']['ExposureTime'] = exposure_us         # exposure in microseconds
-    cfg['controls']['AeEnable'] = False                   # disable auto exposure
-    cfg['controls']['AwbEnable'] = False                  # disable auto white balance
+    cfg['controls']['AeEnable'] = False                   # disable auto exposure (necessary for manual exposure)
+    cfg['controls']['AwbEnable'] = False                  # disable auto white balance (necessary for manual exposure)
     # Select parameters
     # if mode == 'auto':
     #     cfg['controls']['FrameDurationLimits'] = (0, 100)
@@ -159,7 +159,7 @@ def get_config(mode, exposure_us):
     # elif mode == 'fast':
     #     cfg['controls']['FrameDurationLimits'] = (0, 100)
     # elif mode == 'max':
-    #     cfg['controls']['FrameDurationLimits'] = (33333, 33333)
+    #     cfg['controls']['FrameDurationLimits'] = (0, 33333)
     # else:
     #     raise ValueError(f"Invalid mode: {mode}")
     cam.close()

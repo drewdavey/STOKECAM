@@ -57,7 +57,6 @@ def configure_cameras(fname_log, mode, exposure_us):
         cam.configure(config)
         cam.start()
         log.write(f"{tstr}:     cam{idx} configuration: {cam.camera_configuration()}\n")
-        # log.write(f"{tstr}:     cam{idx} metadata: {cam.capture_metadata()}\n")
     log.write('\n'), log.close()
 
 def calib(fdir, fname_log, calib_dt, calib_frames, mode, portName, exposure):
