@@ -132,18 +132,22 @@ function basicQCplots(imu, figDir, res)
     quatX = imu.quatX;
     quatY = imu.quatY;
     quatZ = imu.quatZ;
+    quatW = imu.quatW;
     f8 = figure;
-    subplot(3,1,1); hold on; grid on; box on; axis tight;
+    subplot(4,1,1); hold on; grid on; box on; axis tight;
     plot(t, quatX, 'k', 'LineWidth', 1);
     ylabel('QuatX');
-    subplot(3,1,2); hold on; grid on; box on; axis tight;
+    subplot(4,1,2); hold on; grid on; box on; axis tight;
     plot(t, quatY, 'k', 'LineWidth', 1);
     ylabel('QuatY');
-    subplot(3,1,3); hold on; grid on; box on; axis tight;
+    subplot(4,1,3); hold on; grid on; box on; axis tight;
     plot(t, quatZ, 'k', 'LineWidth', 1);
     ylabel('QuatZ');
+    subplot(4,1,4); hold on; grid on; box on; axis tight;
+    plot(t, quatW, 'k', 'LineWidth', 1);
+    ylabel('QuatW');
     xlabel('Time (sec)');
-    % sgtitle('Accel');
+    % sgtitle('Quaternions');
     print(f8, fullfile(figDir, 'quaternion.png'), '-dpng', ['-r', num2str(res)]);
 
     %% Plot GNSS position and uncertainty

@@ -286,8 +286,8 @@ set_trigger_mode(True, fname_log)
 # Initialize and configure cameras 
 global cam0, cam1, mode, standby, exposure, dt
 frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times = parse_inputs(fname_log)
-mode = shooting_modes[0]                        # Default mode
-exposure_us = exposure_times[0]                 # Default exposure time
+mode = shooting_modes[1]                        # Default mode
+exposure_us = exposure_times[1]                 # Default exposure time
 configure_cameras(fname_log, mode, exposure_us) # Configure the cameras
 exposure, dt = calc_dt(frame_rate, exposure_us) # Calculate dt
 
@@ -303,6 +303,7 @@ try:
     # Hold both buttons for 3 seconds to toggle modes, then:
     #     - release both to toggle modes
     #     - release left ONLY to exit script
+    #     - release right ONLY to reconfigure cameras
     while True:
         if (time.time() - tlast > 10) and not standby:
             monitor_gps(portName)
@@ -318,9 +319,21 @@ try:
             left_button.wait_for_release()
             time.sleep(1)
             if right_button.is_held:
-                break
+                break                                           # EXIT SCRIPT
+            elif left_button.is_held:                           # RECONFIGURE CAMERAS
+                cam0.stop(), cam1.stop()                        # Stop the cameras
+                cam0.close(), cam1.close()                      # Close the cameras
+                set_trigger_mode(False, fname_log)              # Disable external trigger mode
+                write_inputs_yaml(fname_log)                    # Write exposure times to inputs.yaml
+                frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times = parse_inputs(fname_log)
+                mode = shooting_modes[1]                        # Default mode
+                exposure_us = exposure_times[1]                 # Default exposure time
+                configure_cameras(fname_log, mode, exposure_us) # Configure the cameras
+                exposure, dt = calc_dt(frame_rate, exposure_us) # Calculate dt
+                set_trigger_mode(True, fname_log)               # Enable external trigger mode
             else:
-                toggle_modes()
+                toggle_modes()                                  # TOGGLE MODES
+                standby = False
                 monitor_gps(portName)
         time.sleep(0.2)
 

@@ -39,8 +39,6 @@ end
 for m = 1:length(waves)
     wave = waves{m};
 
-    % WasteMgmtAuto(wave); % Run WasteMgmt on wave
-
     dir1 = dir([wave '/cam0/*.jpg']); 
     dir2 = dir([wave '/cam1/*.jpg']); 
     % dir1 = dir([wave '/cam1/*.jpg']); % THESE ARE FLIPPED
@@ -50,7 +48,7 @@ for m = 1:length(waves)
 
     L1Dir = [wave '/L1'];
     L2Dir = [wave '/L2'];
-    figDir = [wave '/figs']; 
+    figDir = [wave '/figs'];
     shapesDir = [figDir '/shapes'];
     
     if exist(L1Dir, 'dir')
@@ -89,9 +87,12 @@ for m = 1:length(waves)
     geoidHeight = geoidheight(imu.lat(1), imu.lon(1), 'EGM96'); 
     zm = imu.alt - geoidHeight;
     
-    E = xm - xm(1);
-    N = ym - ym(1);
-    U = zm - zm(1);
+    E = xm;
+    N = ym;
+    U = zm;
+    % E = xm - xm(1);
+    % N = ym - ym(1);
+    % U = zm - zm(1);
     
     % LL to XY SIO
     [xSIO, ySIO] = lltoxy_siopier(imu.lat, imu.lon);
@@ -159,24 +160,29 @@ for m = 1:length(waves)
     
             % Origin
             % imu_origin = [xm(i), ym(i), zm(i)];
-            % cam_origin = [E(i), N(i), U(i)]; % ENU?
-            cam_origin = [N(i), E(i), -U(i)]; % NED?
-            % cam_origin = [ySIO(i), xSIO(i), -zm(i)]; % XY_SIO and Up 
+            % cam_origin = [E(i), N(i), U(1)]; % ENU?
+            % cam_origin = [N(i), E(i), -U(1)]; % NED?
+            % cam_origin = [N(i), E(i), -U(i)]; % NED?
+            cam_origin = [ySIO(i), xSIO(i), -zm(i)]; % XY_SIO and Up 
+            % cam_origin = [ySIO(1), xSIO(1), -zm(1)]; % XY_SIO and Up 
     
             %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
             xyz_world = xyz_NED + cam_origin;
     
             figure(24); hold on; axis equal; grid on; axis tight;
             title('World coordinates');
-            
-            scatter3(xyz_world(:,2), xyz_world(:,1), xyz_world(:,3),...
-                1, double(matData.colors) / 255, 'filled');
+
+            % scatter3(xyz_world(:,2), xyz_world(:,1), xyz_world(:,3),...
+            %     1, double(matData.colors) / 255, 'filled');
+            % xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('D world');
+
+            scatter3(xyz_world(:,2), xyz_world(:,1), xyz_world(:,3), 1);
             xlabel('X_{SIO} (m)', 'FontSize', 12);
             ylabel('Y_{SIO} (m)', 'FontSize', 12);
             zlabel('Z_{NAVD88} (m)', 'FontSize', 12);
     
-            % view(-64,16);
-            view(-164,10);
+            view(-64,16);
+            % view(-164,10);
             
             % % Save the figure in the shapes/ directory
             % print(gcf, fullfile(shapesDir, [matFiles(i).name(end-8:end-4)]),...
