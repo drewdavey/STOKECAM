@@ -119,7 +119,7 @@ def monitor_gps(portName):
     elif gnssFix == 'RtkFix':
         green.on()
     else:
-        green.blink(1, 10) 
+        green.blink(1, 10)
     s.disconnect()
 
 def toggle_modes():
@@ -317,24 +317,25 @@ try:
         if (right_button.is_held and left_button.is_held) and not standby:
             [led.on() for led in (red, green, yellow)]
             left_button.wait_for_release()
-            time.sleep(1)
-            if right_button.is_held:
+            time.sleep(5)
+            if left_button.is_held and not right_button.is_pressed: 
                 break                                           # EXIT SCRIPT
-            elif left_button.is_held:                           # RECONFIGURE CAMERAS
+            elif right_button.is_held and not left_button.is_pressed:      
+                [led.blink(0.25, 0.25) for led in (red, green, yellow)]                     
                 cam0.stop(), cam1.stop()                        # Stop the cameras
                 cam0.close(), cam1.close()                      # Close the cameras
                 set_trigger_mode(False, fname_log)              # Disable external trigger mode
                 write_inputs_yaml(fname_log)                    # Write exposure times to inputs.yaml
-                frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times = parse_inputs(fname_log)
+                _, _, _, shooting_modes, exposure_times = parse_inputs(fname_log)
                 mode = shooting_modes[1]                        # Default mode
                 exposure_us = exposure_times[1]                 # Default exposure time
                 configure_cameras(fname_log, mode, exposure_us) # Configure the cameras
                 exposure, dt = calc_dt(frame_rate, exposure_us) # Calculate dt
                 set_trigger_mode(True, fname_log)               # Enable external trigger mode
+                [led.off() for led in (red, green, yellow)]
             else:
-                toggle_modes()                                  # TOGGLE MODES
-                standby = False
-                monitor_gps(portName)
+                toggle_modes()                                  # Toggle modes
+            monitor_gps(portName)
         time.sleep(0.2)
 
 except Exception as e:
