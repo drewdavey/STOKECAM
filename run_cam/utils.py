@@ -214,7 +214,8 @@ def sync_clock(portName, gps_timeout):
     gnss = Registers.GnssSolLla()
     s.readRegister(gnss)
     gnssFix = gnss.gnss1Fix.name
-    valid_fixes = {'TimeFix', 'Fix2D', 'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
+    # valid_fixes = {'TimeFix', 'Fix2D', 'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
+    valid_fixes = {'Fix3D', 'SBAS', 'RtkFloat', 'RtkFix'}
     # Wait for GNSS fix
     t0 = time.time()
     while (time.time() - t0 < gps_timeout):
