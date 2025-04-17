@@ -202,7 +202,7 @@ def config_vecnav(portName):
     binaryOutput1Register.gnss.gnss1PosLla = 1
     binaryOutput1Register.gnss.gnss1Dop = 1
     # binaryOutput1Register.gnss.gnss1SatInfo = 1
-    binaryOutput1Register.gnss.gnss1AltMSL = 1
+    binaryOutput1Register.gnss.gnss1AltMsl = 1
     binaryOutput1Register.gnss.gnss1PosUncertainty = 1
     binaryOutput1Register.gnss.gnss1Fix = 1
     binaryOutput1Register.gnss.gnss1NumSats = 1
