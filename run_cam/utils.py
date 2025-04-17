@@ -184,7 +184,7 @@ def config_vecnav(portName):
     binaryOutput1Register = Registers.BinaryOutput1()
     binaryOutput1Register.rateDivisor = 16           ### 50 Hz (~800/rateDivisor) ###
     binaryOutput1Register.asyncMode.serial1 = 1
-    # binaryOutput1Register.time.timeUtc = 1
+    binaryOutput1Register.time.timeUtc = 1
     binaryOutput1Register.time.timeStartup = 1
     # binaryOutput1Register.time.timeGps = 1
     binaryOutput1Register.imu.imuStatus = 1
@@ -200,8 +200,8 @@ def config_vecnav(portName):
     binaryOutput1Register.ins.posU = 1
     binaryOutput1Register.ins.insStatus = 1
     binaryOutput1Register.gnss.gnss1PosLla = 1
-    # binaryOutput1Register.gnss.gnss1Dop = 1
-    binaryOutput1Register.gnss.gnss1SatInfo = 1
+    binaryOutput1Register.gnss.gnss1Dop = 1
+    # binaryOutput1Register.gnss.gnss1SatInfo = 1
     binaryOutput1Register.gnss.gnss1AltMSL = 1
     binaryOutput1Register.gnss.gnss1PosUncertainty = 1
     binaryOutput1Register.gnss.gnss1Fix = 1
