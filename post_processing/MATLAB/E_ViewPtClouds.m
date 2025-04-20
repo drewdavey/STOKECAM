@@ -21,16 +21,16 @@ ybounds = [-50, 50];
 %% Filepath
 
 path = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session for point cloud viewing'); % load path to dir
-% matDir = [path '/L1/mats'];
-matDir = [path '/mats'];
+matDir = [path '/L1/mats'];
+% matDir = [path '/mats'];
 
 %% View point clouds
 
 viewFlag = 1;
 while viewFlag
     % Choose point cloud
-    % file = uigetfile([path '/figs/Rectified_Images/*.png'],'Select file to view point cloud');
-    file = uigetfile([path '/Rectified_Images/*.png'],'Select file to view point cloud');
+    file = uigetfile([path '/figs/Rectified_Images/*.png'],'Select file to view point cloud');
+    % file = uigetfile([path '/Rectified_Images/*.png'],'Select file to view point cloud');
     file = file(1:end-9);
     % Load mat
     load([matDir '/' file '.mat']);
@@ -43,8 +43,8 @@ while viewFlag
     if viewPtCloud_orig
         view(player3D, original.ptCloud);
     else
-        % view(player3D, ptCloud);
-        view(player3D, data.ptCloud);
+        view(player3D, ptCloud);
+        % view(player3D, data.ptCloud);
     end
 
     while isOpen(player3D)
