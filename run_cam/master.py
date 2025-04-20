@@ -129,6 +129,8 @@ def toggle_modes(shooting_modes, exposure_times):
     [led.off() for led in (red, green, yellow)]
     cam0.close(), cam1.close()                      # Close the cameras
     idx = shooting_modes.index(mode)                # Get the index of the current mode
+    mode = shooting_modes[idx]
+    exposure_us = exposure_times[idx]
     while not (right_button.is_held and left_button.is_held):
         if right_button.is_pressed and not left_button.is_pressed:
             idx = (idx + 1) % len(shooting_modes)
