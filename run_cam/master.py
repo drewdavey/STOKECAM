@@ -121,7 +121,7 @@ def monitor_gps(portName):
         green.blink(1, 10)
     s.disconnect()
 
-def toggle_modes():
+def toggle_modes(shooting_modes, exposure_times):
     """Toggle between shooting modes and configure the cameras accordingly."""
     global cam0, cam1, mode, exposure, dt
     [led.blink(0.1, 0.1) for led in (red, green, yellow)]
@@ -333,7 +333,8 @@ try:
                 set_trigger_mode(True, fname_log)               # Enable external trigger mode
                 [led.off() for led in (red, green, yellow)]
             else:
-                toggle_modes()                                  # Toggle modes
+                _, _, _, shooting_modes, exposure_times = parse_inputs(fname_log)
+                toggle_modes(shooting_modes, exposure_times)    # Toggle modes
             monitor_gps(portName)
         time.sleep(0.2)
 
