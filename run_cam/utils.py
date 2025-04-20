@@ -347,14 +347,14 @@ def vecnav_status(portName, fname_log, gps_timeout):
                 vn_time = datetime(year, month, day, hours, minutes, seconds, milliseconds * 1000, tzinfo=timezone.utc)
                 diff_time = vn_time - rp_time
                 diff_seconds = diff_time.total_seconds()
+                tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
+                log.write(f"{tstr}:     VN-200 Time: {vn_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
+                log.write(f"{tstr}:     RP Time: {rp_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
+                log.write(f"{tstr}:     System Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n")
+                vn_mono_time = cd.time.timeStartup.microseconds() * 1e3
+                delta_mono_time = (vn_mono_time - rp_mono_time) * 1e-9
+                log.write(f"{tstr}:     Startup Time Offset (VN200 - RP): {delta_mono_time} seconds\n\n")
                 break
-        tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
-        log.write(f"{tstr}:     VN-200 Time: {vn_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
-        log.write(f"{tstr}:     RP Time: {rp_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}\n")
-        log.write(f"{tstr}:     System Clock Offset (VN200 - RP): {diff_seconds:.6f} seconds\n")
-        vn_mono_time = cd.time.timeStartup.microseconds() * 1e3
-        delta_mono_time = (vn_mono_time - rp_mono_time) * 1e-9
-        log.write(f"{tstr}:     Startup Time Offset (VN200 - RP): {delta_mono_time} seconds\n\n")
     else:
         log.write(f"{tstr}:     VN-200 could not acquire GPS fix. Exiting.\n")
 
