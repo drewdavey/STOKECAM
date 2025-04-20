@@ -9,9 +9,11 @@ mainDir = session; waveFolder = wave;
     vn_tmp = dir(fullfile(mainDir, '*.csv'));
     vn = readtable([mainDir '\' vn_tmp.name], 'Variablenamesline',1);
 
-    % %%%%%% FIGURE THIS OUT!
-    % Remove unwanted data column (column 33)
-    vn(:,33) = []; % explicitly remove column 33 data
+    %%%%%% FIGURE THIS OUT! Check and remove column 33 explicitly
+    if length(vn.Properties.VariableNames) >= 33
+        disp(['Removing column 33: ', vn.VariableNames{33}]);
+        vn.SelectedVariableNames(33) = []; % Remove column 33
+    end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Get cam0 and cam1 dirs
@@ -56,7 +58,7 @@ mainDir = session; waveFolder = wave;
     fields = vn.Properties.VariableNames;  % Get all column names of the vn table
 
     % Loop over each field for interpolation
-    for i = 2:numel(fields)
+    for i = 1:numel(fields)
 
         % Linearly interpolate each column to query points
         interp_values = interp1(vn{:,1}, vn{:,i}, queryTime, 'linear', 'extrap');

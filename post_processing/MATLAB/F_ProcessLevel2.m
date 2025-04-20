@@ -185,7 +185,7 @@ for m = 1:length(waves)
             % cam_origin = [ySIO(1), xSIO(1), U(1)]; % XY_SIO and Up 
     
             %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
-            xyz_world = -xyz_NED + cam_origin;
+            xyz_world = xyz_NED + cam_origin;
             % xyz_world = cam_origin + xyz_NED;
 
             %%% Heading dependent?
