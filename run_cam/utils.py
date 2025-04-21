@@ -78,7 +78,7 @@ def write_inputs_yaml(fname_log):
             auto_exposure_us = round(yaml_default_exposure)
             log.write(f"{tstr}:     [WARN] No valid metadata, using YAML default auto exposure: {auto_exposure_us:.3f} µs\n")
         else:
-            auto_exposure_us = round(max(exposure_list))
+            auto_exposure_us = round(min(exposure_list))
             log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs\n")
         cam.stop()
         cam.close()
