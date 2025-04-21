@@ -72,7 +72,14 @@ for m = 1:length(waves)
     
     %% Georectification
     % Convert geodetic to UTM
-    [E, N, zone] = deg2utm(imu.lat, imu.lon); % Easting, Northing
+    % [E, N, zone] = deg2utm(imu.lat, imu.lon); % Easting, Northing
+    % [N, E, UTMZone] = lltoUTM(imu.lat, imu.lon);
+
+    lla = [imu.lat; imu.lon; imu.alt]';
+    lla0 = [mean(imu.lat); mean(imu.lon); mean(imu.alt)]';
+    % lla0 = [(32 + 51/60. + 58.59779/3600.); -1*(117 + 15/60. + 15.40493/3600.); -20]';
+    NED = lla2ned(lla, lla0, 'ellipsoid');
+    N = NED(:,1); E = NED(:,2); D = NED(:,3);
 
     % LL to XY SIO
     [xSIO, ySIO] = lltoxy_siopier(imu.lat, imu.lon);
@@ -91,29 +98,6 @@ for m = 1:length(waves)
         qw = imu.quatW(i);
         rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
     end
-
-    % %% Compute rotation matrix from Yaw-Pitch-Roll (3-2-1 sequence)
-    % numFrames = numel(imu.yaw);
-    % rotationMatrices = zeros(3, 3, numFrames);
-    % imu.yaw = imu.yaw + 180;
-    % imu.yaw = mod(imu.yaw, 360);
-    % for i = 1:numFrames
-    %     yaw = deg2rad(imu.yaw(i));   % Yaw (rotation around Z-axis)
-    %     pitch = deg2rad(imu.pitch(i));  % Pitch (rotation around Y-axis)
-    %     roll = deg2rad(imu.roll(i));    % Roll (rotation around X-axis)
-    %     % Compute rotation matrix using 3-2-1 (Z-Y-X) Euler sequence
-    %     Rz = [cos(yaw), -sin(yaw), 0;
-    %           sin(yaw),  cos(yaw), 0;
-    %                 0,        0,  1];  % Yaw (Z-axis)
-    %     Ry = [ cos(pitch), 0, sin(pitch);
-    %                    0, 1,          0;
-    %           -sin(pitch), 0, cos(pitch)];  % Pitch (Y-axis)
-    %     Rx = [1,        0,         0;
-    %           0, cos(roll), -sin(roll);
-    %           0, sin(roll),  cos(roll)];  % Roll (X-axis)
-    %     % Final rotation matrix (Z-Y-X sequence)
-    %     rotationMatrices(:, :, i) = Rz * Ry * Rx;
-    % end
     
     %% Plot X-Y cross sections
     for i = 1:length(matFilenames)
@@ -126,8 +110,8 @@ for m = 1:length(waves)
 
             % %%%%%%%%%% TRANSLATE HERE? %%%%%%%%%%%
             % % f = 1.727174826954456;
-            % f = 3;
-            % xyz_cam = [xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3) + f];
+            % f = 0.01;
+            % xyz_cam = [xyz_cam(:,1) - 0.06, xyz_cam(:,2) + 0.06, xyz_cam(:,3) + f];
             % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
             figure(21); hold on; axis equal; grid on; axis tight;
@@ -142,13 +126,7 @@ for m = 1:length(waves)
     
             %%%%%%%%%%%%%% Rotate into IMU coords: XYZ_imu = +Z+X+Y_cam %%%%%%%%%%%%%%
             xyz_imu = ([0 0 1; 1 0 0; 0 1 0] * xyz_cam')'; 
-            % xyz_imu = [xyz_cam(:,3), xyz_cam(:,1), xyz_cam(:,2)];
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-            % %%%%%%%%%% TRANSLATE HERE? %%%%%%%%%%%
-            % f = 3;
-            % xyz_imu = [xyz_imu(:,1) - f, xyz_imu(:,2) - 0.06, xyz_imu(:,3) - 0.06];
-            % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
             figure(22); hold on; axis equal; grid on; axis tight;
             title('imu coord.');
@@ -183,25 +161,13 @@ for m = 1:length(waves)
             scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3), 1);
     
             % Origin
-            % cam_origin = [E(i), N(i), U(1)]; % ENU?
-            % cam_origin = [N(i), E(i), -U(1)]; % NED?
-            cam_origin = [ySIO(i), xSIO(i), U(1)]; % XY_SIO and Up 
-            % cam_origin = [ySIO(1), xSIO(1), U(1)]; % XY_SIO and Up 
+            cam_origin = [N(i), E(i), U(1)]; % NED
+            % cam_origin = [ySIO(i), xSIO(i), U(1)]; % XY_SIO and Up 
+            % cam_origin = [ySIO(1), xSIO(1), U(1)]; % XY_SIO and Up ;
     
             %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
-            % xyz_world = xyz_NED + cam_origin; 
+            % xyz_world = xyz_NED - cam_origin; 
             xyz_world = cam_origin - xyz_NED;
-
-            % xyz_world = zeros(size(xyz_NED));
-            % xyz_world(:,1) = cam_origin(:,1) - xyz_NED(:,1); % Northing
-            % xyz_world(:,2) = cam_origin(:,2) - xyz_NED(:,2); % Easting
-            % xyz_world(:,3) = cam_origin(:,3) - xyz_NED(:,3); % Down
-
-            %%% Heading dependent?
-            % xyz_world = zeros(size(xyz_NED));
-            % xyz_world(:,1) = xyz_NED(:,1) - cam_origin(:,1); % Northing
-            % xyz_world(:,2) = xyz_NED(:,2) - cam_origin(:,2); % Easting
-            % xyz_world(:,3) = xyz_NED(:,3) + cam_origin(:,3); % Down
             
             figure(24); hold on; axis equal; grid on; axis tight;
             title('World coordinates');
@@ -225,46 +191,46 @@ for m = 1:length(waves)
 
     % close all; % close figs before next wave
 
-    %% Plot rotations/translations
-    % Create points
-    depth = 2;
-    pointColors = {'r', 'g', 'b', 'm'};    % Corner colors
-    points = [depth, depth, depth, depth;  % X-coordinates
-              0.5, -0.5, -0.5,  0.5;       % Y-coordinates
-              0.5,  0.5, -0.5, -0.5];      % Z-coordinates
-    video = VideoWriter(fullfile(figDir, '3D_Orientation_with_Plane.mp4'), 'MPEG-4');
-    video.FrameRate = 1;
-    open(video);
-    figure;
-    xlabel('X'); ylabel('Y'); zlabel('Z');
-    grid on;
-    hold on;
-    % Set axis limits
-    range = depth*1.5;
-    axisLimits = [min(E)-range, max(E)+range, min(N)-range, max(N)+range, min(U)-range, max(U)+range];
-    for k = 1:numFrames
-        cla;
-        origin = [ySIO(i), xSIO(i), U(1)];                  % Origin
-        R = rotationMatrices(:, :, k);                      % Rotation matrix 
-        rotated = R * points;                               % Rotate the points
-        translated = rotated + origin';                     % Translate the points 
-        % Plot the camera axes 
-        xAxis = R * [1; 0; 0];
-        yAxis = R * [0; 1; 0];
-        zAxis = R * [0; 0; 1];
-        quiver3(E(k), N(k), U(k), xAxis(1), xAxis(2), xAxis(3), 'r', 'LineWidth', 2);
-        quiver3(E(k), N(k), U(k), yAxis(1), yAxis(2), yAxis(3), 'g', 'LineWidth', 2);
-        quiver3(E(k), N(k), U(k), zAxis(1), zAxis(2), zAxis(3), 'b', 'LineWidth', 2);
-        % Shade the plane
-        fill3(translated(1, :), translated(2, :), translated(3, :), ...
-              'k', 'FaceAlpha', 0.5, 'EdgeColor', 'none');
-        for j = 1:4
-            scatter3(translated(1, j), translated(2, j), translated(3, j), ...
-                     10, pointColors{j}, 'filled');
-        end
-        axis equal; axis(axisLimits); title(['Frame ', num2str(k)]); drawnow;
-        % pause(0.01);
-        frame = getframe(gcf); writeVideo(video, frame); % Write frame to video
-    end
-    close(video);
+    % %% Plot rotations/translations
+    % % Create points
+    % depth = 2;
+    % pointColors = {'r', 'g', 'b', 'm'};    % Corner colors
+    % points = [depth, depth, depth, depth;  % X-coordinates
+    %           0.5, -0.5, -0.5,  0.5;       % Y-coordinates
+    %           0.5,  0.5, -0.5, -0.5]';     % Z-coordinates
+    % video = VideoWriter(fullfile(figDir, '3D_Orientation_with_Plane.mp4'), 'MPEG-4');
+    % video.FrameRate = 0.5;
+    % open(video);
+    % figure;
+    % xlabel('X'); ylabel('Y'); zlabel('Z');
+    % grid on;
+    % hold on;
+    % % Set axis limits
+    % range = depth*1.5;
+    % axisLimits = [min(E)-range, max(E)+range, min(N)-range, max(N)+range, min(U)-range, max(U)+range];
+    % for k = 1:numFrames
+    %     cla;
+    %     origin = [ySIO(i), xSIO(i), U(1)];                  % Origin
+    %     R = rotationMatrices(:, :, k);                      % Rotation matrix 
+    %     rotated = (R * points')';                           % Rotate the points
+    %     translated = origin - rotated;                      % Translate the points 
+    %     % Plot the camera axes 
+    %     xAxis = R * [1; 0; 0];
+    %     yAxis = R * [0; 1; 0];
+    %     zAxis = R * [0; 0; 1];
+    %     quiver3(E(k), N(k), U(k), xAxis(1), xAxis(2), xAxis(3), 'r', 'LineWidth', 2);
+    %     quiver3(E(k), N(k), U(k), yAxis(1), yAxis(2), yAxis(3), 'g', 'LineWidth', 2);
+    %     quiver3(E(k), N(k), U(k), zAxis(1), zAxis(2), zAxis(3), 'b', 'LineWidth', 2);
+    %     % Shade the plane
+    %     fill3(translated(1, :), translated(2, :), translated(3, :), ...
+    %           'k', 'FaceAlpha', 0.5, 'EdgeColor', 'none');
+    %     for j = 1:4
+    %         scatter3(translated(j, 1), translated(j, 2), translated(j, 3), ...
+    %                  10, pointColors{j}, 'filled');
+    %     end
+    %     axis equal; axis(axisLimits); title(['Frame ', num2str(k)]); drawnow;
+    %     % pause(0.01);
+    %     frame = getframe(gcf); writeVideo(video, frame); % Write frame to video
+    % end
+    % close(video);
 end

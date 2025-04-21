@@ -44,6 +44,7 @@ def setup_logging():
 
 def write_inputs_yaml(fname_log):
     """Write exposure times to inputs.yaml file"""
+    yaml_path = "../inputs.yaml"
     with open(fname_log, 'a') as log:
         # Create a camera instance with auto exposure turned on
         cam = Picamera2()
@@ -54,21 +55,34 @@ def write_inputs_yaml(fname_log):
         config['controls']['AwbEnable'] = True
         cam.configure(config)
         cam.start()
-        # Allow time for auto-exposure to converge
-        time.sleep(5)
-        while (auto_exposure_us := cam.capture_metadata()['ExposureTime']) <= 0:
-            time.sleep(0.1)   
-        auto_exposure_us = round(auto_exposure_us)                                    
+        # # Allow time for auto-exposure to converge
+        # time.sleep(5)
+        # while (auto_exposure_us := cam.capture_metadata()['ExposureTime']) <= 0:
+        #     time.sleep(0.1)   
+        # auto_exposure_us = round(auto_exposure_us)      
+        # Allow time for auto-exposure to converge and record values for 5 seconds
+        exposure_list = []
+        t0 = time.time()
+        while time.time() - t0 < 5:
+            exp = cam.capture_metadata()['ExposureTime']
+            if exp > 0:
+                exposure_list.append(exp)
+            time.sleep(0.1)
+        print(f"Exposure times: {exposure_list}")
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
-        log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs \n")
+        if not exposure_list:
+            auto_exposure_us = 1000  # fallback value
+            log.write(f"{tstr}:     [WARN] Unable to read cam metadata, default auto exposure: {auto_exposure_us:.3f} µs\n")
+        else:
+            auto_exposure_us = round(max(exposure_list))
+            log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs\n")
         cam.stop()
         cam.close()
         # Define brighter/darker exposures; e.g. half and double
         bright_us = round(max(auto_exposure_us / 2, 1))
         dark_us   = round(max(auto_exposure_us * 2, 1))
         log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_us:.3f} µs, dark mode = {dark_us:.3f} µs\n")
-        yaml_path = "../inputs.yaml"
         if not os.path.exists(yaml_path):
             log.write(f"{tstr}:     [WARN] inputs.yaml not found, creating minimal file...\n")
             with open(yaml_path, "w") as fh:
