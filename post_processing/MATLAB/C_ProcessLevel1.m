@@ -8,6 +8,12 @@ addpath('functions/');
 
 %% Inputs
 
+% Manually clean ptClouds
+manual_clean = 0;
+
+% Auto clean ptClouds (RGB and HSV thresholding)
+auto_clean = 0;
+
 % Define calibration path
 calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
 load([calib_path '/calib.mat']); 
@@ -25,9 +31,6 @@ BlockSize = 25;                % only applied if specs
 ContrastThreshold = 0.25;      % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
 TextureThreshold = 0.00002;    % only applied if specs
-
-% Manually clean ptClouds
-manual_clean = 1;
 
 % Bounds for trimBounds (meters)
 bounds = [-10 10 -10 10 0 10];   % [xmin xmax ymin ymax zmin zmax] 
@@ -208,17 +211,18 @@ for m = 1:length(waves)
         if manual_clean
             % Trim to polygon
             [points3D, colors] = refinedTrimPolygon(points3D, colors, J1);
-
             % Brush points
             [points3D, colors] = manualClean(points3D, colors);
-        else
+        elseif auto_clean
             % Threshold foreground/background by HSV
             [points3D, colors] = colorThreshHSV(points3D, colors, J1, ...
                                           topFraction, bottomFraction, Nstd);
             % Threshold foreground/background by RGB
             [points3D, colors] = colorThreshRGB(points3D, colors, J1, ...
                                           topFraction, bottomFraction, Nstd);
-    
+            % Trim points >= Nstd from centroid
+            [points3D, colors] = refinedTrim(points3D, colors, Nstd2);
+        else
             % Trim points >= Nstd from centroid
             [points3D, colors] = refinedTrim(points3D, colors, Nstd2);
         end
