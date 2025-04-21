@@ -126,8 +126,8 @@ for m = 1:length(waves)
 
             % %%%%%%%%%% TRANSLATE HERE? %%%%%%%%%%%
             % f = 1.727174826954456;
-            % f = 3;
-            % xyz_cam = [xyz_cam(:,1) + 0.06, xyz_cam(:,2) - 0.06, xyz_cam(:,3) - f];
+            % % f = 1;
+            % xyz_cam = [xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3) - f];
             % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
             figure(21); hold on; axis equal; grid on; axis tight;
@@ -159,7 +159,10 @@ for m = 1:length(waves)
             zlabel('Z imu');
     
             %%%%%%%%%%%%%%%%%%%%%% Rotation matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            R = rotationMatrices(:, :, i);
+            R = -rotationMatrices(:, :, i);
+
+            % Rotate and transpose
+            xyz_NED = (R * xyz_imu')';
 
             % % Rotate about centroid???
             % centroid = mean(xyz_imu, 1, 'omitnan');
@@ -168,8 +171,9 @@ for m = 1:length(waves)
             % centroid_rot = (R * centroid')';        % Rotate centroid itself
             % xyz_NED = xyz_NED + centroid_rot;       % Add it back
 
-            % Rotate and transpose
-            xyz_NED = (R * xyz_imu')';
+            % %% Remove mean centroid?
+            % centroid = mean(xyz_NED, 1, 'omitnan');
+            % xyz_NED = xyz_NED - centroid;
     
             figure(23); hold on; axis equal; grid on; axis tight;
             title('rotated into NED');
@@ -185,8 +189,13 @@ for m = 1:length(waves)
             % cam_origin = [ySIO(1), xSIO(1), U(1)]; % XY_SIO and Up 
     
             %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
-            xyz_world = -xyz_NED + cam_origin;
-            % xyz_world = cam_origin + xyz_NED;
+            xyz_world = xyz_NED - cam_origin; 
+            % xyz_world = cam_origin - xyz_NED;
+
+            % xyz_world = zeros(size(xyz_NED));
+            % xyz_world(:,1) = cam_origin(:,1) - xyz_NED(:,1); % Northing
+            % xyz_world(:,2) = cam_origin(:,2) - xyz_NED(:,2); % Easting
+            % xyz_world(:,3) = cam_origin(:,3) - xyz_NED(:,3); % Down
 
             %%% Heading dependent?
             % xyz_world = zeros(size(xyz_NED));

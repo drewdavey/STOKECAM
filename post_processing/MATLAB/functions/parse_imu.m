@@ -2,17 +2,12 @@
 % Drew Davey
 % Last updated: 2024-12-16
 
-% function imu = parse_imu(mainDir, waveFolder)
-mainDir = session; waveFolder = wave;
+function imu = parse_imu(mainDir, waveFolder)
 
     % Load IMU/GPS
     vn_tmp = dir(fullfile(mainDir, '*.csv'));
-    vn = readtable([mainDir '\' vn_tmp.name], 'Variablenamesline',1);
-
-    % %%%%%% FIGURE THIS OUT!
-    % Remove unwanted data column (column 33)
-    vn(:,33) = []; % explicitly remove column 33 data
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    vn = readtable([mainDir '\' vn_tmp.name]);
+    % vn = readtable([mainDir '\' vn_tmp.name], 'Variablenamesline',1);
 
     % Get cam0 and cam1 dirs
     cam0Dir = fullfile(waveFolder, 'cam0');
@@ -74,4 +69,4 @@ mainDir = session; waveFolder = wave;
     % Save cam delays
     imu.camDiffs = timeDiffNs * 10^-9;  % cam delay in seconds
 
-% end
+end
