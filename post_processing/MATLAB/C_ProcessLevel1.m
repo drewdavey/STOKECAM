@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-11-15
+% Last updated: 2025-04-21
 
 clear; clc; close all;
 
@@ -9,31 +9,14 @@ addpath('functions/');
 %% Inputs
 
 % Manually clean ptClouds
-manual_clean = 0;
+manual_clean = 1;
 
 % Auto clean ptClouds (RGB and HSV thresholding)
 auto_clean = 0;
 
-% Define calibration path
-calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
-load([calib_path '/calib.mat']); 
-
-% Feature matching
-BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1)
-specs = 0;       % default specs (0) or input specs (1)
-
-% Applied to BM & SGBM
-UniquenessThreshold = 0;       % only applied if specs
-
-% Applied to BM only
-DisparityRange = [0 64];       % only applied if specs
-BlockSize = 25;                % only applied if specs
-ContrastThreshold = 0.25;      % only applied if specs
-DistanceThreshold = 20;        % only applied if specs
-TextureThreshold = 0.00002;    % only applied if specs
-
 % Bounds for trimBounds (meters)
-bounds = [-10 10 -10 10 0 10];   % [xmin xmax ymin ymax zmin zmax] 
+% [xmin xmax ymin ymax zmin zmax] 
+bounds = [-10 10 -10 10 0 10];   
 
 % Image regions for RGB and HSV thresholding
 topFraction = 0.25;
@@ -46,13 +29,30 @@ Nstd2 = 5;
 % Default resolution for figures
 res = 600; % dpng
 
-%% Filepath
+% Define calibration path
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
+load([calib_path '/calib.mat']); 
+
+%% Process L1
 
 % Load path to dir to reconstruct
 session = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session containing wave subfolders'); 
 
+%%% Parse all Vectornav data %%%
+figDir = [session '/figs'];
+if ~exist(figDir, 'dir')
+    mkdir(figDir); % mkdir for figs
+end
+imu = parse_imu(session, session); % Parse imu data into struct
+basicQCplots(imu, figDir, res); % Plot basic QC figs
+
 % Find subfolders that start with "wave"
 waveSubfolders = dir(fullfile(session, 'wave*'));
+waveSubfolders = waveSubfolders([waveSubfolders.isdir]); 
+if isempty(waveSubfolders)
+    fprintf('No wave subfolders found in %s\n', session);
+    return;
+end
 
 % Initialize waves array
 waves = {};
@@ -71,16 +71,10 @@ end
 for m = 1:length(waves)
     wave = waves{m};
 
-    % WasteMgmtAuto(wave); % Run WasteMgmt on wave
-
     dir1 = dir([wave '/cam0/*.jpg']); 
     dir2 = dir([wave '/cam1/*.jpg']); 
-    % dir1 = dir([wave '/cam1/*.jpg']); % THESE ARE FLIPPED
-    % dir2 = dir([wave '/cam0/*.jpg']); % THESE ARE FLIPPED
     
-    %% Create dirs
-
-    %%%%% THIS WILL OVERWRITE PREVIOUS L1 DATA IF IT EXISTS %%%%%
+    %%% Create dirs %%%
     L1Dir = [wave '/L1'];
     figDir = [wave '/figs'];
     matDir = [L1Dir '/mats'];
@@ -102,7 +96,7 @@ for m = 1:length(waves)
         mkdir(figDir); % mkdir for figs
     end
 
-    %% Parse Vectornav data
+    %%% Parse Vectornav data %%%
 
     imu = parse_imu(session, wave); % Parse imu data into struct
 
@@ -112,7 +106,7 @@ for m = 1:length(waves)
 
     close all; % Close QC figs
 
-    %% Rectify images
+    %%% Rectify images %%%
      
     % Check the number of files in each directory
     numFiles = min(length(dir1), length(dir2));
@@ -134,52 +128,23 @@ for m = 1:length(waves)
     
         % Rectify Images
         [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams, OutputView='valid'); 
-        %[J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams, OutputView='full'); 
         frameLeftGray  = im2gray(J1);
         frameRightGray = im2gray(J2);
-    
-        % Compute Disparity Map
-        if BM_SGBM
 
-            %%%%%%%%%%%%% Block Matching %%%%%%%%%%%%%
-            if specs
-                disparityMap = disparityBM(frameLeftGray, frameRightGray,'DisparityRange', DisparityRange,...
-                    'BlockSize', BlockSize,...
-                    'UniquenessThreshold', UniquenessThreshold,...
-                    'ContrastThreshold', ContrastThreshold,...
-                    'DistanceThreshold', DistanceThreshold,...
-                    'TextureThreshold', TextureThreshold);
-            else
-                disparityMap = disparityBM(frameLeftGray, frameRightGray); % default block matching
-            end
-        else
-
-            %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
-            if specs
-                disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'UniquenessThreshold', UniquenessThreshold); 
-            else
-                disparityMap = disparitySGM(frameLeftGray, frameRightGray); % default semi-global matching
-            end
-    
-        end
+        %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
+        disparityMap = disparitySGM(frameLeftGray, frameRightGray); 
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
         % Extract timestamp and image number from selected file
         [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));
     
         % Plotting
-        % f1 = figure(1);
-        % imshow(stereoAnaglyph(J1,J2)); % Display rectified images
-        % filename = [timestamp '_' imageNum '_rect.png'];
-        % fullFilePath = fullfile(rectifiedImagesDir, filename);
-        % exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
-        f2 = figure(2); 
+        f1 = figure(1); 
         imshow(disparityMap, [0, 64]); % Display disparity map
         colormap jet; colorbar;
         filename = [timestamp '_' imageNum '_disp.png'];
         fullFilePath = fullfile(rectifiedImagesDir, filename);
-        exportgraphics(f2,fullFilePath,'Resolution',res); % Save disparity map as PNG
-    
-        %%% TRY triangulate() %%%
+        exportgraphics(f1,fullFilePath,'Resolution',res); % Save disparity map as PNG
 
         % Create points3D
         points3D = reconstructScene(disparityMap, reprojectionMatrix);
@@ -202,7 +167,7 @@ for m = 1:length(waves)
         % Reshape colors into an Nx3 matrix
         colors = reshape(colors, [], 3);  
     
-        %% L1 cleaning of point clouds
+        %%% L1 cleaning of point clouds %%%
 
         % Trim to bounding box
         [points3D, colors] = trimBounds(points3D, colors, bounds);
@@ -256,3 +221,5 @@ for m = 1:length(waves)
     end
 
 end
+
+close all; % Close disparity map

@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2025-01-14
+% Last updated: 2025-04-21
 
 clear; clc; close all;
 
@@ -38,13 +38,13 @@ for i = 1:numel(waveSubfolders)
     end
 end
 
-% Process each selected path
+%% Process Level 2
 for m = 1:length(waves)
     wave = waves{m};
     dir1 = dir([wave '/cam0/*.jpg']); 
     dir2 = dir([wave '/cam1/*.jpg']); 
 
-    %% Create dirs and load L1 data
+    %%% Create dirs and load L1 data %%%
     L1Dir = [wave '/L1'];
     L2Dir = [wave '/L2'];
     figDir = [wave '/figs'];
@@ -73,7 +73,7 @@ for m = 1:length(waves)
         mkdir(shapesDir);  % Create shapes/ directory if it doesn't exist
     end
     
-    %% Georectification
+    %%% Georectification %%%
     % Convert geodetic to UTM
     % [E, N, zone] = deg2utm(imu.lat, imu.lon); % Easting, Northing
     % [N, E, UTMZone] = lltoUTM(imu.lat, imu.lon);
@@ -92,7 +92,7 @@ for m = 1:length(waves)
     geoidHeight = geoidheight(imu.lat(1), imu.lon(1), 'EGM96'); 
     U = imu.alt - geoidHeight; % Up
     
-    %% Compute rotation matrix from quaternion
+    %%% Compute rotation matrix from quaternion %%%
     numFrames = numel(imu.quatX);
     rotationMatrices = zeros(3, 3, numFrames);
     for i = 1:numFrames
@@ -103,7 +103,7 @@ for m = 1:length(waves)
         rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
     end
     
-    %% Plot X-Y cross sections
+    %%% Rotate and translate into local coordinate system
     for i = 1:length(matFilenames)
         matData = load(fullfile(matDir, matFilenames{i}));
         if isfield(matData, 'points3D') && (isfield(matData, 'clean') && matData.clean == true)
@@ -169,6 +169,17 @@ for m = 1:length(waves)
             % % Save the figure in the shapes/ directory
             % print(gcf, fullfile(shapesDir, [matFiles(i).name(end-8:end-4)]),...
             %     '-dpng', ['-r', num2str(res)]);
+
+            % Save transformed points3D, colors, and ptCloud
+            points3D = xyz_world;
+            colors = matData.colors;
+            ptCloud = pointCloud(points3D, 'Color', colors);
+
+            % Save .mat
+            filename = [timestamp '_' imageNum];
+            fullFilePath = fullfile(matDir, filename);
+            save(fullFilePath, 'points3D', 'colors', ...
+            'ptCloud', 'clean');
 
         end
     end

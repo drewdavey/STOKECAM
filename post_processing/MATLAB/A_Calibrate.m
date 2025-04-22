@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2024-10-10
+% Last updated: 2025-04-21
 
 clear; clc; close all;
 
@@ -31,8 +31,6 @@ calib_path = uigetdir('../../','Select path to calibration session'); % load pat
 
 dir1 = dir([calib_path '/cam0/*.jpg']); 
 dir2 = dir([calib_path '/cam1/*.jpg']); 
-% dir1 = dir([calib_path '/cam1/*.jpg']); % THESE ARE FLIPPED
-% dir2 = dir([calib_path '/cam0/*.jpg']); % THESE ARE FLIPPED
 
 % Check the number of files in each directory
 numFiles = min(length(dir1), length(dir2));

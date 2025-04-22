@@ -1,6 +1,6 @@
 % STOKECAM Post-Processing
 % Drew Davey
-% Last updated: 2025-04-07
+% Last updated: 2025-04-21
 
 % Function to generate basic QC plots of Vecnav data
 function basicQCplots(imu, figDir, res)    
@@ -14,7 +14,7 @@ function basicQCplots(imu, figDir, res)
     t = imu.t0;
 
     %% Plot Cam delay
-    % This is camd elay between cam0 and cam1, with hardware trigger, this
+    % This is cam delay between cam0 and cam1, with hardware trigger, this
     % is now zero. Keep here for QC if not using hardware trigger.
     f1 = figure; hold on; grid on; box on; 
     plot(t, imu.camDiffs * 1e6, 'o-', 'LineWidth', 1.5);
@@ -35,16 +35,19 @@ function basicQCplots(imu, figDir, res)
     f2 = figure;
     subplot(3,1,1); hold on; grid on; box on; axis tight;
     plot(t, yaw, 'k', 'LineWidth', 1);
-    ylabel('Yaw (deg)');
+    ylabel('Yaw (deg)'); ylim([-180 180]);
+    title([ '\mu: ' num2str(mean(yaw), '%.3f') ', \sigma: ' num2str(std(yaw), '%.3f')]);
     subplot(3,1,2); hold on; grid on; box on; axis tight;
     plot(t, pitch, 'k', 'LineWidth', 1);
-    ylabel('Pitch (deg)');
+    title([ '\mu: ' num2str(mean(pitch), '%.3f') ', \sigma: ' num2str(std(pitch), '%.3f')]);
+    ylabel('Pitch (deg)'); ylim([-90 90]);
     subplot(3,1,3); hold on; grid on; box on; axis tight;
     plot(t, roll, 'k', 'LineWidth', 1);
-    ylabel('Roll (deg)');
-    xlabel('Time (sec)');
+    title([ '\mu: ' num2str(mean(roll), '%.3f') ', \sigma: ' num2str(std(roll), '%.3f')]);
+    ylabel('Roll (deg)'); ylim([-90 90]);
+    xlabel('Time (min)');
     % sgtitle('YPR');
-    print(f2, fullfile(figDir, 'ypr.png'), '-dpng', ['-r', num2str(res)]);
+    print(f2, fullfile(figDir, 'ypr.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot gyro
     % The IMU angular rate given in the body-frame. 
@@ -56,31 +59,34 @@ function basicQCplots(imu, figDir, res)
     f3 = figure;
     subplot(3,1,1); hold on; grid on; box on; axis tight;
     plot(t, gyroX, 'k', 'LineWidth', 1);
-    ylabel('GyroX (rad/s)');
+    title([ '\mu: ' num2str(mean(gyroX), '%.3f') ', \sigma: ' num2str(std(gyroX), '%.3f')]);
+    ylabel('GyroX (rad/s)'); ylim([-1 1]);
     subplot(3,1,2); hold on; grid on; box on; axis tight;
     plot(t, gyroY, 'k', 'LineWidth', 1);
-    ylabel('GyroY (rad/s)');
+    title([ '\mu: ' num2str(mean(gyroY), '%.3f') ', \sigma: ' num2str(std(gyroY), '%.3f')]);
+    ylabel('GyroY (rad/s)'); ylim([-1 1]);
     subplot(3,1,3); hold on; grid on; box on; axis tight;
     plot(t, gyroZ, 'k', 'LineWidth', 1);
-    ylabel('GyroZ (rad/s)');
-    xlabel('Time (sec)');
+    title([ '\mu: ' num2str(mean(gyroZ), '%.3f') ', \sigma: ' num2str(std(gyroZ), '%.3f')]);
+    ylabel('GyroZ (rad/s)'); ylim([-1 1]);
+    xlabel('Time (min)');
     % sgtitle('Uncompensated Gyro');
-    print(f3, fullfile(figDir, 'gyro.png'), '-dpng', ['-r', num2str(res)]);
+    print(f3, fullfile(figDir, 'gyro.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot temp / press
     % Why not
     f4 = figure; hold on; grid on; box on; 
     plot(t, imu.temperature, 'k');
-    xlabel('Time (sec)');
+    xlabel('Time (min)');
     ylabel('Temperature (deg C)');
     % title('');
-    print(f4, fullfile(figDir, 'temperature.png'), '-dpng', ['-r', num2str(res)]);
+    print(f4, fullfile(figDir, 'temperature.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
     f5 = figure; hold on; grid on; box on; 
     plot(t, imu.pressure, 'k');
-    xlabel('Time (sec)');
+    xlabel('Time (min)');
     ylabel('Pressure (kPa)');
     % title('');
-    print(f5, fullfile(figDir, 'pressure.png'), '-dpng', ['-r', num2str(res)]);
+    print(f5, fullfile(figDir, 'pressure.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot magnetometer
     % The IMU compensated magnetic field given in the body-frame. 
@@ -93,16 +99,19 @@ function basicQCplots(imu, figDir, res)
     f6 = figure;
     subplot(3,1,1); hold on; grid on; box on; axis tight;
     plot(t, magX, 'k', 'LineWidth', 1);
-    ylabel('MagX (G)');
+    title([ '\mu: ' num2str(mean(magX), '%.3f') ', \sigma: ' num2str(std(magX), '%.3f')]);
+    ylabel('MagX (G)'); ylim([0 5]);
     subplot(3,1,2); hold on; grid on; box on; axis tight;
     plot(t, magY, 'k', 'LineWidth', 1);
-    ylabel('MagY (G)');
+    title([ '\mu: ' num2str(mean(magY), '%.3f') ', \sigma: ' num2str(std(magY), '%.3f')]);
+    ylabel('MagY (G)'); ylim([0 5]);
     subplot(3,1,3); hold on; grid on; box on; axis tight;
     plot(t, magZ, 'k', 'LineWidth', 1);
-    ylabel('MagZ (G)');
-    xlabel('Time (sec)');
+    title([ '\mu: ' num2str(mean(magZ), '%.3f') ', \sigma: ' num2str(std(magZ), '%.3f')]);
+    ylabel('MagZ (G)'); ylim([0 5]);
+    xlabel('Time (min)');
     % sgtitle('Mag');
-    print(f6, fullfile(figDir, 'mag.png'), '-dpng', ['-r', num2str(res)]);
+    print(f6, fullfile(figDir, 'mag.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot accelerometer
     % The bias-compensated acceleration measured in the body-frame. 
@@ -113,18 +122,21 @@ function basicQCplots(imu, figDir, res)
     accelY = imu.accelY;
     accelZ = imu.accelZ;
     f7 = figure;
-    subplot(3,1,1); hold on; grid on; box on; axis tight;
+    subplot(3,1,1); hold on; grid on; box on; axis tight; 
     plot(t, accelX, 'k', 'LineWidth', 1);
-    ylabel('AccelX (m/s^2)');
+    title([ '\mu: ' num2str(mean(accelX), '%.3f') ', \sigma: ' num2str(std(accelX), '%.3f')]);
+    ylabel('AccelX (m/s^2)'); ylim([-10 10]);
     subplot(3,1,2); hold on; grid on; box on; axis tight;
     plot(t, accelY, 'k', 'LineWidth', 1);
-    ylabel('AccelY (m/s^2)');
+    title([ '\mu: ' num2str(mean(accelY), '%.3f') ', \sigma: ' num2str(std(accelY), '%.3f')]);
+    ylabel('AccelY (m/s^2)'); ylim([-10 10]);
     subplot(3,1,3); hold on; grid on; box on; axis tight;
     plot(t, accelZ, 'k', 'LineWidth', 1);
-    ylabel('AccelZ (m/s^2)');
-    xlabel('Time (sec)');
+    title([ '\mu: ' num2str(mean(accelZ), '%.3f') ', \sigma: ' num2str(std(accelZ), '%.3f')]);
+    ylabel('AccelZ (m/s^2)'); ylim([-20 0]);
+    xlabel('Time (min)');
     % sgtitle('Accel');
-    print(f7, fullfile(figDir, 'accel.png'), '-dpng', ['-r', num2str(res)]);
+    print(f7, fullfile(figDir, 'accel.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot quaternions
     % The estimated attitude describing the body frame with respect to the 
@@ -136,27 +148,31 @@ function basicQCplots(imu, figDir, res)
     f8 = figure;
     subplot(4,1,1); hold on; grid on; box on; axis tight;
     plot(t, quatX, 'k', 'LineWidth', 1);
-    ylabel('QuatX');
+    title([ '\mu: ' num2str(mean(quatX), '%.3f') ', \sigma: ' num2str(std(quatX), '%.3f')]);
+    ylabel('QuatX'); ylim([-1 1]);
     subplot(4,1,2); hold on; grid on; box on; axis tight;
     plot(t, quatY, 'k', 'LineWidth', 1);
-    ylabel('QuatY');
+    title([ '\mu: ' num2str(mean(quatY), '%.3f') ', \sigma: ' num2str(std(quatY), '%.3f')]);
+    ylabel('QuatY'); ylim([-1 1]);
     subplot(4,1,3); hold on; grid on; box on; axis tight;
     plot(t, quatZ, 'k', 'LineWidth', 1);
-    ylabel('QuatZ');
+    title([ '\mu: ' num2str(mean(quatZ), '%.3f') ', \sigma: ' num2str(std(quatZ), '%.3f')]);
+    ylabel('QuatZ'); ylim([-1 1]);
     subplot(4,1,4); hold on; grid on; box on; axis tight;
     plot(t, quatW, 'k', 'LineWidth', 1);
-    ylabel('QuatW');
-    xlabel('Time (sec)');
+    title([ '\mu: ' num2str(mean(quatW), '%.3f') ', \sigma: ' num2str(std(quatW), '%.3f')]);
+    ylabel('QuatW'); ylim([-1 1]);
+    xlabel('Time (min)');
     % sgtitle('Quaternions');
-    print(f8, fullfile(figDir, 'quaternion.png'), '-dpng', ['-r', num2str(res)]);
+    print(f8, fullfile(figDir, 'quaternion.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot GNSS position and uncertainty
     % The current GNSS position measurement given as the geodetic latitude, 
     % longitude and altitude above the ellipsoid. The current GNSS position 
     % uncertainty in the North East Down (NED) reference frame.
-    lat = imu.gnss1PosLat;
-    lon = imu.gnss1PosLon;
-    alt = imu.gnss1PosAlt;
+    lat = imu.lat;
+    lon = imu.lon;
+    alt = imu.alt;
     unc = imu.posU;
 
     f9 = figure;
@@ -174,7 +190,7 @@ function basicQCplots(imu, figDir, res)
     plot(t, unc, 'k', 'LineWidth', 1);
     ylabel('Uncertainty (%)');
     xlabel('Time (sec)');
-    % sgtitle('Accel');
+    % sgtitle('INS Position');
     print(f9, fullfile(figDir, 'position.png'), '-dpng', ['-r', num2str(res)]);
     
     % Video
@@ -190,12 +206,10 @@ function basicQCplots(imu, figDir, res)
     legend show;
     for i = 1:length(lat)
         title(['Frame ', num2str(i)]);
-        % geoscatter(lat(i), lon(i), 10, 'r','filled'); hold on;
         h1.LatitudeData = lat(1:i);
         h1.LongitudeData = lon(1:i);
         h2.LatitudeData = lat(i);
         h2.LongitudeData = lon(i);
-        % pause(0.00001);
         frame = getframe(f10);
         writeVideo(video, frame);
     end
