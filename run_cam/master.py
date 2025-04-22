@@ -1,8 +1,7 @@
 # Last updated: 2025-04-01
 ##################################
-# This script allows the user to toggle through camera settings, launch standby mode, 
-# and capture images synchronously by holding right button.
-# The user can also calibrate the cameras by holding the left button for more than 5 seconds.
+# Main script for STOKECAM
+# Interfaces with Vectornav and Raspberry Pi cams.
 ##################################
 import os
 os.environ["LIBCAMERA_RPI_CONFIG_FILE"] = "../STOKECAM.yaml"
