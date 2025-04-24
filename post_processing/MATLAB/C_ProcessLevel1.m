@@ -9,14 +9,12 @@ addpath('functions/');
 %% Inputs
 
 % Manually clean ptClouds
+% else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
 manual_clean = 1;
-
-% Auto clean ptClouds (RGB and HSV thresholding)
-auto_clean = 0;
 
 % Bounds for trimBounds (meters)
 % [xmin xmax ymin ymax zmin zmax] 
-bounds = [-10 10 -10 10 0 10];   
+bounds = [-10 10 -10 10 0 30];   
 
 % Image regions for RGB and HSV thresholding
 topFraction = 0.25;
@@ -38,13 +36,13 @@ load([calib_path '/calib.mat']);
 % Load path to dir to reconstruct
 session = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session containing wave subfolders'); 
 
-%%% Parse all Vectornav data %%%
+%%% Session QC figs %%%
 figDir = [session '/figs'];
 if ~exist(figDir, 'dir')
-    mkdir(figDir); % mkdir for figs
+    mkdir(figDir);                     % mkdir for figs
+    imu = parse_imu(session, session); % Parse imu data into struct
+    basicQCplots(imu, figDir, res);    % Plot basic QC figs
 end
-imu = parse_imu(session, session); % Parse imu data into struct
-basicQCplots(imu, figDir, res); % Plot basic QC figs
 
 % Find subfolders that start with "wave"
 waveSubfolders = dir(fullfile(session, 'wave*'));
@@ -77,37 +75,25 @@ for m = 1:length(waves)
     %%% Create dirs %%%
     L1Dir = [wave '/L1'];
     figDir = [wave '/figs'];
-    matDir = [L1Dir '/mats'];
-    rectifiedImagesDir = [figDir '/Rectified_Images']; 
+    dispDir = [figDir '/disparityMaps']; 
     
     if ~exist(L1Dir, 'dir')
         mkdir(L1Dir); % mkdir for L1
     end
-
-    if ~exist(rectifiedImagesDir, 'dir')
-        mkdir(rectifiedImagesDir); % mkdir for rectified images
+    if ~exist(dispDir, 'dir')
+        mkdir(dispDir); % mkdir for rectified images
     end
-
-    if ~exist(matDir, 'dir')
-        mkdir(matDir); % mkdir for mats
-    end
-
     if ~exist(figDir, 'dir')
         mkdir(figDir); % mkdir for figs
     end
 
     %%% Parse Vectornav data %%%
-
     imu = parse_imu(session, wave); % Parse imu data into struct
-
     basicQCplots(imu, figDir, res); % Plot basic QC figs
-
-    save(fullfile(L1Dir, 'imu.mat'), 'imu'); % Save VN-200 data to L1
-
+    save(fullfile(wave, 'imu.mat'), 'imu'); % Save VN-200 data to L1
     close all; % Close QC figs
 
     %%% Rectify images %%%
-     
     % Check the number of files in each directory
     numFiles = min(length(dir1), length(dir2));
     
@@ -142,8 +128,8 @@ for m = 1:length(waves)
         f1 = figure(1); 
         imshow(disparityMap, [0, 64]); % Display disparity map
         colormap jet; colorbar;
-        filename = [timestamp '_' imageNum '_disp.png'];
-        fullFilePath = fullfile(rectifiedImagesDir, filename);
+        filename = [timestamp '_' imageNum '.png'];
+        fullFilePath = fullfile(dispDir, filename);
         exportgraphics(f1,fullFilePath,'Resolution',res); % Save disparity map as PNG
 
         % Create points3D
@@ -157,9 +143,9 @@ for m = 1:length(waves)
         ptCloud = pointCloud(points3D, 'Color', colors);
 
         % Duplicate originals
-        original.points3D = points3D;
-        original.colors = colors;
-        original.ptCloud = ptCloud;
+        raw.points3D = points3D;
+        raw.colors = colors;
+        raw.ptCloud = ptCloud;
 
         % Reshape points3D into an Nx3 matrix
         points3D = reshape(points3D, [], 3);  
@@ -168,7 +154,6 @@ for m = 1:length(waves)
         colors = reshape(colors, [], 3);  
     
         %%% L1 cleaning of point clouds %%%
-
         % Trim to bounding box
         [points3D, colors] = trimBounds(points3D, colors, bounds);
 
@@ -178,16 +163,13 @@ for m = 1:length(waves)
             [points3D, colors] = refinedTrimPolygon(points3D, colors, J1);
             % Brush points
             [points3D, colors] = manualClean(points3D, colors);
-        elseif auto_clean
+        else
             % Threshold foreground/background by HSV
             [points3D, colors] = colorThreshHSV(points3D, colors, J1, ...
                                           topFraction, bottomFraction, Nstd);
             % Threshold foreground/background by RGB
             [points3D, colors] = colorThreshRGB(points3D, colors, J1, ...
                                           topFraction, bottomFraction, Nstd);
-            % Trim points >= Nstd from centroid
-            [points3D, colors] = refinedTrim(points3D, colors, Nstd2);
-        else
             % Trim points >= Nstd from centroid
             [points3D, colors] = refinedTrim(points3D, colors, Nstd2);
         end
@@ -197,7 +179,7 @@ for m = 1:length(waves)
         
         % Keep only the valid rows in points3D and corresponding colors
         points3D = points3D(validRows, :);  % Remove rows with NaNs in points3D
-        colors = colors(validRows, :);  % Keep corresponding color rows
+        colors = colors(validRows, :);      % Keep corresponding color rows
         
         % Write updated point cloud
         ptCloud = pointCloud(points3D, 'Color', colors);
@@ -211,15 +193,14 @@ for m = 1:length(waves)
         % Send clean flag
         clean = 1; 
    
-        % Save .mat
+        % Save L1 .mat
         filename = [timestamp '_' imageNum];
-        fullFilePath = fullfile(matDir, filename);
+        fullFilePath = fullfile(L1Dir, filename);
         save(fullFilePath,'I1','I2','J1','J2','frameLeftGray',...
             'frameRightGray','reprojectionMatrix','disparityMap', ...
-            'calib_path', 'original', 'points3D', 'colors', ...
+            'calib_path', 'raw', 'points3D', 'colors', ...
             'ptCloud', 'clean');
     end
-
 end
 
 close all; % Close disparity map

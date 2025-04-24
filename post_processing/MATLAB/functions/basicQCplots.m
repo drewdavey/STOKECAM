@@ -45,7 +45,7 @@ function basicQCplots(imu, figDir, res)
     plot(t, roll, 'k', 'LineWidth', 1);
     title([ '\mu: ' num2str(mean(roll), '%.3f') ', \sigma: ' num2str(std(roll), '%.3f')]);
     ylabel('Roll (deg)'); ylim([-90 90]);
-    xlabel('Time (min)');
+    xlabel('Time (sec)');
     % sgtitle('YPR');
     print(f2, fullfile(figDir, 'ypr.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
@@ -69,7 +69,7 @@ function basicQCplots(imu, figDir, res)
     plot(t, gyroZ, 'k', 'LineWidth', 1);
     title([ '\mu: ' num2str(mean(gyroZ), '%.3f') ', \sigma: ' num2str(std(gyroZ), '%.3f')]);
     ylabel('GyroZ (rad/s)'); ylim([-1 1]);
-    xlabel('Time (min)');
+    xlabel('Time (sec)');
     % sgtitle('Uncompensated Gyro');
     print(f3, fullfile(figDir, 'gyro.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
@@ -77,13 +77,13 @@ function basicQCplots(imu, figDir, res)
     % Why not
     f4 = figure; hold on; grid on; box on; 
     plot(t, imu.temperature, 'k');
-    xlabel('Time (min)');
+    xlabel('Time (sec)');
     ylabel('Temperature (deg C)');
     % title('');
     print(f4, fullfile(figDir, 'temperature.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
     f5 = figure; hold on; grid on; box on; 
     plot(t, imu.pressure, 'k');
-    xlabel('Time (min)');
+    xlabel('Time (sec)');
     ylabel('Pressure (kPa)');
     % title('');
     print(f5, fullfile(figDir, 'pressure.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
@@ -109,7 +109,7 @@ function basicQCplots(imu, figDir, res)
     plot(t, magZ, 'k', 'LineWidth', 1);
     title([ '\mu: ' num2str(mean(magZ), '%.3f') ', \sigma: ' num2str(std(magZ), '%.3f')]);
     ylabel('MagZ (G)'); ylim([0 5]);
-    xlabel('Time (min)');
+    xlabel('Time (sec)');
     % sgtitle('Mag');
     print(f6, fullfile(figDir, 'mag.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
@@ -134,7 +134,7 @@ function basicQCplots(imu, figDir, res)
     plot(t, accelZ, 'k', 'LineWidth', 1);
     title([ '\mu: ' num2str(mean(accelZ), '%.3f') ', \sigma: ' num2str(std(accelZ), '%.3f')]);
     ylabel('AccelZ (m/s^2)'); ylim([-20 0]);
-    xlabel('Time (min)');
+    xlabel('Time (sec)');
     % sgtitle('Accel');
     print(f7, fullfile(figDir, 'accel.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
@@ -162,7 +162,7 @@ function basicQCplots(imu, figDir, res)
     plot(t, quatW, 'k', 'LineWidth', 1);
     title([ '\mu: ' num2str(mean(quatW), '%.3f') ', \sigma: ' num2str(std(quatW), '%.3f')]);
     ylabel('QuatW'); ylim([-1 1]);
-    xlabel('Time (min)');
+    xlabel('Time (sec)');
     % sgtitle('Quaternions');
     print(f8, fullfile(figDir, 'quaternion.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
