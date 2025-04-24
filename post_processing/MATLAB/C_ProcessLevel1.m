@@ -12,8 +12,7 @@ addpath('functions/');
 % else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
 manual_clean = 1;
 
-% Bounds for trimBounds (meters)
-% [xmin xmax ymin ymax zmin zmax] 
+% Bounds for trimBounds [xmin xmax ymin ymax zmin zmax] (meters)
 bounds = [-10 10 -10 10 0 30];   
 
 % Image regions for RGB and HSV thresholding

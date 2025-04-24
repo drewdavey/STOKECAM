@@ -13,6 +13,9 @@ function basicQCplots(imu, figDir, res)
     % Relative time
     t = imu.t0;
 
+    % Lat/lon buffer for video
+    buffer = 0.001;
+
     %% Plot Cam delay
     % This is cam delay between cam0 and cam1, with hardware trigger, this
     % is now zero. Keep here for QC if not using hardware trigger.
@@ -79,13 +82,13 @@ function basicQCplots(imu, figDir, res)
     plot(t, imu.temperature, 'k');
     xlabel('Time (sec)');
     ylabel('Temperature (deg C)');
-    % title('');
+    % title('Temperature');
     print(f4, fullfile(figDir, 'temperature.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
     f5 = figure; hold on; grid on; box on; 
     plot(t, imu.pressure, 'k');
     xlabel('Time (sec)');
     ylabel('Pressure (kPa)');
-    % title('');
+    % title('Pressure');
     print(f5, fullfile(figDir, 'pressure.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot magnetometer
@@ -110,7 +113,7 @@ function basicQCplots(imu, figDir, res)
     title([ '\mu: ' num2str(mean(magZ), '%.3f') ', \sigma: ' num2str(std(magZ), '%.3f')]);
     ylabel('MagZ (G)'); ylim([0 5]);
     xlabel('Time (sec)');
-    % sgtitle('Mag');
+    % sgtitle('Magnetometer');
     print(f6, fullfile(figDir, 'mag.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot accelerometer
@@ -135,7 +138,7 @@ function basicQCplots(imu, figDir, res)
     title([ '\mu: ' num2str(mean(accelZ), '%.3f') ', \sigma: ' num2str(std(accelZ), '%.3f')]);
     ylabel('AccelZ (m/s^2)'); ylim([-20 0]);
     xlabel('Time (sec)');
-    % sgtitle('Accel');
+    % sgtitle('Accelerometer');
     print(f7, fullfile(figDir, 'accel.png'), '-dpng', ['-r', num2str(res, '%.3f')]);
 
     %% Plot quaternions
@@ -194,7 +197,6 @@ function basicQCplots(imu, figDir, res)
     print(f9, fullfile(figDir, 'position.png'), '-dpng', ['-r', num2str(res)]);
     
     % Video
-    buffer = 0.0001;
     f10 = figure; ax = geoaxes; 
     geobasemap(ax, 'satellite'); hold on;
     geolimits([min(lat)-buffer max(lat)+buffer], [min(lon)-buffer max(lon)+buffer]);

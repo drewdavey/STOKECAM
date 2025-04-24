@@ -164,7 +164,7 @@ for m = 1:length(waves)
         points3D = xyz_world;
         colors = L1matData.colors;
         ptCloud = pointCloud(points3D, 'Color', colors);
-
+        
         %%% Extract cross sections %%%
 
 
@@ -173,7 +173,6 @@ for m = 1:length(waves)
         fullFilePath = fullfile(L2Dir, filename);
         save(fullFilePath, 'points3D', 'colors', ...
         'ptCloud', 'R', 'cam_origin');
-
     end
 
     % Save figures in figDir
@@ -182,13 +181,8 @@ for m = 1:length(waves)
     print(f3, fullfile(figDir, 'NEDlocal.png'), '-dpng', ['-r', num2str(res)]);
     print(f4, fullfile(figDir, 'NEDworld.png'), '-dpng', ['-r', num2str(res)]);
 
-    for i = 1:length(L1matFilenames)
-        L1matData = load(fullfile(L1Dir, L1matFilenames{i}));
-
-        % PCALIGN to stitch all together and save as its own ptCloud in its own
-        % mat in wave dir
-
-    end
+    % Generate L3 concatenated ptCloud from all L2 ptClouds
+    genL3ptCloud(wave);
 
     close all; % close figs before next wave
 
