@@ -8,8 +8,7 @@ addpath('functions/');
 
 %% Inputs
 
-session = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session'); % load path to session
-wave = uigetdir(session,'Select a wave'); % load path to wave
+wave = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to wave'); % load path to wave
 
 L1 = 0; L2 = 0; L3 = 0;
 answer = questdlg('Select level of post-processing', ...
@@ -48,7 +47,7 @@ while viewFlag
         end
         load(matPath);
         player3D = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits, VerticalAxis="z", ...
-            VerticalAxisDir="down");
+            VerticalAxisDir="up");
         view(player3D, ptCloud);
     end
 
@@ -56,7 +55,7 @@ while viewFlag
         pause(0.1)
     end
 
-    if L1 || L2
+    if L2
         answer = questdlg('Manually clean point cloud?', ...
         'Manually clean point cloud?', ...
         'Yes','No','Yes');
@@ -76,7 +75,8 @@ while viewFlag
                 switch answer
                     case 'Yes' % Save updates
                         clean = 1;
-                        save(matPath); 
+                        save(matPath);      % Write updated L2 ptCloud
+                        genL3ptCloud(wave); % Write new L3ptCloud
                 end
         end
     end
@@ -87,15 +87,6 @@ while viewFlag
         case 'Yes'
             viewFlag = 1; 
         case 'No'
-            if L2
-                answer = questdlg('Generate L3 ptCloud?', ...
-                'Generate L3 ptCloud?', ...
-                'Yes','No','Yes');
-                switch answer
-                    case 'Yes' % Write new L3ptCloud with L2 edits
-                        genL3ptCloud(wave);
-                end
-            end
             viewFlag = 0; % Exit
     end
 end

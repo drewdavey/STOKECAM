@@ -13,7 +13,7 @@ addpath('functions/');
 manual_clean = 1;
 
 % Bounds for trimBounds [xmin xmax ymin ymax zmin zmax] (meters)
-bounds = [-10 10 -10 10 0 30];   
+bounds = [-10 10 -10 10 0 30];
 
 % Image regions for RGB and HSV thresholding
 topFraction = 0.25;
@@ -30,7 +30,7 @@ res = 600; % dpng
 calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
 load([calib_path '/calib.mat']); 
 
-%% Process L1
+%% Process Level 1
 
 % Load path to dir to reconstruct
 session = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session containing wave subfolders'); 
@@ -118,7 +118,6 @@ for m = 1:length(waves)
 
         %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
         disparityMap = disparitySGM(frameLeftGray, frameRightGray); 
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
         % Extract timestamp and image number from selected file
         [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));
@@ -182,12 +181,6 @@ for m = 1:length(waves)
         
         % Write updated point cloud
         ptCloud = pointCloud(points3D, 'Color', colors);
-        
-        % Denoise ptCloud
-        ptCloud = pcdenoise(ptCloud);
-
-        % Downsample ptCloud
-        ptCloud = pcdownsample(ptCloud, random=0.5);
 
         % Send clean flag
         clean = 1; 

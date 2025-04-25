@@ -5,12 +5,12 @@
 
 fps: 25                  # Framerate/Hz (do not exceed 40 fps...max file writing capability without skipping frames) 
 
-shooting_mode0: 'auto'      # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
-exposure_us0: 1000          # Exposure time in microseconds (for shooting mode 0), 4ms ~ 1/250 sec
-shooting_mode1: 'bright'    # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
-exposure_us1: 500           # Exposure time in microseconds (for shooting mode 1), 2ms ~ 1/500 sec
-shooting_mode2: 'dark'      # Shooting mode: 'standard', 'auto', 'bright', 'dark', 'fast', 'max'
-exposure_us2: 2000          # Exposure time in microseconds (for shooting mode 2), 1ms ~ 1/1000 sec
+shooting_mode0: 'auto'      # Shooting mode: 'auto', 'bright', 'dark'
+exposure_us0: 250           # Exposure time in microseconds (for shooting mode 0), 250us ~ 0.25ms ~ 1/4000 sec
+shooting_mode1: 'bright'    # Shooting mode: 'auto', 'bright', 'dark'
+exposure_us1: 125           # Exposure time in microseconds (for shooting mode 1), 125us ~ 0.125ms ~ 1/8000 sec
+shooting_mode2: 'dark'      # Shooting mode: 'auto', 'bright', 'dark'
+exposure_us2: 500           # Exposure time in microseconds (for shooting mode 2), 500us ~ 0.5ms ~ 1/2000 sec
 
 calib_dt: 2              # Time between frames in seconds (for calibration)
 calib_frames: 50         # Number of frames to be captured by calib mode
