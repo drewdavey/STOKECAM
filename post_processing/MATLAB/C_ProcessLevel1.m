@@ -35,13 +35,13 @@ load([calib_path '/calib.mat']);
 % Load path to dir to reconstruct
 session = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session containing wave subfolders'); 
 
-%%% Session QC figs %%%
-figDir = [session '/figs'];
-if ~exist(figDir, 'dir')
-    mkdir(figDir);                     % mkdir for figs
-    imu = parse_imu(session, session); % Parse imu data into struct
-    basicQCplots(imu, figDir, res);    % Plot basic QC figs
-end
+% %%% Session QC figs %%%
+% figDir = [session '/figs'];
+% if ~exist(figDir, 'dir')
+%     mkdir(figDir);                     % mkdir for figs
+%     imu = parse_imu(session, session); % Parse imu data into struct
+%     basicQCplots(imu, figDir, res);    % Plot basic QC figs
+% end
 
 % Find subfolders that start with "wave"
 waveSubfolders = dir(fullfile(session, 'wave*'));

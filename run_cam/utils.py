@@ -6,6 +6,7 @@
 import os
 import time
 import yaml
+import numpy as np
 from vectornav import *
 from ruamel.yaml import YAML
 from picamera2 import Picamera2
@@ -78,7 +79,7 @@ def write_inputs_yaml(fname_log):
             auto_exposure_us = round(yaml_default_exposure)
             log.write(f"{tstr}:     [WARN] No valid metadata, using YAML default auto exposure: {auto_exposure_us:.3f} µs\n")
         else:
-            auto_exposure_us = round(min(exposure_list)) # min or mean?
+            auto_exposure_us = round(np.mean(exposure_list)) # min or mean?
             log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs\n")
         cam.stop()
         cam.close()
