@@ -70,7 +70,9 @@ for m = 1:length(waves)
 
     dir1 = dir([wave '/cam0/*.jpg']); 
     dir2 = dir([wave '/cam1/*.jpg']); 
-    
+    % dir1 = dir([wave '/cam1/*.jpg']); 
+    % dir2 = dir([wave '/cam0/*.jpg']); 
+    % 
     %%% Create dirs %%%
     L1Dir = [wave '/L1'];
     figDir = [wave '/figs'];

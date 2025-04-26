@@ -57,7 +57,7 @@ def write_inputs_yaml(fname_log):
     # Default fallback: try to get auto exposure from YAML if available
     yaml_default_exposure = yaml_data.get("exposure_us0", 250)
     with open(fname_log, 'a') as log:
-        cam = Picamera2()
+        cam = Picamera2(0)
         config = cam.create_still_configuration()
         config['main']['size'] = (1440, 1080)
         config['main']['format'] = 'RGB888'
@@ -72,7 +72,8 @@ def write_inputs_yaml(fname_log):
             if exp > 0:
                 exposure_list.append(exp)
             time.sleep(0.1)
-        print(f"Exposure times: {exposure_list}")
+        print(f"\n\nExposure times: {exposure_list}\n\n")
+        print(f"\n\nMean exposure time: {round(np.mean(exposure_list))}\n\n")
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
         if not exposure_list:
