@@ -327,8 +327,8 @@ try:
                 set_trigger_mode(False, fname_log)              # Disable external trigger mode
                 write_inputs_yaml(fname_log)                    # Write exposure times to inputs.yaml
                 _, _, _, shooting_modes, exposure_times = parse_inputs(fname_log)
-                mode = shooting_modes[1]                        # Default mode
-                exposure_us = exposure_times[1]                 # Default exposure time
+                mode = shooting_modes[0]                        # Default mode
+                exposure_us = exposure_times[0]                 # Default exposure time
                 configure_cameras(fname_log, mode, exposure_us) # Configure the cameras
                 exposure, dt = calc_dt(frame_rate, exposure_us) # Calculate dt
                 set_trigger_mode(True, fname_log)               # Enable external trigger mode
