@@ -9,7 +9,6 @@ addpath('functions/');
 %% Inputs
 
 default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
-% default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calibHQ_SIO';
 
 def_calib = 0;   % default calib (0) or select calib (1)
 BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1)
