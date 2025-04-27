@@ -44,48 +44,56 @@ def setup_logging():
     return fdir, fname_log
 
 def write_inputs_yaml(fname_log):
-    """Write exposure times to inputs.yaml file"""
+    """Write exposure times from cam0 and cam1 to inputs.yaml file"""
     yaml_path = "../inputs.yaml"
-    # Load YAML early to check for default exposure fallback
     ry = YAML()
     ry.preserve_quotes = True
+    # Load YAML early to check for default exposure fallback
     if os.path.exists(yaml_path):
         with open(yaml_path, "r") as f:
             yaml_data = ry.load(f)
     else:
         yaml_data = {}
-    # Default fallback: try to get auto exposure from YAML if available
     yaml_default_exposure = yaml_data.get("exposure_us0", 250)
     with open(fname_log, 'a') as log:
-        cam = Picamera2(1)
-        config = cam.create_still_configuration()
-        config['main']['size'] = (1440, 1080)
-        config['main']['format'] = 'RGB888'
-        config['controls']['AeEnable'] = True
-        config['controls']['AwbEnable'] = True
-        cam.configure(config)
-        cam.start()
+        cam0 = Picamera2(0)
+        cam1 = Picamera2(1)
+        config0 = cam0.create_still_configuration()
+        config1 = cam1.create_still_configuration()
+        for cfg in [config0, config1]:
+            cfg['main']['size'] = (1440, 1080)
+            cfg['main']['format'] = 'RGB888'
+            cfg['controls']['AeEnable'] = True
+            cfg['controls']['AwbEnable'] = True
+        cam0.configure(config0)
+        cam1.configure(config1)
+        cam0.start()
+        cam1.start()
         exposure_list = []
         t0 = time.time()
         while time.time() - t0 < 5:
-            exp = cam.capture_metadata().get('ExposureTime', 0)
-            if exp > 0:
-                exposure_list.append(exp)
+            exp0 = cam0.capture_metadata().get('ExposureTime', 0)
+            exp1 = cam1.capture_metadata().get('ExposureTime', 0)
+            if exp0 > 0:
+                exposure_list.append(exp0)
+            if exp1 > 0:
+                exposure_list.append(exp1)
             time.sleep(0.1)
         print(f"\n\nExposure times: {exposure_list}\n\n")
-        print(f"\n\nMean exposure time: {round(np.mean(exposure_list))}\n\n")
+        mean_exposure_us = round(np.mean(exposure_list)) if exposure_list else yaml_default_exposure
+        print(f"\n\nMean exposure time: {mean_exposure_us}\n\n")
         tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
         log.write(f"{tstr}:     [INFO] ========== write_inputs_yaml() ==========\n")
         if not exposure_list:
-            auto_exposure_us = round(yaml_default_exposure)
-            log.write(f"{tstr}:     [WARN] No valid metadata, using YAML default auto exposure: {auto_exposure_us:.3f} µs\n")
+            log.write(f"{tstr}:     [WARN] No valid metadata, using YAML default auto exposure: {mean_exposure_us:.3f} µs\n")
         else:
-            auto_exposure_us = round(np.mean(exposure_list)) # min or mean?
-            log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {auto_exposure_us} µs\n")
-        cam.stop()
-        cam.close()
-        bright_us = round(max(auto_exposure_us / 2, 1))
-        dark_us   = round(max(auto_exposure_us * 2, 1))
+            log.write(f"{tstr}:     [INFO] Measured auto exposure from metadata: {mean_exposure_us} µs\n")
+        cam0.stop()
+        cam1.stop()
+        cam0.close()
+        cam1.close()
+        bright_us = round(max(mean_exposure_us / 2, 1))
+        dark_us   = round(max(mean_exposure_us * 2, 1))
         log.write(f"{tstr}:     [INFO] Setting bright mode = {bright_us:.3f} µs, dark mode = {dark_us:.3f} µs\n")
         if not os.path.exists(yaml_path):
             log.write(f"{tstr}:     [WARN] inputs.yaml not found, creating minimal file...\n")
@@ -97,13 +105,14 @@ def write_inputs_yaml(fname_log):
                 fh.write("shooting_mode2: dark\nexposure_us2: 4\n")
             with open(yaml_path, "r") as f:
                 yaml_data = ry.load(f)
-        # Update values in YAML
-        yaml_data["shooting_mode0"] = "auto"
-        yaml_data["exposure_us0"]   = auto_exposure_us
-        yaml_data["shooting_mode1"] = "bright"
-        yaml_data["exposure_us1"]   = bright_us
-        yaml_data["shooting_mode2"] = "dark"
-        yaml_data["exposure_us2"]   = dark_us
+        yaml_data.update({
+            "shooting_mode0": "auto",
+            "exposure_us0": mean_exposure_us,
+            "shooting_mode1": "bright",
+            "exposure_us1": bright_us,
+            "shooting_mode2": "dark",
+            "exposure_us2": dark_us
+        })
         with open(yaml_path, "w") as f:
             ry.dump(yaml_data, f)
         log.write(f"{tstr}:     [INFO] Successfully updated inputs.yaml.\n\n")
