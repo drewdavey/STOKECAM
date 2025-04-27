@@ -57,7 +57,7 @@ def write_inputs_yaml(fname_log):
     # Default fallback: try to get auto exposure from YAML if available
     yaml_default_exposure = yaml_data.get("exposure_us0", 250)
     with open(fname_log, 'a') as log:
-        cam = Picamera2(0)
+        cam = Picamera2(1)
         config = cam.create_still_configuration()
         config['main']['size'] = (1440, 1080)
         config['main']['format'] = 'RGB888'

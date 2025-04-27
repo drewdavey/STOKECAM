@@ -72,7 +72,7 @@ for m = 1:length(waves)
     dir2 = dir([wave '/cam1/*.jpg']); 
     % dir1 = dir([wave '/cam1/*.jpg']); 
     % dir2 = dir([wave '/cam0/*.jpg']); 
-    % 
+
     %%% Create dirs %%%
     L1Dir = [wave '/L1'];
     figDir = [wave '/figs'];
@@ -90,7 +90,7 @@ for m = 1:length(waves)
 
     %%% Parse Vectornav data %%%
     imu = parse_imu(session, wave); % Parse imu data into struct
-    basicQCplots(imu, figDir, res); % Plot basic QC figs
+    % basicQCplots(imu, figDir, res); % Plot basic QC figs
     save(fullfile(wave, 'imu.mat'), 'imu'); % Save VN-200 data to L1
     close all; % Close QC figs
 

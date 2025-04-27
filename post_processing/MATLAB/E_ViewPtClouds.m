@@ -16,7 +16,7 @@ answer = questdlg('Select level of post-processing', ...
     'L1','L2','L3','L3');
     switch answer
         case 'L1'
-            L1 = 1; 
+            L1 = 1;
         case 'L2'
             L2 = 1;
         case 'L3'
