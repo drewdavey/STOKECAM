@@ -118,7 +118,7 @@ for m = 1:length(waves)
         f1 = figure(1); hold on; axis equal; grid on; axis tight;
         title('Camera reference frame');
         % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
-        scatter3(xyz_cam(:,2), xyz_cam(:,1), xyz_cam(:,3),...
+        scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3),...
                 1, double(L1matData.colors) / 255, 'filled');
         xlabel('X_{cam} (m)'); ylabel('Y_{cam} (m)'); zlabel('Z_{cam} (m)');
 
@@ -128,9 +128,9 @@ for m = 1:length(waves)
         f2 = figure(2); hold on; axis equal; grid on; axis tight;
         title('IMU reference frame');
         % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
-        scatter3(xyz_imu(:,2), xyz_imu(:,1), xyz_imu(:,3),...
+        scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3),...
                 1, double(L1matData.colors) / 255, 'filled');
-        xlabel('X_{IMU}'); ylabel('Y_{IMU}'); zlabel('Z_{IMU}');
+        xlabel('X_{IMU} (m)'); ylabel('Y_{IMU} (m)'); zlabel('Z_{IMU} (m)');
 
         %%%%%%%%%%%%%%%%%%%%%% Rotation matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R = rotationMatrices(:, :, i);
