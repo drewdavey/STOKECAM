@@ -108,7 +108,6 @@ def write_inputs_yaml(fname_log):
             ry.dump(yaml_data, f)
         log.write(f"{tstr}:     [INFO] Successfully updated inputs.yaml.\n\n")
 
-
 def read_inputs_yaml(fname_log):
     """Read inputs.yaml file and return parameters"""
     inputs_path = '../inputs.yaml'
