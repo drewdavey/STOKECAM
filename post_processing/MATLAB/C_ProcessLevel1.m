@@ -8,6 +8,9 @@ addpath('functions/');
 
 %% Inputs
 
+% Process all waves in session?
+processAll = 0;
+
 % Manually clean ptClouds
 % else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
 manual_clean = 1;
@@ -23,8 +26,9 @@ Nstd = 2; % std from RGB or HSV values
 % Nstd from centroid for refinedTrim
 Nstd2 = 5;
 
-% Default resolution for figures
-res = 600; % dpng
+% Generate QC figs?
+figs = 1;
+res = 600; % Figure resolution
 
 % Define calibration path
 calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
@@ -35,33 +39,40 @@ load([calib_path '/calib.mat']);
 % Load path to dir to reconstruct
 session = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session containing wave subfolders'); 
 
-% %%% Session QC figs %%%
-% figDir = [session '/figs'];
-% if ~exist(figDir, 'dir')
-%     mkdir(figDir);                     % mkdir for figs
-%     imu = parse_imu(session, session); % Parse imu data into struct
-%     basicQCplots(imu, figDir, res);    % Plot basic QC figs
-% end
-
-% Find subfolders that start with "wave"
-waveSubfolders = dir(fullfile(session, 'wave*'));
-waveSubfolders = waveSubfolders([waveSubfolders.isdir]); 
-if isempty(waveSubfolders)
-    fprintf('No wave subfolders found in %s\n', session);
-    return;
+%%% Session QC figs %%%
+if figs
+    figDir = [session '/figs'];
+    if ~exist(figDir, 'dir')
+        mkdir(figDir);                     % mkdir for figs
+        imu = parse_imu(session, session); % Parse imu data into struct
+        basicQCplots(imu, figDir, res);    % Plot basic QC figs
+    end
 end
 
 % Initialize waves array
 waves = {};
 
-% Loop over each matching entry
-for i = 1:numel(waveSubfolders)
-    if waveSubfolders(i).isdir
-        % Build full path to subfolder
-        wavePath = fullfile(session, waveSubfolders(i).name);
-        % Append to the cell array
-        waves{end + 1} = wavePath;
+if processAll
+    % Find subfolders that start with "wave"
+    waveSubfolders = dir(fullfile(session, 'wave*'));
+    waveSubfolders = waveSubfolders([waveSubfolders.isdir]); 
+    if isempty(waveSubfolders)
+        fprintf('No wave subfolders found in %s\n', session);
+        return;
     end
+    
+    % Loop over each matching entry
+    for i = 1:numel(waveSubfolders)
+        if waveSubfolders(i).isdir
+            % Build full path to subfolder
+            wavePath = fullfile(session, waveSubfolders(i).name);
+            % Append to the cell array
+            waves{end + 1} = wavePath;
+        end
+    end
+else
+    % Just process one wave
+    waves{1} = uigetdir(session, 'Select a wave subfolder');
 end
 
 % Process each selected path
@@ -70,8 +81,6 @@ for m = 1:length(waves)
 
     dir1 = dir([wave '/cam0/*.jpg']); 
     dir2 = dir([wave '/cam1/*.jpg']); 
-    % dir1 = dir([wave '/cam1/*.jpg']); 
-    % dir2 = dir([wave '/cam0/*.jpg']); 
 
     %%% Create dirs %%%
     L1Dir = [wave '/L1'];
@@ -90,7 +99,9 @@ for m = 1:length(waves)
 
     %%% Parse Vectornav data %%%
     imu = parse_imu(session, wave); % Parse imu data into struct
-    % basicQCplots(imu, figDir, res); % Plot basic QC figs
+    if figs
+        basicQCplots(imu, figDir, res); % Plot basic QC figs
+    end
     save(fullfile(wave, 'imu.mat'), 'imu'); % Save VN-200 data to L1
     close all; % Close QC figs
 
@@ -120,6 +131,7 @@ for m = 1:length(waves)
 
         %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
         disparityMap = disparitySGM(frameLeftGray, frameRightGray); 
+        % disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'UniquenessThreshold', 5); 
     
         % Extract timestamp and image number from selected file
         [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));

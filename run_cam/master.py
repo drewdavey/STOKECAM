@@ -152,10 +152,10 @@ def toggle_modes(shooting_modes, exposure_times):
 def enter_standby(fdir, fname_log, mode, portName, exposure, dt):
     """Enter standby mode to capture images with external trigger."""
     yellow.on()
+    fdir_out, fdir_cam0, fdir_cam1 = create_dirs(fdir, f"session_{mode}")
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
-    log.write(f"{tstr}:     Entering standby... \n\n"), log.close()
-    fdir_out, fdir_cam0, fdir_cam1 = create_dirs(fdir, f"session_{mode}")
+    log.write(f"{tstr}:     Entering {fdir_out} \n\n"), log.close()
     s = Sensor()  # Create sensor object and connect to the VN-200
     csvExporter = ExporterCsv(fdir_out, True)
     s.autoConnect(portName)
@@ -223,7 +223,7 @@ def exit_standby(fname_log):
     yellow.off(), red.off() # Close the lights
     tstr = datetime.now(timezone.utc).strftime('%H%M%S%f')
     log = open(fname_log, 'a')
-    log.write(f"{tstr}:     Exiting standby.\n\n"), log.close()
+    log.write(f"{tstr}:     Exiting session.\n\n"), log.close()
     time.sleep(1)
     standby = False
 

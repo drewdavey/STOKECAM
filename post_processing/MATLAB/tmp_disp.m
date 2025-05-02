@@ -16,12 +16,12 @@ specs = 0;       % default specs (0) or input specs (1)
 plys = 0;        % save .plys seperate in a 'ptCloud' directory?
 
 % Applied to BM & SGBM
-UniquenessThreshold = 0;       % only applied if specs
+UniquenessThreshold = 5;       % only applied if specs
 
 % Applied to BM only
 DisparityRange = [0 64];       % only applied if specs
-BlockSize = 25;                % only applied if specs
-ContrastThreshold = 0.25;       % only applied if specs
+BlockSize = 15;                % only applied if specs
+ContrastThreshold = 0.25;      % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
 TextureThreshold = 0.00002;    % only applied if specs
 
@@ -63,15 +63,16 @@ for m = 1:length(paths)
     if def_calib
         calib_path = uigetdir('../../../FSR/stereo_cam/DATA/calibrations/', 'Select path to calibration session'); % load path to calibration session
     else
-        calib_path = default_calib; 
+        calib_path = default_calib;
     end
     
-    load([calib_path '/calib.mat']); 
+    load([calib_path '/calib.mat']);
     pause(2); close(gcf); pause(2); close(gcf);
     % uiwait(gcf); uiwait(gcf); 
     
     matDir = [path '/mats'];
     rectifiedImagesDir = [path '/Rectified_Images']; 
+    % rectifiedImagesDir = [path '/Rectified_Images_histMatch']; 
     ptCloudDir = [path '/ptClouds'];
     
     if ~exist(rectifiedImagesDir, 'dir')
@@ -97,6 +98,24 @@ for m = 1:length(paths)
     for i = 1:length(imageFileNames1)
         I1 = imread(imageFileNames1{i});
         I2 = imread(imageFileNames2{i});
+
+        % Extract timestamp and image number from selected file
+        [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));
+        % 
+        % %%% Histogram matching %%%
+        % % Plot hist matching
+        % f1 = figure(1);
+        % subplot(2,1,1);
+        % montage({I1,I2});
+        % title('cam0 (Left) vs cam1 (Right)');
+        % I1 = imhistmatch(I1,I2,256,'method','polynomial'); % use polynomial matched I1
+        % % K = imhistmatch(I1,I2,'method','uniform');
+        % subplot(2,1,2);
+        % montage({I1,I2});
+        % title('Histogram-Matched cam0 (Left) vs cam1 (Right)');
+        % filename = [timestamp '_' imageNum '_hist.png'];
+        % fullFilePath = fullfile(rectifiedImagesDir, filename);
+        % % exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
     
         %%% Rectify Images %%%
         [J1, J2, reprojectionMatrix] = rectifyStereoImages(I1, I2, stereoParams, OutputView='valid'); 
@@ -131,15 +150,7 @@ for m = 1:length(paths)
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-        % Extract timestamp and image number from selected file
-        [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));
-    
         % Plotting
-        % f1 = figure(1);
-        % imshow(stereoAnaglyph(J1,J2)); % Display rectified images
-        % filename = [timestamp '_' imageNum '_rect.png'];
-        % fullFilePath = fullfile(rectifiedImagesDir, filename);
-        % exportgraphics(f1,fullFilePath,'Resolution',600); % Save rectified images as PNG
         f2 = figure(2); 
         imshow(disparityMap, [0, 64]); % Display disparity map
         colormap jet; colorbar;

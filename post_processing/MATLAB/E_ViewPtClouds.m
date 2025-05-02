@@ -35,40 +35,42 @@ while viewFlag
             VerticalAxisDir="down");
         view(player3D, ptCloud);
     elseif L2
-        % matFile = uigetfile([wave '/L2/*.mat'],'Select file to L2 ptCloud');
-        % matPath = [wave '/L2/' matFile]; load(matPath);
-        % player3D = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits, VerticalAxis="z", ...
-        %     VerticalAxisDir="up");
-        % view(player3D, ptCloud);
-         % Get all .mat files from L2 directory
-            % Get all .mat files from L2 directory
-
-        % Animate L2
-        matFiles = dir(fullfile(wave, 'L2', '*.mat'));
-        if isempty(matFiles)
-            disp('No .mat files found in L2 directory.');
-            return;
-        end
-        matPath0 = [wave '/L3ptCloud.mat']; load(matPath0);
+        matFile = uigetfile([wave '/L2/*.mat'],'Select file to L2 ptCloud');
+        matPath = [wave '/L2/' matFile]; load(matPath);
         player3D = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits, VerticalAxis="z", ...
             VerticalAxisDir="up");
-        pause(10);
-        for k = 1:length(matFiles)
-            matPath = fullfile(matFiles(k).folder, matFiles(k).name);
-            data = load(matPath);
-            if ~isfield(data, 'ptCloud')
-                warning('File %s does not contain ptCloud object.', matFiles(k).name);
-                continue;
-            end
-            if k == 1
-                cumulativePtCloud = data.ptCloud;
-                pause(10);
-            else
-                cumulativePtCloud = pccat([cumulativePtCloud, data.ptCloud]);
-            end
-            view(player3D, cumulativePtCloud);
-            pause(2);
-        end
+        view(player3D, ptCloud);
+
+        % % Animate L2
+        % load([wave '/imu.mat']);
+        % matFiles = dir(fullfile(wave, 'L2', '*.mat'));
+        % if isempty(matFiles)
+        %     disp('No .mat files found in L2 directory.');
+        %     return;
+        % end
+        % matPath0 = [wave '/L3ptCloud.mat']; load(matPath0);
+        % player3D = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits, VerticalAxis="z", ...
+        %     VerticalAxisDir="up");
+        % pause(10);
+        % for k = 1:length(matFiles)
+        %     matPath = fullfile(matFiles(k).folder, matFiles(k).name);
+        %     data = load(matPath);
+        %     if ~isfield(data, 'ptCloud')
+        %         warning('File %s does not contain ptCloud object.', matFiles(k).name);
+        %         continue;
+        %     end
+        %     if k == 1
+        %         cumulativePtCloud = data.ptCloud;
+        %         pause(10);
+        %         view(player3D, cumulativePtCloud);
+        %     else
+        %         cumulativePtCloud = pccat([cumulativePtCloud, data.ptCloud]);
+        %         view(player3D, cumulativePtCloud);
+        %     end
+        %     if k<length(matFiles)
+        %         pause(imu.t0(k+1)-imu.t0(k));
+        %     end
+        % end
 
     elseif L3
         matPath = [wave '/L3ptCloud.mat'];
@@ -104,19 +106,40 @@ while viewFlag
                 'Yes','No','Yes');
                 switch answer
                     case 'Yes' % Save updates
-                        clean = 1;
                         save(matPath);      % Write updated L2 ptCloud
-                        genL3ptCloud(wave); % Write new L3ptCloud
                 end
         end
+
+        answer = questdlg('Export brushedData to transect?', ...
+        'Export brushedData to transect?', ...
+        'Yes','No','Yes');
+        switch answer
+            case 'Yes'
+                transectDir = fullfile(wave, 'transect');
+                if ~exist(transectDir, 'dir')
+                    mkdir(transectDir);
+                end
+                X = brushedData(:,1);
+                Y = brushedData(:,2);
+                Z = brushedData(:,3);
+                tName = matFile(1:end-4);
+                save(fullfile(transectDir, tName), 'X', 'Y', 'Z');
+        end
     end
-    answer = questdlg('View another point cloud?', ...
-    'View another point cloud', ...
-    'Yes','No','Yes');
-    switch answer
-        case 'Yes'
-            viewFlag = 1; 
-        case 'No'
-            viewFlag = 0; % Exit
+    if L1 || L2
+        answer = questdlg('View another point cloud?', ...
+        'View another point cloud', ...
+        'Yes','No','Yes');
+        switch answer
+            case 'Yes'
+                viewFlag = 1; 
+            case 'No'
+                viewFlag = 0; % Exit
+                if L2
+                    genL3ptCloud(wave); % Write new L3ptCloud
+                end
+        end
+    else
+        viewFlag = 0; % Exit
     end
 end

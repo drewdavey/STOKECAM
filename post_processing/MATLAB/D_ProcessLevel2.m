@@ -8,8 +8,19 @@ addpath('functions/');
 
 %% Inputs
 
+% Process all waves?
+all = 0;
+
 % Input origin [lat, lon]. Defaults to local origin if none specified.
 origin = [32.866277163888888, -117.2542791472222]; % SIO
+
+% Rotate wave field?
+rotate = 0;
+theta_deg = 50; % wave6
+
+% Brighten point colors?
+brighten = 0;
+brightenFactor = 2;
 
 % Denoise ptClouds?
 denoise = 1;
@@ -18,8 +29,9 @@ denoise = 1;
 downsample = 0;
 randPerc = 0.5; % randomly downsample 50%
 
-% Figure resolution
-res = 600;
+% Generate QC figs?
+figs = 0;
+res = 600; % Figure resolution
 
 g = 9.81;     % gravity
 
@@ -32,20 +44,30 @@ dZ = 0.1;     % Z step size for plotting (meters)
 % Load path to dir to reconstruct
 session = uigetdir('../../../FSR/stereo_cam/DATA','Select path to session containing wave subfolders'); 
 
-% Find subfolders that start with "wave"
-waveSubfolders = dir(fullfile(session, 'wave*'));
-
 % Initialize waves array
 waves = {};
 
-% Loop over each matching entry
-for i = 1:numel(waveSubfolders)
-    if waveSubfolders(i).isdir
-        % Build full path to subfolder
-        wavePath = fullfile(session, waveSubfolders(i).name);
-        % Append to the cell array
-        waves{end + 1} = wavePath;
+if all
+    % Find subfolders that start with "wave"
+    waveSubfolders = dir(fullfile(session, 'wave*'));
+    waveSubfolders = waveSubfolders([waveSubfolders.isdir]); 
+    if isempty(waveSubfolders)
+        fprintf('No wave subfolders found in %s\n', session);
+        return;
     end
+    
+    % Loop over each matching entry
+    for i = 1:numel(waveSubfolders)
+        if waveSubfolders(i).isdir
+            % Build full path to subfolder
+            wavePath = fullfile(session, waveSubfolders(i).name);
+            % Append to the cell array
+            waves{end + 1} = wavePath;
+        end
+    end
+else
+    % Just process one wave
+    waves{1} = uigetdir(session, 'Select a wave subfolder');
 end
 
 %% Process Level 2
@@ -115,54 +137,79 @@ for m = 1:length(waves)
         %%%%%%%%%%%%%% Point cloud in camera reference frame %%%%%%%%%%%%%%
         xyz_cam = L1matData.points3D;
 
-        f1 = figure(1); hold on; axis equal; grid on; axis tight;
-        title('Camera reference frame');
-        % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
-        scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3),...
-                1, double(L1matData.colors) / 255, 'filled');
-        xlabel('X_{cam} (m)'); ylabel('Y_{cam} (m)'); zlabel('Z_{cam} (m)');
-
+        if figs
+            f1 = figure(1); hold on; axis equal; grid on; axis tight;
+            title('Camera reference frame');
+            scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
+            % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3),...
+            %         1, double(L1matData.colors) / 255, 'filled');
+            xlabel('X_{cam} (m)'); ylabel('Y_{cam} (m)'); zlabel('Z_{cam} (m)');
+        end
         %%%%%%%%%%%% Rotate into IMU coords: XYZ_imu = +Z+X+Y_cam %%%%%%%%%
         xyz_imu = ([0 0 1; 1 0 0; 0 1 0] * xyz_cam')'; 
 
-        f2 = figure(2); hold on; axis equal; grid on; axis tight;
-        title('IMU reference frame');
-        % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
-        scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3),...
-                1, double(L1matData.colors) / 255, 'filled');
-        xlabel('X_{IMU} (m)'); ylabel('Y_{IMU} (m)'); zlabel('Z_{IMU} (m)');
-
+        if figs
+            f2 = figure(2); hold on; axis equal; grid on; axis tight;
+            title('IMU reference frame');
+            scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
+            % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3),...
+            %         1, double(L1matData.colors) / 255, 'filled');
+            xlabel('X_{IMU} (m)'); ylabel('Y_{IMU} (m)'); zlabel('Z_{IMU} (m)');
+        end
         %%%%%%%%%%%%%%%%%%%%%% Rotation matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R = rotationMatrices(:, :, i);
 
         xyz_NED = (R * xyz_imu')'; % Rotate and transpose
 
-        f3 = figure(3); hold on; axis equal; grid on; axis tight;
-        title('Local NED reference frame');
-        % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3), 1);
-        scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
-                1, double(L1matData.colors) / 255, 'filled');
-        xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('Down (m)');
-
+        if figs
+            f3 = figure(3); hold on; axis equal; grid on; axis tight;
+            title('Local NED reference frame');
+            scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3), 1);
+            % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
+            %         1, double(L1matData.colors) / 255, 'filled');
+            xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('Down (m)');
+        end
         %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
-        cam_origin = [N(i), E(i), D(1)]; % NED Origin (uses first elev)
+        cam_origin = [N(i), E(i), D(i)-2]; % NED Origin (uses first elev)
 
         % Need to invert E, N to account for ptCloud-->cam displacement
         xyz_NED = [-xyz_NED(:,1), -xyz_NED(:,2), xyz_NED(:,3)] + cam_origin;
+        % xyz_NED = xyz_NED + cam_origin;
 
         %%%%%%%%%%%%% Rotate NED to ENU: XYZ_ENU = +Y+X-Z_NED %%%%%%%%%%%%%
         xyz_ENU = ([0 1 0; 1 0 0; 0 0 -1] * xyz_NED')'; 
         
-        f4 = figure(4); hold on; axis equal; grid on; axis tight;
-        title('World ENU reference frame');
-        % scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3), 1);
-        scatter3(xyz_ENU(:,2), xyz_ENU(:,1), xyz_ENU(:,3),...
-                1, double(L1matData.colors) / 255, 'filled');
-        xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('Z_{NAVD88} (m)');
+        if figs
+            f4 = figure(4); hold on; axis equal; grid on; axis tight;
+            title('World ENU reference frame');
+            scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3), 1);
+            % scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3),...
+            %         1, double(L1matData.colors) / 255, 'filled');
+            % xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('Z_{NAVD88} (m)');
+            xlabel('X_{SIO} (m)'); ylabel('Y_{SIO} (m)'); zlabel('Z_{NAVD88} (m)');
+        end
 
-        % Save transformed points3D, colors, and ptCloud
-        points3D = xyz_ENU;
-        colors = L1matData.colors;
+        % Save transformed (rotate optional) points3D, colors, and ptCloud
+        if rotate
+            theta_rad = deg2rad(theta_deg); % Convert degrees to radians
+            % Rotate around z-axis
+            R = [cos(theta_rad) -sin(theta_rad); 
+                 sin(theta_rad)  cos(theta_rad)];
+            % Apply to x-y part (East, North)
+            xy = xyz_ENU(:,1:2);       % Extract East-North
+            xy_rot = (R * xy')';       % Rotate (transpose -> rotate -> transpose back)
+            % Reassemble rotated xyz
+            points3D = [xy_rot xyz_ENU(:,3)];  % Keep Up (z) unchanged
+        else
+            points3D = xyz_ENU;
+        end
+
+        if brighten
+            colors = min(L1matData.colors * brightenFactor, 255);
+            colors = uint8(colors);
+        else
+            colors = L1matData.colors;
+        end
         ptCloud = pointCloud(points3D, 'Color', colors);
 
         % Denoise ptCloud
@@ -175,8 +222,6 @@ for m = 1:length(waves)
             ptCloud = pcdownsample(ptCloud, random=randPerc);
         end
 
-        %%% Extract cross sections ? %%%
-
         % Save L2 .mat
         filename = L1matFilenames{i};
         fullFilePath = fullfile(L2Dir, filename);
@@ -184,16 +229,18 @@ for m = 1:length(waves)
         'ptCloud', 'R', 'cam_origin');
     end
 
-    % Save figures in figDir
-    print(f1, fullfile(figDir, 'camCoord.png'), '-dpng', ['-r', num2str(res)]);
-    print(f2, fullfile(figDir, 'imuCoord.png'), '-dpng', ['-r', num2str(res)]);
-    print(f3, fullfile(figDir, 'NEDlocal.png'), '-dpng', ['-r', num2str(res)]);
-    print(f4, fullfile(figDir, 'ENUworld.png'), '-dpng', ['-r', num2str(res)]);
-    % savefig(f1, fullfile(figDir, 'camCoord.fig'));
-    % savefig(f2, fullfile(figDir, 'imuCoord.fig'));
-    % savefig(f3, fullfile(figDir, 'NEDlocal.fig'));
-    % savefig(f4, fullfile(figDir, 'ENUworld.fig'));
-    % close all; % close figs before next wave
+    if figs
+        % Save figures in figDir
+        print(f1, fullfile(figDir, 'camCoord.png'), '-dpng', ['-r', num2str(res)]);
+        print(f2, fullfile(figDir, 'imuCoord.png'), '-dpng', ['-r', num2str(res)]);
+        print(f3, fullfile(figDir, 'NEDlocal.png'), '-dpng', ['-r', num2str(res)]);
+        print(f4, fullfile(figDir, 'ENUworld.png'), '-dpng', ['-r', num2str(res)]);
+        % savefig(f1, fullfile(figDir, 'camCoord.fig'));
+        % savefig(f2, fullfile(figDir, 'imuCoord.fig'));
+        % savefig(f3, fullfile(figDir, 'NEDlocal.fig'));
+        % savefig(f4, fullfile(figDir, 'ENUworld.fig'));
+        % close all; % close figs before next wave
+    end
 
     % Generate L3 concatenated ptCloud from all L2 ptClouds
     genL3ptCloud(wave);
