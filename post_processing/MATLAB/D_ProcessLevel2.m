@@ -12,7 +12,7 @@ addpath('functions/');
 all = 0;
 
 % Input origin [lat, lon]. Defaults to local origin if none specified.
-origin = [32.866277163888888, -117.2542791472222]; % SIO
+% origin = [32.866277163888888, -117.2542791472222]; % SIO
 
 % Rotate wave field?
 rotate = 0;
@@ -30,7 +30,7 @@ downsample = 0;
 randPerc = 0.5; % randomly downsample 50%
 
 % Generate QC figs?
-figs = 0;
+figs = 1;
 res = 600; % Figure resolution
 
 g = 9.81;     % gravity
@@ -140,9 +140,9 @@ for m = 1:length(waves)
         if figs
             f1 = figure(1); hold on; axis equal; grid on; axis tight;
             title('Camera reference frame');
-            scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
-            % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3),...
-            %         1, double(L1matData.colors) / 255, 'filled');
+            % scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3), 1);
+            scatter3(xyz_cam(:,1), xyz_cam(:,2), xyz_cam(:,3),...
+                    1, double(L1matData.colors) / 255, 'filled');
             xlabel('X_{cam} (m)'); ylabel('Y_{cam} (m)'); zlabel('Z_{cam} (m)');
         end
         %%%%%%%%%%%% Rotate into IMU coords: XYZ_imu = +Z+X+Y_cam %%%%%%%%%
@@ -151,9 +151,9 @@ for m = 1:length(waves)
         if figs
             f2 = figure(2); hold on; axis equal; grid on; axis tight;
             title('IMU reference frame');
-            scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
-            % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3),...
-            %         1, double(L1matData.colors) / 255, 'filled');
+            % scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3), 1);
+            scatter3(xyz_imu(:,1), xyz_imu(:,2), xyz_imu(:,3),...
+                    1, double(L1matData.colors) / 255, 'filled');
             xlabel('X_{IMU} (m)'); ylabel('Y_{IMU} (m)'); zlabel('Z_{IMU} (m)');
         end
         %%%%%%%%%%%%%%%%%%%%%% Rotation matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -164,13 +164,15 @@ for m = 1:length(waves)
         if figs
             f3 = figure(3); hold on; axis equal; grid on; axis tight;
             title('Local NED reference frame');
-            scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3), 1);
-            % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
-            %         1, double(L1matData.colors) / 255, 'filled');
+            % scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3), 1);
+            scatter3(xyz_NED(:,2), xyz_NED(:,1), xyz_NED(:,3),...
+                    1, double(L1matData.colors) / 255, 'filled');
             xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('Down (m)');
         end
         %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
-        cam_origin = [N(i), E(i), D(i)-2]; % NED Origin (uses first elev)
+        % cam_origin = [N(i), E(i), D(1)]; % NED Origin (uses first elev)
+        cam_origin = [N(i), E(i), D(i)]; % NED Origin (uses each elev)
+        % cam_origin = [mean(N), mean(E), mean(D)]; % NED Origin (uses each elev)
 
         % Need to invert E, N to account for ptCloud-->cam displacement
         xyz_NED = [-xyz_NED(:,1), -xyz_NED(:,2), xyz_NED(:,3)] + cam_origin;
@@ -182,9 +184,9 @@ for m = 1:length(waves)
         if figs
             f4 = figure(4); hold on; axis equal; grid on; axis tight;
             title('World ENU reference frame');
-            scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3), 1);
-            % scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3),...
-            %         1, double(L1matData.colors) / 255, 'filled');
+            % scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3), 1);
+            scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3),...
+                    1, double(L1matData.colors) / 255, 'filled');
             % xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('Z_{NAVD88} (m)');
             xlabel('X_{SIO} (m)'); ylabel('Y_{SIO} (m)'); zlabel('Z_{NAVD88} (m)');
         end
@@ -199,6 +201,8 @@ for m = 1:length(waves)
             xy = xyz_ENU(:,1:2);       % Extract East-North
             xy_rot = (R * xy')';       % Rotate (transpose -> rotate -> transpose back)
             % Reassemble rotated xyz
+            % xy_rot(:,1) = xy_rot(:,1)+73;
+            % xy_rot(:,2) = xy_rot(:,2)+137;
             points3D = [xy_rot xyz_ENU(:,3)];  % Keep Up (z) unchanged
         else
             points3D = xyz_ENU;

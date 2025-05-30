@@ -27,7 +27,7 @@ Nstd = 2; % std from RGB or HSV values
 Nstd2 = 5;
 
 % Generate QC figs?
-figs = 1;
+figs = 0;
 res = 600; % Figure resolution
 
 % Define calibration path

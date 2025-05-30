@@ -8,6 +8,9 @@ addpath('functions/');
 
 %% Inputs
 
+% Animate L2 ptClouds?
+animate = 0;
+
 wave = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to wave'); % load path to wave
 
 L1 = 0; L2 = 0; L3 = 0;
@@ -35,42 +38,44 @@ while viewFlag
             VerticalAxisDir="down");
         view(player3D, ptCloud);
     elseif L2
-        matFile = uigetfile([wave '/L2/*.mat'],'Select file to L2 ptCloud');
-        matPath = [wave '/L2/' matFile]; load(matPath);
-        player3D = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits, VerticalAxis="z", ...
-            VerticalAxisDir="up");
-        view(player3D, ptCloud);
-
-        % % Animate L2
-        % load([wave '/imu.mat']);
-        % matFiles = dir(fullfile(wave, 'L2', '*.mat'));
-        % if isempty(matFiles)
-        %     disp('No .mat files found in L2 directory.');
-        %     return;
-        % end
-        % matPath0 = [wave '/L3ptCloud.mat']; load(matPath0);
-        % player3D = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits, VerticalAxis="z", ...
-        %     VerticalAxisDir="up");
-        % pause(10);
-        % for k = 1:length(matFiles)
-        %     matPath = fullfile(matFiles(k).folder, matFiles(k).name);
-        %     data = load(matPath);
-        %     if ~isfield(data, 'ptCloud')
-        %         warning('File %s does not contain ptCloud object.', matFiles(k).name);
-        %         continue;
-        %     end
-        %     if k == 1
-        %         cumulativePtCloud = data.ptCloud;
-        %         pause(10);
-        %         view(player3D, cumulativePtCloud);
-        %     else
-        %         cumulativePtCloud = pccat([cumulativePtCloud, data.ptCloud]);
-        %         view(player3D, cumulativePtCloud);
-        %     end
-        %     if k<length(matFiles)
-        %         pause(imu.t0(k+1)-imu.t0(k));
-        %     end
-        % end
+        if animate
+            load([wave '/imu.mat']);
+            matFiles = dir(fullfile(wave, 'L2', '*.mat'));
+            if isempty(matFiles)
+                disp('No .mat files found in L2 directory.');
+                return;
+            end
+            matPath0 = [wave '/L3ptCloud.mat']; load(matPath0);
+            player3D = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits, VerticalAxis="z", ...
+                VerticalAxisDir="up");
+            pause(10);
+            for k = 1:length(matFiles)
+                matPath = fullfile(matFiles(k).folder, matFiles(k).name);
+                data = load(matPath);
+                if ~isfield(data, 'ptCloud')
+                    warning('File %s does not contain ptCloud object.', matFiles(k).name);
+                    continue;
+                end
+                if k == 1
+                    cumulativePtCloud = data.ptCloud;
+                    pause(10);
+                    view(player3D, cumulativePtCloud);
+                else
+                    cumulativePtCloud = pccat([cumulativePtCloud, data.ptCloud]);
+                    view(player3D, cumulativePtCloud);
+                end
+                pause(1);
+                % if k<length(matFiles)
+                    % pause(imu.t0(k+1)-imu.t0(k));
+                % end
+            end
+        else
+            matFile = uigetfile([wave '/L2/*.mat'],'Select file to L2 ptCloud');
+            matPath = [wave '/L2/' matFile]; load(matPath);
+            player3D = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits, VerticalAxis="z", ...
+                VerticalAxisDir="up");
+            view(player3D, ptCloud);
+        end
 
     elseif L3
         matPath = [wave '/L3ptCloud.mat'];

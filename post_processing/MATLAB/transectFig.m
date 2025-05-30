@@ -63,7 +63,7 @@ v = VideoWriter([wave '/transect/animated_slice.mp4'], 'MPEG-4');
 v.FrameRate = 10; 
 open(v); 
 
-targetYs = linspace(10, 5, 50); % Range of Y-slice values
+targetYs = linspace(147, 142, 50); % Range of Y-slice values
 dy = 0.05;                      % Thickness of each slice
 
 f = figure('Position', [100 100 800 700]);
