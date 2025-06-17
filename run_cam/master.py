@@ -1,4 +1,4 @@
-# Last updated: 2025-04-01
+# Last updated: 2025-06-17
 ##################################
 # Main script for STOKECAM
 # Interfaces with Vectornav and Raspberry Pi cams.

@@ -177,15 +177,21 @@ def get_config(mode, exposure_us):
     cfg['controls']['AeEnable'] = False                   # disable auto exposure (necessary for manual exposure)
     cfg['controls']['AwbEnable'] = False                  # disable auto white balance (necessary for manual exposure)
     # Select parameters
-    # if mode == 'auto':
-    #     cfg['controls']['FrameDurationLimits'] = (0, 100)
-    #     # add other settings by mode here
-    # elif mode == 'fast':
-    #     cfg['controls']['FrameDurationLimits'] = (0, 100)
-    # elif mode == 'max':
-    #     cfg['controls']['FrameDurationLimits'] = (0, 33333)
-    # else:
-    #     raise ValueError(f"Invalid mode: {mode}")
+    if mode == 'auto':
+        # cfg['controls']['FrameDurationLimits'] = (0, 100)
+        cfg['controls']['AnalogueGain'] = 1.0             # ~ ISO 100
+        cfg['controls']['DigitalGain'] = 1.0              
+        # add other settings by mode here
+    elif mode == 'bright':
+        # cfg['controls']['FrameDurationLimits'] = (0, 100)
+        cfg['controls']['AnalogueGain'] = 1.0             # ~ ISO 100
+        cfg['controls']['DigitalGain'] = 1.0 
+    elif mode == 'dark':
+        # cfg['controls']['FrameDurationLimits'] = (0, 33333)
+        cfg['controls']['AnalogueGain'] = 1.0             # ~ ISO 100
+        cfg['controls']['DigitalGain'] = 1.0 
+    else:
+        raise ValueError(f"Invalid mode: {mode}")
     cam.close()
     return cfg
 

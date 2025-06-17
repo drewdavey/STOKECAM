@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# Last updated: 2024-06-17
-##################################
-# Live preview for focusing stereo cameras, with live exposure readout.
-# Usage: ./focus.sh [width] [height]
-##################################
+# # Last updated: 2024-06-17
+# ##################################
+# # This script creates two preview windows to focus the cameras
+# # Inputs: (1) Width in pixels (default = 1440) (2) Height in pixels (default = 1080)
+# # Example:
+# #  ./focus.sh 1440 1080
+# ##################################
 
 # Parse command line input
 if [ $# -eq 0 ]; then
