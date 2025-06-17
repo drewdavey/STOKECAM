@@ -180,16 +180,16 @@ def get_config(mode, exposure_us):
     if mode == 'auto':
         # cfg['controls']['FrameDurationLimits'] = (0, 100)
         cfg['controls']['AnalogueGain'] = 1.0             # ~ ISO 100
-        cfg['controls']['DigitalGain'] = 1.0              
+        # cfg['controls']['DigitalGain'] = 1.0              
         # add other settings by mode here
     elif mode == 'bright':
         # cfg['controls']['FrameDurationLimits'] = (0, 100)
         cfg['controls']['AnalogueGain'] = 1.0             # ~ ISO 100
-        cfg['controls']['DigitalGain'] = 1.0 
+        # cfg['controls']['DigitalGain'] = 1.0 
     elif mode == 'dark':
         # cfg['controls']['FrameDurationLimits'] = (0, 33333)
         cfg['controls']['AnalogueGain'] = 1.0             # ~ ISO 100
-        cfg['controls']['DigitalGain'] = 1.0 
+        # cfg['controls']['DigitalGain'] = 1.0 
     else:
         raise ValueError(f"Invalid mode: {mode}")
     cam.close()
