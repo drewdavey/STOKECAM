@@ -12,11 +12,13 @@ addpath('functions/');
 all = 0;
 
 % Input origin [lat, lon]. Defaults to local origin if none specified.
-% origin = [32.866277163888888, -117.2542791472222]; % SIO
+origin = [32.866277163888888, -117.2542791472222]; % SIO
 
 % Rotate wave field?
 rotate = 0;
-theta_deg = 50; % wave6
+theta_deg = 50; % rotation angle CCW
+x_offset = 0;   % translate x
+y_offset = 0;   % translate y
 
 % Brighten point colors?
 brighten = 0;
@@ -172,7 +174,7 @@ for m = 1:length(waves)
         %%%%%%%%%%%%%%%%%% Translate to world coord %%%%%%%%%%%%%%%%%%%%%%%
         % cam_origin = [N(i), E(i), D(1)]; % NED Origin (uses first elev)
         cam_origin = [N(i), E(i), D(i)]; % NED Origin (uses each elev)
-        % cam_origin = [mean(N), mean(E), mean(D)]; % NED Origin (uses each elev)
+        % cam_origin = [mean(N), mean(E), mean(D)]; % NED Origin (uses mean NED)
 
         % Need to invert E, N to account for ptCloud-->cam displacement
         xyz_NED = [-xyz_NED(:,1), -xyz_NED(:,2), xyz_NED(:,3)] + cam_origin;
@@ -201,8 +203,8 @@ for m = 1:length(waves)
             xy = xyz_ENU(:,1:2);       % Extract East-North
             xy_rot = (R * xy')';       % Rotate (transpose -> rotate -> transpose back)
             % Reassemble rotated xyz
-            % xy_rot(:,1) = xy_rot(:,1)+73;
-            % xy_rot(:,2) = xy_rot(:,2)+137;
+            xy_rot(:,1) = xy_rot(:,1) + x_offset;
+            xy_rot(:,2) = xy_rot(:,2) + y_offset;
             points3D = [xy_rot xyz_ENU(:,3)];  % Keep Up (z) unchanged
         else
             points3D = xyz_ENU;
