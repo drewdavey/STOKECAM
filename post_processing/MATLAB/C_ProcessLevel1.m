@@ -11,6 +11,9 @@ addpath('functions/');
 % Process all waves in session?
 processAll = 0;
 
+% Set disparity range [20 200], but diff < 128 and divisible by 8
+DisparityRange = [0 128];
+
 % Manually clean ptClouds
 % else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
 manual_clean = 1;
@@ -31,7 +34,7 @@ figs = 0;
 res = 600; % Figure resolution
 
 % Define calibration path
-calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib5_SIO';
 load([calib_path '/calib.mat']); 
 
 %% Process Level 1
@@ -130,8 +133,8 @@ for m = 1:length(waves)
         frameRightGray = im2gray(J2);
 
         %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
-        disparityMap = disparitySGM(frameLeftGray, frameRightGray); 
-        % disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'UniquenessThreshold', 5); 
+        disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', DisparityRange); 
+        % disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', DisparityRange, 'UniquenessThreshold', 5); 
     
         % Extract timestamp and image number from selected file
         [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));

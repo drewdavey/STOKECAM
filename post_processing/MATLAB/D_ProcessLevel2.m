@@ -8,8 +8,8 @@ addpath('functions/');
 
 %% Inputs
 
-% Process all waves?
-all = 0;
+% Process all waves in session?
+processAll = 0;
 
 % Input origin [lat, lon]. Defaults to local origin if none specified.
 origin = [32.866277163888888, -117.2542791472222]; % SIO
@@ -49,7 +49,7 @@ session = uigetdir('../../../FSR/stereo_cam/DATA','Select path to session contai
 % Initialize waves array
 waves = {};
 
-if all
+if processAll
     % Find subfolders that start with "wave"
     waveSubfolders = dir(fullfile(session, 'wave*'));
     waveSubfolders = waveSubfolders([waveSubfolders.isdir]); 

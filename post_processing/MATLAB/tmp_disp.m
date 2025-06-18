@@ -8,7 +8,7 @@ addpath('functions/');
 
 %% Inputs
 
-default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
+default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib5_SIO';
 
 def_calib = 0;   % default calib (0) or select calib (1)
 BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1)
@@ -19,7 +19,7 @@ plys = 0;        % save .plys seperate in a 'ptCloud' directory?
 UniquenessThreshold = 5;       % only applied if specs
 
 % Applied to BM only
-DisparityRange = [0 64];       % only applied if specs
+DisparityRange = [0 128];       % only applied if specs
 BlockSize = 15;                % only applied if specs
 ContrastThreshold = 0.25;      % only applied if specs
 DistanceThreshold = 20;        % only applied if specs
@@ -141,9 +141,9 @@ for m = 1:length(paths)
         else
             %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
             if specs
-                disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'UniquenessThreshold', UniquenessThreshold); 
+                disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'UniquenessThreshold', UniquenessThreshold, 'DisparityRange', DisparityRange); 
             else
-                disparityMap = disparitySGM(frameLeftGray, frameRightGray); % default semi-global matching
+                disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', DisparityRange); % default semi-global matching
             end
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
