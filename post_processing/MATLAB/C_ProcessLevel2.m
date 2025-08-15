@@ -15,7 +15,7 @@ processAll = 0;
 origin = [32.866277163888888, -117.2542791472222]; % SIO
 
 % Rotate wave field?
-rotate = 0;
+rotate = 1;
 theta_deg = 50; % rotation angle CCW
 x_offset = 0;   % translate x
 y_offset = 0;   % translate y

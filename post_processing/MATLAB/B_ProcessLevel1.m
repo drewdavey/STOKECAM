@@ -12,14 +12,14 @@ addpath('functions/');
 processAll = 0;
 
 % Set disparity range [20 200], but diff < 128 and divisible by 8
-DisparityRange = [0 128];
+disparityRange = [0 64];
 
 % Manually clean ptClouds
 % else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
 manual_clean = 1;
 
 % Bounds for trimBounds [xmin xmax ymin ymax zmin zmax] (meters)
-bounds = [-10 10 -10 10 0 30];
+bounds = [-10 10 -10 10 0 50];
 
 % Image regions for RGB and HSV thresholding
 topFraction = 0.25;
@@ -34,7 +34,7 @@ figs = 0;
 res = 600; % Figure resolution
 
 % Define calibration path
-calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib5_SIO';
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
 load([calib_path '/calib.mat']); 
 
 %% Process Level 1
@@ -63,7 +63,7 @@ if processAll
         fprintf('No wave subfolders found in %s\n', session);
         return;
     end
-    
+
     % Loop over each matching entry
     for i = 1:numel(waveSubfolders)
         if waveSubfolders(i).isdir
@@ -77,6 +77,8 @@ else
     % Just process one wave
     waves{1} = uigetdir(session, 'Select a wave subfolder');
 end
+
+% waves{1} = '\\wsl.localhost\Ubuntu\home\drew\waveTracking\data\waveTest1';
 
 % Process each selected path
 for m = 1:length(waves)
@@ -133,8 +135,8 @@ for m = 1:length(waves)
         frameRightGray = im2gray(J2);
 
         %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
-        disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', DisparityRange); 
-        % disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', DisparityRange, 'UniquenessThreshold', 5); 
+        disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', disparityRange); 
+        % disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', disparityRange, 'UniquenessThreshold', 5); 
     
         % Extract timestamp and image number from selected file
         [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));

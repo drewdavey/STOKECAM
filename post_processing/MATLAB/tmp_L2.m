@@ -13,14 +13,14 @@ all = 0;
 
 % Rotate wave field?
 rotate = 0;
-theta_deg = 30; % CCW
+theta_deg = -10; % CCW
 
 % Brighten point colors?
-brighten = 1;
-brightenFactor = 2;
+brighten = 0;
+brightenFactor = 0.75;
 
 % Denoise ptClouds?
-denoise = 0;
+denoise = 1;
 
 % Downsample ptClouds?
 downsample = 0;
@@ -54,7 +54,7 @@ for i = 1:length(L2matFilenames)
 
     load(fullfile(L2Dir, L2matFilenames{i}));
 
-    % points3D = [points3D(:,1), -points3D(:,2), points3D(:,3)];
+    points3D = [points3D(:,1), points3D(:,2)+200, points3D(:,3)];
 
     if rotate
             theta_rad = deg2rad(theta_deg); % Convert degrees to radians

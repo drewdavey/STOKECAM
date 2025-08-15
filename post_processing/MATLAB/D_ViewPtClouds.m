@@ -12,6 +12,7 @@ addpath('functions/');
 animate = 0;
 
 wave = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to wave'); % load path to wave
+% wave = '\\wsl.localhost\Ubuntu\home\drew\waveTracking\data\waveTest1';
 
 L1 = 0; L2 = 0; L3 = 0;
 answer = questdlg('Select level of post-processing', ...
