@@ -34,7 +34,7 @@ figs = 0;
 res = 600; % Figure resolution
 
 % Define calibration path
-calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib4_SIO';
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib7_SIO';
 load([calib_path '/calib.mat']); 
 
 %% Process Level 1
@@ -103,11 +103,10 @@ for m = 1:length(waves)
     end
 
     %%% Parse Vectornav data %%%
-    imu = parse_imu(session, wave); % Parse imu data into struct
+    imu = load(fullfile(wave, 'imu.mat')); % Get imu struct
     if figs
         basicQCplots(imu, figDir, res); % Plot basic QC figs
     end
-    save(fullfile(wave, 'imu.mat'), 'imu'); % Save VN-200 data to L1
     close all; % Close QC figs
 
     %%% Rectify images %%%
@@ -134,8 +133,12 @@ for m = 1:length(waves)
         frameLeftGray  = im2gray(J1);
         frameRightGray = im2gray(J2);
 
+        % Adaptive histogram equalization
+        frameLeftGray = adapthisteq(frameLeftGray);
+        frameRightGray = adapthisteq(frameRightGray);
+
         %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
-        disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', disparityRange); 
+        disparityMap = disparitySGM(frameLeftGray, frameRightGray); 
         % disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', disparityRange, 'UniquenessThreshold', 5); 
     
         % Extract timestamp and image number from selected file

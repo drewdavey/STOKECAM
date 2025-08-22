@@ -12,14 +12,16 @@ squareSize = 45;  % in units of 'millimeters'
 
 focalLength = 6; % mm
 
-sx = 1080; % x pixels
-sy = 1440; % y pixels
+pixelSize = 0.00345; % mm
+
+sx = 1440; % x pixels
+sy = 1080; % y pixels
 
 cx = sx / 2; % optical center
 cy = sy / 2;
 
-fx = focalLength * sx;
-fy = focalLength * sy;
+fx = focalLength / pixelSize;
+fy = focalLength / pixelSize;
 
 s = 0;
 
@@ -27,7 +29,7 @@ InitialK = [fx s cx; 0 fy cy; 0 0 1];
 
 %% Filepath
 
-calib_path = uigetdir('../../','Select path to calibration session'); % load path to calibration session
+calib_path = uigetdir('../../../FSR/stereo_cam/DATA','Select path to calibration session'); % load path to calibration session
 
 dir1 = dir([calib_path '/cam0/*.jpg']); 
 dir2 = dir([calib_path '/cam1/*.jpg']); 
@@ -76,3 +78,34 @@ displayErrors(estimationErrors, stereoParams);
 save([calib_path '/full_calibration.mat']);
 clearvars -except stereoParams calib_path %h1 h2 % comment h1/h2 if you don't want figs to pop up
 save([calib_path '/calib.mat']);
+
+%% Convert MATLAB to OpenCV format
+% --- Intrinsics (MATLAB IntrinsicMatrix is transposed vs OpenCV) ---
+K0 = stereoParams.CameraParameters1.K; % [fx 0 cx; 0 fy cy; 0 0 1]
+K1 = stereoParams.CameraParameters2.K;
+
+% --- Distortion to OpenCV order: [k1 k2 p1 p2 k3] ---
+rd1 = stereoParams.CameraParameters1.RadialDistortion;     % [k1 k2 (k3)]
+td1 = stereoParams.CameraParameters1.TangentialDistortion; % [p1 p2]
+k3_1 = 0; if numel(rd1) >= 3, k3_1 = rd1(3); end
+D0 = [rd1(1) rd1(2) td1(1) td1(2) k3_1];
+
+rd2 = stereoParams.CameraParameters2.RadialDistortion;
+td2 = stereoParams.CameraParameters2.TangentialDistortion;
+k3_2 = 0; if numel(rd2) >= 3, k3_2 = rd2(3); end
+D1 = [rd2(1) rd2(2) td2(1) td2(2) k3_2];
+
+% --- Extrinsics of cam2 w.r.t. cam1 ---
+R = stereoParams.PoseCamera2.Rotation;           % 3x3
+T = stereoParams.PoseCamera2.Translation(:);       % 3x1 
+
+% --- Image size as [W H] for OpenCV ---
+sz = stereoParams.CameraParameters1.ImageSize; % [H W]
+image_size = [sz(2) sz(1)];
+
+% --- Pack and write JSON ---
+calib = struct('K0',K0,'D0',D0,'K1',K1,'D1',D1,'R',R,'T',T,'image_size',image_size);
+txt   = jsonencode(calib, 'PrettyPrint', true);
+outf = fullfile(calib_path, 'calib.json');
+fid  = fopen(outf, 'w'); assert(fid>0, 'Cannot open file for write.');
+fwrite(fid, txt, 'char'); fclose(fid);

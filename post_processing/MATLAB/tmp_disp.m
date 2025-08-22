@@ -8,7 +8,7 @@ addpath('functions/');
 
 %% Inputs
 
-default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib6_SIO';
+default_calib = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib7_SIO';
 
 def_calib = 0;   % default calib (0) or select calib (1)
 BM_SGBM = 0;     % default semi-global block matching? (0) use block matching? (1)
@@ -143,7 +143,7 @@ for m = 1:length(paths)
             if specs
                 disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'UniquenessThreshold', UniquenessThreshold, 'DisparityRange', DisparityRange); 
             else
-                disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', DisparityRange); % default semi-global matching
+                disparityMap = disparitySGM(frameLeftGray, frameRightGray); % default semi-global matching
             end
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     

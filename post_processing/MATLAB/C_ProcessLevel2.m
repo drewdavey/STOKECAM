@@ -15,7 +15,7 @@ processAll = 0;
 origin = [32.866277163888888, -117.2542791472222]; % SIO
 
 % Rotate wave field?
-rotate = 1;
+rotate = 0;
 theta_deg = 50; % rotation angle CCW
 x_offset = 0;   % translate x
 y_offset = 0;   % translate y
@@ -32,7 +32,7 @@ downsample = 0;
 randPerc = 0.5; % randomly downsample 50%
 
 % Generate QC figs?
-figs = 1;
+figs = 0;
 res = 600; % Figure resolution
 
 g = 9.81;     % gravity

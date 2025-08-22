@@ -6,3 +6,13 @@ post_processing/Python/old/
 docs/old/
 run_cam/__pycache__/
 post_processing/MATLAB/quat_demo.m
+post_processing/Python/EnhancementCompare.ipynb
+post_processing/Python/fieldscale.py
+post_processing/MATLAB/tmp_disp.m
+post_processing/MATLAB/tmp_L2.m
+post_processing/Python/OpenCV_demo1.py
+post_processing/Python/OpenCV_demo2.py
+post_processing/Python/viewCalibParams.py
+post_processing/Python/__pycache__/fieldscale.cpython-312.pyc
+post_processing/Python/__pycache__/fieldscale.cpython-313.pyc
+post_processing/Python/__pycache__/utils.cpython-313.pyc
