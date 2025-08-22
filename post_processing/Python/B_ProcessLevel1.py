@@ -201,7 +201,7 @@ def main():
             low_tex_sky = np.zeros_like(gL, dtype=bool)
 
         keep_mask = texture_mask & (~low_tex_sky)
-        # set masked to just-below min_d (so colorizer maps to low end)
+        # set masked to just-below min_d so colorizer maps to low end
         disp_px = np.where(keep_mask, disp_px, min_d - 1.0)
 
         # ---------- Save disparity (color preview) ----------
@@ -220,7 +220,7 @@ def main():
             valid  = np.isfinite(disp_px) & (disp_px > min_d) & (disp_px < max_d)
             colors = cv2.cvtColor(rL, cv2.COLOR_BGR2RGB)
 
-            # Crop to XYZ bounds if requested — inline, no function call
+            # Crop to XYZ bounds if requested
             if use_xyz_bounds:
                 xmin, xmax = xyz_bounds_x
                 ymin, ymax = xyz_bounds_y

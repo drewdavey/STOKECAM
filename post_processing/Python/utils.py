@@ -192,9 +192,7 @@ def build_sgbm(cfg):
     return matcher, min_d, num_disp
 
 def colorize_disparity(disp16):
-    # Input: raw SGBM output (fixed-point: *16). Convert to float disparity and colorize.
     disp = disp16.astype(np.float32) / 16.0
-    # Normalize for color map visualization (ignore invalids)
     valid = disp > 0
     if np.any(valid):
         dmin = np.percentile(disp[valid], 1.0)
