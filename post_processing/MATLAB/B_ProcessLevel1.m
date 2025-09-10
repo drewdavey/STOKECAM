@@ -19,7 +19,7 @@ disparityRange = [0 64];
 manual_clean = 1;
 
 % Bounds for trimBounds [xmin xmax ymin ymax zmin zmax] (meters)
-bounds = [-10 10 -10 10 0 50];
+bounds = [-20 20 -20 20 0 50];
 
 % Image regions for RGB and HSV thresholding
 topFraction = 0.25;
@@ -34,7 +34,7 @@ figs = 0;
 res = 600; % Figure resolution
 
 % Define calibration path
-calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib7_SIO';
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib8_SIO';
 load([calib_path '/calib.mat']); 
 
 %% Process Level 1

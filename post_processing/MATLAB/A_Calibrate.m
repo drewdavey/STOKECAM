@@ -103,8 +103,11 @@ T = stereoParams.PoseCamera2.Translation(:);       % 3x1
 sz = stereoParams.CameraParameters1.ImageSize; % [H W]
 image_size = [sz(2) sz(1)];
 
+% --- Mean reprojection error ---
+err_m = stereoParams.MeanReprojectionError;
+
 % --- Pack and write JSON ---
-calib = struct('K0',K0,'D0',D0,'K1',K1,'D1',D1,'R',R,'T',T,'image_size',image_size);
+calib = struct('K0',K0,'D0',D0,'K1',K1,'D1',D1,'R',R,'T',T,'image_size',image_size,'err_m',err_m);
 txt   = jsonencode(calib, 'PrettyPrint', true);
 outf = fullfile(calib_path, 'calib.json');
 fid  = fopen(outf, 'w'); assert(fid>0, 'Cannot open file for write.');

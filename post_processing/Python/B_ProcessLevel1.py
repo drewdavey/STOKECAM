@@ -1,28 +1,26 @@
 """
-STOKECAM Post-Processing
+STOKECAM Post-Processing Level 1
 Drew Davey
 Last updated: 2025-08-21
 
 Processes stereo image pairs for disparity & point cloud.
 """
 # =================== PACKAGES ===============================
-import os, sys
-from pathlib import Path
-import numpy as np
 import cv2
+import os, sys
+import numpy as np
 from utils import *
-
-try:
-    import cv2.ximgproc as xip
-except Exception:
-    xip = None  # WLS unavailable if contrib not installed
+from pathlib import Path
+import cv2.ximgproc as xip
 
 # ======================= INPUTS ============================
-calib   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/calibrations/calib7_SIO"
+calib   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/calibrations/calib4_SIO"
 # wave    = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250814/141908_session_bright/wave1"
-# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250429/003014_session_auto/wave6"
+wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250429/003014_session_auto/wave6"
 # wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/testing/static/staticStairs/wave1"
-wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250814/141908_session_bright/wave4"
+# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250814/141908_session_bright/wave6"
+# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250813/222744_session_auto/wave1"
+# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/pres_reports/paper1/data/wave5"
 
 # ---- Use Matlab or Python calib ----
 # calib_choice = "matlab"
@@ -46,7 +44,7 @@ sgbm_speckle_window  = 120
 sgbm_speckle_range   = 2
 sgbm_disp12_maxdiff  = 1
 sgbm_prefilter_cap   = 31
-sgbm_mode            = "SGBM"  # "SGBM", "SGBM_3WAY", "HH", "HH4"
+sgbm_mode            = "HH"  # "SGBM", "SGBM_3WAY", "HH", "HH4"
 sgbm_P1              = 8 * 3 * (5 ** 2)  # OpenCV format
 sgbm_P2              = 48 * 3 * (5 ** 2)
 # sgbm_P1              = 15  # Copying MATLAB
@@ -64,13 +62,13 @@ wls_sigma  = 0.8           # 0.8–1.5 typical
 # ---- Outputs ----
 write_ptcloud   = True
 use_xyz_bounds  = True
-xyz_bounds_x    = (-10, 10)   # keep xmin <= X <= xmax
-xyz_bounds_y    = (-10, 10)   # keep ymin <= Y <= ymax
-xyz_bounds_z    = (1, 20)     # keep zmin <= Z <= zmax
+xyz_bounds_x    = (-20, 20)   # keep xmin <= X <= xmax
+xyz_bounds_y    = (-20, 20)   # keep ymin <= Y <= ymax
+xyz_bounds_z    = (1, 30)     # keep zmin <= Z <= zmax
 
 # ------------------------------- Main ----------------------------------
 def main():
-    # ---------- Inputs / minimal validation ----------
+    # ---------- Inputs ----------
     calib_path = calib or pick_file_gui()
     wave_path  = wave  or pick_dir_gui()
 
@@ -82,7 +80,7 @@ def main():
         sys.exit("wave must contain cam0/ and cam1/ subfolders.")
 
     # ---------- Load calibration ----------
-    K0, D0, K1, D1, R, T, image_size = load_calibration(calib_path, choice=calib_choice)
+    K0, D0, K1, D1, R, T, image_size, err_m = load_calibration(calib_path, choice=calib_choice)
 
     # ---------- Collect pairs ----------
     cam0_list = sorted_images(os.path.join(wave_path, "cam0"))
@@ -182,43 +180,46 @@ def main():
         else:
             disp_16 = dispL_16
 
-        # float disparity in px
+        # Convert to float disparity in px
         disp_px = disp_16.astype(np.float32) / 16.0
 
         # ---------- Optional texture / sky suppression ----------
         if use_texture_mask:
-            gx = cv2.Sobel(gL, cv2.CV_16S, 1, 0, ksize=3)
-            gy = cv2.Sobel(gL, cv2.CV_16S, 0, 1, ksize=3)
-            mag = cv2.convertScaleAbs((np.abs(gx) + np.abs(gy)) // 2)
-            texture_mask = (mag > 10)
+            gx = cv2.Sobel(gL, cv2.CV_32F, 1, 0, ksize=3)
+            gy = cv2.Sobel(gL, cv2.CV_32F, 0, 1, ksize=3)
+            mag = cv2.magnitude(gx, gy)
+            thr = max(10.0, float(np.percentile(mag, 75)))  # robust vs scenes
+            texture_mask = (mag > thr)
         else:
             texture_mask = np.ones_like(gL, dtype=bool)
-
         if use_sky_suppress:
-            hsv = cv2.cvtColor(cv2.cvtColor(gL, cv2.COLOR_GRAY2BGR), cv2.COLOR_BGR2HSV)
-            low_tex_sky = (hsv[..., 1] < 38) & (hsv[..., 2] > 153)  # ~S<0.15, V>0.6
+            hsv = cv2.cvtColor(rL, cv2.COLOR_BGR2HSV)       # use color, not gray->HSV
+            low_tex_sky = (hsv[...,1] < 38) & (hsv[...,2] > 153)  # S<~0.15, V>~0.6 (0–255 scale)
         else:
             low_tex_sky = np.zeros_like(gL, dtype=bool)
-
         keep_mask = texture_mask & (~low_tex_sky)
-        # set masked to just-below min_d so colorizer maps to low end
-        disp_px = np.where(keep_mask, disp_px, min_d - 1.0)
 
-        # ---------- Save disparity (color preview) ----------
+        # set masked to just-below min_d so colorizer maps to low end
+        disp_color = np.where(keep_mask, disp_px, min_d - 1.0)
+
+        # ---------- Save disparity (color) ----------
         stem = strip_leading_cam_prefix(Path(fL).stem)
-        out_dispc  = os.path.join(out_dir, f"{stem}_color.png")
-        cv2.imwrite(out_dispc, colorize_disparity(disp_px))
+        out_dispc = os.path.join(out_dir, f"{stem}_color.png")
+        cv2.imwrite(out_dispc, colorize_disparity(disp_color))
 
         # ---------- Optional point cloud ----------
         if write_ptcloud:
+            # Disparity in pixels
+            disp = disp_px
+
             # Reproject to 3D (XYZ in rectified left camera frame)
-            disp_for_3d = np.nan_to_num(disp_px, nan=0.0)
-            points3D = cv2.reprojectImageTo3D(disp_for_3d, Q)
+            points3D = cv2.reprojectImageTo3D(disp, Q)
             points3D = points3D / 1000.0 # convert mm to meters
+            colors = cv2.cvtColor(rL, cv2.COLOR_BGR2RGB)
 
             # Keep finite and plausible disparities
-            valid  = np.isfinite(disp_px) & (disp_px > min_d) & (disp_px < max_d)
-            colors = cv2.cvtColor(rL, cv2.COLOR_BGR2RGB)
+            valid = np.isfinite(disp) & (disp > 0)
+            valid &= np.isfinite(points3D).all(axis=2)
 
             # Crop to XYZ bounds if requested
             if use_xyz_bounds:

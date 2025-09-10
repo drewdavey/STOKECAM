@@ -8,11 +8,12 @@ Utilities for calibration and stereo rectification.
 
 # =================== PACKAGES ===============================
 import os
+import cv2
 import glob
 import math
 import json
 import numpy as np
-import cv2
+from pyproj import CRS, Transformer
 
 # ------------------------------ Utilities ------------------------------
 def pick_file_gui(title="Select calib .npz", filetypes=(("NPZ files","*.npz"), ("All","*.*"))):
@@ -52,6 +53,18 @@ def load_pairs(calib_path):
         raise FileNotFoundError("No images found in cam0/ or cam1/ under: " + calib_path)
     n = min(len(cam0), len(cam1))
     return cam0[:n], cam1[:n]
+
+def brighten(img, value=30):
+    # Convert to int16 to avoid overflow/underflow
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.int16)
+    
+    # Increase only V (value) channel
+    hsv[..., 2] = np.clip(hsv[..., 2] + value, 0, 255)
+    
+    # Convert back
+    hsv = hsv.astype(np.uint8)
+    brightened = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    return brightened
 
 def detect_points_on_pair(img0, img1, pattern, use_sb=True):
     cols, rows = pattern
@@ -121,6 +134,7 @@ def load_calibration(calib_path, choice="python"):
         R  = np.array(data["R"])
         T  = np.array(data["T"])
         image_size = tuple(data["image_size"])
+        err_m = data["err_m"]
     elif choice.lower() == "python":
         npz_path = os.path.join(calib_path, "calib.npz")
         data = np.load(npz_path)
@@ -130,17 +144,17 @@ def load_calibration(calib_path, choice="python"):
         D1 = data["D1"]
         R  = data["R"]
         T  = data["T"]
+        err_m = float(data.get("stereo_rms", -1.0))  # may not be present
         image_size = tuple(map(int, data["image_size"]))
     else:
         raise ValueError("choice must be 'matlab' or 'python'")
 
-    return K0, D0, K1, D1, R, T, image_size
+    return K0, D0, K1, D1, R, T, image_size, err_m
 
 def stereo_rectify_maps(K0, D0, K1, D1, R, T, image_size, crop_valid=True):
     # alpha=0 for valid region (like MATLAB OutputView='valid')
     R1, R2, P1, P2, Q, roi1, roi2 = cv2.stereoRectify(
-        K0, D0, K1, D1, image_size, R, T, flags=cv2.CALIB_ZERO_DISPARITY, alpha=0
-    )
+        K0, D0, K1, D1, image_size, R, T, flags=cv2.CALIB_ZERO_DISPARITY, alpha=0)
     map10, map11 = cv2.initUndistortRectifyMap(K0, D0, R1, P1, image_size, cv2.CV_32FC1)
     map20, map21 = cv2.initUndistortRectifyMap(K1, D1, R2, P2, image_size, cv2.CV_32FC1)
 
@@ -191,8 +205,8 @@ def build_sgbm(cfg):
     )
     return matcher, min_d, num_disp
 
-def colorize_disparity(disp16):
-    disp = disp16.astype(np.float32) / 16.0
+def colorize_disparity(disp):
+    # disp = disp16.astype(np.float32) / 16.0   # already do this in main
     valid = disp > 0
     if np.any(valid):
         dmin = np.percentile(disp[valid], 1.0)
@@ -283,3 +297,58 @@ def select_points_via_polygon(
     sel_colors = colors[final_mask]
 
     return sel_points, sel_colors, final_mask
+
+def load_disparity_map(path):
+    """Load a colorized disparity map as grayscale float."""
+    disp_color = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+    if disp_color is None:
+        raise FileNotFoundError(f"Disparity map not found: {path}")
+    # If color, convert to grayscale
+    if disp_color.ndim == 3:
+        disp_gray = cv2.cvtColor(disp_color, cv2.COLOR_BGR2GRAY)
+    else:
+        disp_gray = disp_color
+    return disp_gray.astype(np.float32)
+
+def load_point_cloud_ply(ply_path):
+    """Load a PLY point cloud using Open3D."""
+    pcd = o3d.io.read_point_cloud(str(ply_path))
+    return pcd
+
+def quat2rotm(q):
+    """Convert quaternion [w, x, y, z] to 3x3 rotation matrix."""
+    w, x, y, z = q
+    return np.array([
+        [1-2*(y**2+z**2), 2*(x*y-z*w),   2*(x*z+y*w)],
+        [2*(x*y+z*w),     1-2*(x**2+z**2), 2*(y*z-x*w)],
+        [2*(x*z-y*w),     2*(y*z+x*w),   1-2*(x**2+y**2)]
+    ])
+
+def lla2ned(lla, lla0):
+    """
+    Convert LLA to NED coordinates relative to lla0.
+    lla, lla0: [lat, lon, alt] in degrees/meters
+    Returns NED in meters.
+    """
+    # WGS84
+    crs_geodetic = CRS.from_epsg(4979)  # WGS84 3D
+    crs_ecef = CRS.from_epsg(4978)
+    transformer = Transformer.from_crs(crs_geodetic, crs_ecef, always_xy=True)
+    # Convert to ECEF
+    x, y, z = transformer.transform(lla[:,1], lla[:,0], lla[:,2])
+    x0, y0, z0 = transformer.transform(lla0[1], lla0[0], lla0[2])
+    # Compute delta
+    dx = x - x0
+    dy = y - y0
+    dz = z - z0
+    # Reference lat/lon in radians
+    phi = np.deg2rad(lla0[0])
+    lam = np.deg2rad(lla0[1])
+    # Rotation matrix ECEF to NED
+    R = np.array([
+        [-np.sin(phi)*np.cos(lam), -np.sin(phi)*np.sin(lam),  np.cos(phi)],
+        [-np.sin(lam),              np.cos(lam),             0],
+        [-np.cos(phi)*np.cos(lam), -np.cos(phi)*np.sin(lam), -np.sin(phi)]
+    ])
+    ned = np.dot(np.stack([dx, dy, dz], axis=1), R.T)
+    return ned

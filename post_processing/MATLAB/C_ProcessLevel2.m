@@ -12,11 +12,13 @@ addpath('functions/');
 processAll = 0;
 
 % Input origin [lat, lon]. Defaults to local origin if none specified.
-origin = [32.866277163888888, -117.2542791472222]; % SIO
+% origin = [32.866277163888888, -117.2542791472222]; % SIO
+% origin = [33.219778, -117.406497]; % DMJs
+origin = [32.836786, -117.281222]; % Marine St.
 
 % Rotate wave field?
 rotate = 0;
-theta_deg = 50; % rotation angle CCW
+theta_deg = -70; % rotation angle CCW
 x_offset = 0;   % translate x
 y_offset = 0;   % translate y
 
@@ -128,7 +130,7 @@ for m = 1:length(waves)
         qy = imu.quatY(i);
         qz = imu.quatZ(i);
         qw = imu.quatW(i);
-        rotationMatrices(:, :, i) = quat2rotm([qw, qx, qy, qz]);
+        rotationMatrices(:, :, i) = quat2rotm([qw qx qy qz]);
     end
     
     %%% Rotate and translate into NED coordinate system
@@ -160,8 +162,13 @@ for m = 1:length(waves)
         end
         %%%%%%%%%%%%%%%%%%%%%% Rotation matrix %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         R = rotationMatrices(:, :, i);
+        % R = R.';
 
-        xyz_NED = (R * xyz_imu')'; % Rotate and transpose
+        % % R_bn = quat2rotm([qw qx qy qz]);   % nav->body
+        % % R_nb = R_bn.';                      % body->nav
+        % % xyz_NED = (R_nb * xyz_imu.').';     % use R_nb, not R_bn
+
+        xyz_NED = (R * xyz_imu.').'; % Rotate and transpose
 
         if figs
             f3 = figure(3); hold on; axis equal; grid on; axis tight;
@@ -186,10 +193,10 @@ for m = 1:length(waves)
         if figs
             f4 = figure(4); hold on; axis equal; grid on; axis tight;
             title('World ENU reference frame');
-            % scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3), 1);
+            scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3), 1);
             scatter3(xyz_ENU(:,1), xyz_ENU(:,2), xyz_ENU(:,3),...
                     1, double(L1matData.colors) / 255, 'filled');
-            % xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('Z_{NAVD88} (m)');
+            xlabel('Easting (m)'); ylabel('Northing (m)'); zlabel('Z_{NAVD88} (m)');
             xlabel('X_{SIO} (m)'); ylabel('Y_{SIO} (m)'); zlabel('Z_{NAVD88} (m)');
         end
 
@@ -252,11 +259,3 @@ for m = 1:length(waves)
     genL3ptCloud(wave);
 
 end
-
-
-
-
-
-
-
-

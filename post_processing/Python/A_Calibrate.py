@@ -13,7 +13,7 @@ from utils import *
 
 # ======================= DEFAULT INPUT PARAMETERS  =====================
 INPUTS = {
-    "calib_path"      : "C:\\Users\\drew\\OneDrive - UC San Diego\\FSR\\stereo_cam\\DATA\\calibrations\\calib7_SIO",       # Leave empty to get a GUI folder picker
+    "calib_path"      : "C:\\Users\\drew\\OneDrive - UC San Diego\\FSR\\stereo_cam\\DATA\\calibrations\\calib8_SIO",       # Leave empty to get a GUI folder picker
     "square_size_mm"  : 45.0,     # Size of a checkerboard square (mm)
     "focal_length_mm" : 6.0,      # Lens focal length (mm)
     "pixel_pitch_um"  : 3.45,   # Sony IMX296 pixel pitch (micrometers)
@@ -59,6 +59,8 @@ def main():
     for i in range(n_pairs):
         im0 = cv2.imread(cam0_files[i], cv2.IMREAD_COLOR)
         im1 = cv2.imread(cam1_files[i], cv2.IMREAD_COLOR)
+        # im0 = brighten(im0, value=50)
+        # im1 = brighten(im1, value=50)
         if im0 is None or im1 is None:
             continue
         f0, c0, f1, c1, sz = detect_points_on_pair(im0, im1, pattern, use_sb=use_sb)
@@ -194,6 +196,10 @@ def main():
     report_lines.append(f"Calib folder: {save_dir}")
     report_lines.append(f"Image size (w,h): {image_size[0]} x {image_size[1]}")
     report_lines.append("")
+    report_lines.append(f"Found {len(cam0_files)} image pairs.")
+    report_lines.append(f"Checkerboard inner-corner pattern: {cols} x {rows}")
+    report_lines.append(f"Usable stereo pairs with detected corners: {len(objpoints)} / {n_pairs}")
+    report_lines.append("")
 
     # Theory
     fx_t, fy_t, cx_t, cy_t, s_t = _fx_fy_cx_cy_s(K_theory)
@@ -203,7 +209,7 @@ def main():
     report_lines.append(f"Baseline={b_theory:.6f} mm, Rotation angle=0.000000 deg")
     report_lines.append("")
 
-    # Python (this run)
+    # Python 
     fx0_p, fy0_p, cx0_p, cy0_p, s0_p = _fx_fy_cx_cy_s(K0s)
     fx1_p, fy1_p, cx1_p, cy1_p, s1_p = _fx_fy_cx_cy_s(K1s)
     b_python = _baseline_mm(T)
@@ -222,12 +228,13 @@ def main():
                         f"skew={s1_p:.6f}")
     report_lines.append(f"[extr] Baseline={b_python:.6f} mm (Δ vs th={b_python - b_theory:+.6f} mm), "
                         f"Rotation angle={ang_python:.9f} deg")
+    report_lines.append(f"Mono RMS reprojection error: cam0={rms0:.4f}, cam1={rms1:.4f}")
     report_lines.append(f"Stereo RMS reprojection error: {stereo_rms:.9f}")
     report_lines.append("")
 
-    # MATLAB (if present)
+    # MATLAB
     if has_matlab:
-        K0_m, D0_m, K1_m, D1_m, R_m, T_m, img_sz_m = load_calibration(save_dir, choice="matlab")
+        K0_m, D0_m, K1_m, D1_m, R_m, T_m, img_sz_m, err_m = load_calibration(save_dir, choice="matlab")
         fx0_m, fy0_m, cx0_m, cy0_m, s0_m = _fx_fy_cx_cy_s(K0_m)
         fx1_m, fy1_m, cx1_m, cy1_m, s1_m = _fx_fy_cx_cy_s(K1_m)
 
@@ -247,6 +254,7 @@ def main():
                             f"skew={s1_m:.6f}")
         report_lines.append(f"[extr] Baseline={b_matlab:.6f} mm (Δ vs th={b_matlab - b_theory:+.6f} mm), "
                             f"Rotation angle={ang_matlab:.9f} deg")
+        report_lines.append(f"Stereo RMS reprojection error: {err_m:.9f}")
         report_lines.append("")
 
         # Direct PY vs MAT diffs
@@ -259,6 +267,7 @@ def main():
                             f"Δskew={s1_p - s1_m:+.6f}")
         report_lines.append(f"[extr] ΔBaseline={b_python - b_matlab:+.6f} mm, "
                             f"ΔRotation angle={ang_python - ang_matlab:+.9f} deg")
+        report_lines.append(f"[stereo] ΔRMS error={stereo_rms - err_m:+.9f}")
         report_lines.append("")
     else:
         report_lines.append("MATLAB calib.json not found in this folder; skipped MATLAB comparison.")
