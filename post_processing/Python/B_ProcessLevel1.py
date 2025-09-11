@@ -5,7 +5,7 @@ Last updated: 2025-08-21
 
 Processes stereo image pairs for disparity & point cloud.
 """
-# =================== PACKAGES ===============================
+
 import cv2
 import os, sys
 import numpy as np
