@@ -14,13 +14,10 @@ from pathlib import Path
 import cv2.ximgproc as xip
 
 # ======================= INPUTS ============================
-calib   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/calibrations/calib4_SIO"
+calib   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/calibrations/calib_f8"
 # wave    = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250814/141908_session_bright/wave1"
-wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250429/003014_session_auto/wave6"
-# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/testing/static/staticStairs/wave1"
-# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250814/141908_session_bright/wave6"
-# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250813/222744_session_auto/wave1"
-# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/pres_reports/paper1/data/wave5"
+# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250911/212909_session_bright"
+wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250911/212909_session_bright_f8/wave1"
 
 # ---- Use Matlab or Python calib ----
 # calib_choice = "matlab"
@@ -38,7 +35,7 @@ clahe_tiles   = (5, 5)
 # ---- Disparity (StereoSGBM) ----
 sgbm_min_disparity   = 0      # inclusive
 sgbm_num_disparities = 64    # multiple of 16
-sgbm_block_size      = 3      # odd, >=3
+sgbm_block_size      = 7      # odd, >=3
 sgbm_uniqueness      = 15
 sgbm_speckle_window  = 120
 sgbm_speckle_range   = 2
@@ -61,6 +58,7 @@ wls_sigma  = 0.8           # 0.8–1.5 typical
 
 # ---- Outputs ----
 write_ptcloud   = True
+
 use_xyz_bounds  = True
 xyz_bounds_x    = (-20, 20)   # keep xmin <= X <= xmax
 xyz_bounds_y    = (-20, 20)   # keep ymin <= Y <= ymax
@@ -70,7 +68,7 @@ xyz_bounds_z    = (1, 30)     # keep zmin <= Z <= zmax
 def main():
     # ---------- Inputs ----------
     calib_path = calib or pick_file_gui()
-    wave_path  = wave  or pick_dir_gui()
+    wave_path  = wave or pick_dir_gui()
 
     if not calib_path or not wave_path:
         sys.exit("Missing calib or wave (empty and GUI canceled).")

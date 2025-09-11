@@ -74,6 +74,34 @@ h2=figure; showExtrinsics(stereoParams, 'CameraCentric');
 % Display parameter estimation errors
 displayErrors(estimationErrors, stereoParams);
 
+% %% Per‑image pair reprojection errors (in pixels)
+% errs = stereoParams.ReprojectionErrors;   % M x 2 x N x 2  (points, xy, imageIdx, camIdx)
+% 
+% fprintf('\nPer-image pair reprojection RMS errors (pixels):\n');
+% fprintf('Idx  Used  RMS_pair  RMS_cam0  RMS_cam1  cam0_filename                       cam1_filename\n');
+% fprintf('---  ----  --------  --------  --------  -----------------------------------  -----------------------------------\n');
+% 
+% numPairs = size(errs,3);
+% for i = 1:numPairs
+%     used = pairsUsed(i);
+%     if used
+%         e1 = errs(:,:,i,1);          % cam0 errors (Nx2)
+%         e2 = errs(:,:,i,2);          % cam1 errors (Nx2)
+%         % Remove rows with NaNs (undetected points)
+%         e1 = e1(all(isfinite(e1),2),:);
+%         e2 = e2(all(isfinite(e2),2),:);
+%         rms1 = sqrt(mean(sum(e1.^2,2)));
+%         rms2 = sqrt(mean(sum(e2.^2,2)));
+%         both = [e1; e2];
+%         rmsPair = sqrt(mean(sum(both.^2,2)));
+%         fprintf('%3d  yes   %8.4f  %8.4f  %8.4f  %-35s %-35s\n', ...
+%             i, rmsPair, rms1, rms2, dir1(i).name, dir2(i).name);
+%     else
+%         fprintf('%3d  no    (-----)  (-----)  (-----)  %-35s %-35s\n', ...
+%             i, dir1(i).name, dir2(i).name);
+%     end
+% end
+
 %% Save mat
 save([calib_path '/full_calibration.mat']);
 clearvars -except stereoParams calib_path %h1 h2 % comment h1/h2 if you don't want figs to pop up

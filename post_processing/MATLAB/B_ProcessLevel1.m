@@ -16,7 +16,7 @@ disparityRange = [0 64];
 
 % Manually clean ptClouds
 % else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
-manual_clean = 1;
+manual_clean = 0;
 
 % Bounds for trimBounds [xmin xmax ymin ymax zmin zmax] (meters)
 bounds = [-20 20 -20 20 0 50];
@@ -34,7 +34,7 @@ figs = 0;
 res = 600; % Figure resolution
 
 % Define calibration path
-calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib8_SIO';
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib_f8';
 load([calib_path '/calib.mat']); 
 
 %% Process Level 1
@@ -184,14 +184,14 @@ for m = 1:length(waves)
             % Brush points
             [points3D, colors] = manualClean(points3D, colors);
         else
-            % Threshold foreground/background by HSV
-            [points3D, colors] = colorThreshHSV(points3D, colors, J1, ...
-                                          topFraction, bottomFraction, Nstd);
-            % Threshold foreground/background by RGB
-            [points3D, colors] = colorThreshRGB(points3D, colors, J1, ...
-                                          topFraction, bottomFraction, Nstd);
-            % Trim points >= Nstd from centroid
-            [points3D, colors] = refinedTrim(points3D, colors, Nstd2);
+            % % Threshold foreground/background by HSV
+            % [points3D, colors] = colorThreshHSV(points3D, colors, J1, ...
+            %                               topFraction, bottomFraction, Nstd);
+            % % Threshold foreground/background by RGB
+            % [points3D, colors] = colorThreshRGB(points3D, colors, J1, ...
+            %                               topFraction, bottomFraction, Nstd);
+            % % Trim points >= Nstd from centroid
+            % [points3D, colors] = refinedTrim(points3D, colors, Nstd2);
         end
 
         % Remove rows where any of the columns in points3D have NaNs
