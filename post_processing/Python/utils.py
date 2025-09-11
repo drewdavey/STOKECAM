@@ -14,6 +14,7 @@ import math
 import json
 import numpy as np
 from pyproj import CRS, Transformer
+import open3d as o3d
 
 # ------------------------------ Utilities ------------------------------
 def pick_file_gui(title="Select calib .npz", filetypes=(("NPZ files","*.npz"), ("All","*.*"))):
@@ -352,3 +353,24 @@ def lla2ned(lla, lla0):
     ])
     ned = np.dot(np.stack([dx, dy, dz], axis=1), R.T)
     return ned
+
+def genL3ptCloud(waveDir):
+    """
+    Concatenates all point clouds from L2 .ply files into a single .ply and saves as L3ptCloud.ply.
+    """
+    l2_dir = os.path.join(waveDir, 'L2')
+    ply_files = [f for f in os.listdir(l2_dir) if f.endswith('.ply')]
+    
+    if not ply_files:
+        raise FileNotFoundError(f"No .ply files found in {l2_dir}")
+    
+    # Load and concatenate
+    combined_pcd = o3d.geometry.PointCloud()
+    for ply_file in ply_files:
+        pcd = o3d.io.read_point_cloud(os.path.join(l2_dir, ply_file))
+        combined_pcd += pcd
+    
+    # Save
+    output_path = os.path.join(waveDir, 'L3ptCloud.ply')
+    o3d.io.write_point_cloud(output_path, combined_pcd)
+    print(f"Saved concatenated point cloud to {output_path}")

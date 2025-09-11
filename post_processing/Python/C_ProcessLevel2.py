@@ -105,6 +105,9 @@ def main(origin=None):
         output_path = os.path.join(l2_dir, ply_file)
         o3d.io.write_point_cloud(output_path, pcd)
         print(f"Processed and saved: {output_path}")
+        
+    # ---- Generate L3 concatenated ptCloud from all L2 ptClouds ----
+    genL3ptCloud(wave)
 
 if __name__ == "__main__":
     main(origin)
