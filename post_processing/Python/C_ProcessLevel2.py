@@ -22,7 +22,7 @@ wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250429/00301
 # wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250814/141908_session_bright/wave1"
 
 # ---- Geoid file (EGM2008 1' grid) ----
-geoid_file = "C:/Users/drew/OneDrive - UC San Diego/STOKECAM/post_processing/Python/GeographicLib/geoids/egm2008-1.pgm"
+geoid_file = "C:/ProgramData/GeographicLib/geoids/egm2008-1.pgm"
 
 # ---- Origin presets [lat, lon] ----
 # origin = None               # Uses local mean if None
