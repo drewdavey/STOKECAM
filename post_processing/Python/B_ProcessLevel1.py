@@ -56,7 +56,7 @@ wls_lambda = 2000.0        # 2000–12000 typical
 wls_sigma  = 0.8           # 0.8–1.5 typical
 
 # ---- Outputs ----
-write_ptcloud   = True
+write_ptcloud   = True 
 
 use_xyz_bounds  = True
 xyz_bounds_x    = (-20, 20)   # keep xmin <= X <= xmax
