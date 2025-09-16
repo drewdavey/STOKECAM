@@ -8,16 +8,15 @@ Processes stereo image pairs for disparity & point cloud.
 
 import cv2
 import os, sys
+import laspy
 import numpy as np
 from utils import *
 from pathlib import Path
 import cv2.ximgproc as xip
 
 # ======================= INPUTS ============================
-calib   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/calibrations/calib_f8"
-# wave    = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250814/141908_session_bright/wave1"
-# wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250911/212909_session_bright"
-wave   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250911/212909_session_bright_f8/wave1"
+calib   = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/calibrations/calib12_SIO_f8"
+wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250913/164253_session_bright/wave2"
 
 # ---- Use Matlab or Python calib ----
 # calib_choice = "matlab"
@@ -57,7 +56,7 @@ wls_lambda = 2000.0        # 2000–12000 typical
 wls_sigma  = 0.8           # 0.8–1.5 typical
 
 # ---- Outputs ----
-write_ptcloud   = True
+write_ptcloud   = True 
 
 use_xyz_bounds  = True
 xyz_bounds_x    = (-20, 20)   # keep xmin <= X <= xmax
@@ -138,8 +137,6 @@ def main():
 
     # ---------- Process frames ----------
     for i in range(n):
-    # for i in range(3, 5):
-    # for i in range(38, 41):
         fL = cam0_list[i]
         fR = cam1_list[i]
 
@@ -236,15 +233,20 @@ def main():
             points3D, colors, _ = select_points_via_polygon(
                 img_bgr=rL, points3D=points3D, colors=colors, base_mask=valid)
 
-            ply_path = os.path.join(l1_dir, f"{stem}.ply")
-            with open(ply_path, 'w') as ply:
-                ply.write("ply\nformat ascii 1.0\n")
-                ply.write(f"element vertex {len(points3D)}\n")
-                ply.write("property float x\nproperty float y\nproperty float z\n")
-                ply.write("property uchar red\nproperty uchar green\nproperty uchar blue\n")
-                ply.write("end_header\n")
-                for p, c in zip(points3D, colors):
-                    ply.write(f"{p[0]} {p[1]} {p[2]} {int(c[0])} {int(c[1])} {int(c[2])}\n")
+            # Create LAS file
+            las_path = os.path.join(l1_dir, f"{stem}.las")
+            header = laspy.LasHeader(point_format=3, version="1.4")  # Format 3 includes RGB
+            # header.add_extra_dim(laspy.ExtraBytesParams(name="dummy", type="uint8"))
+
+            las = laspy.LasData(header)
+            las.x = points3D[:, 0] # Northing
+            las.y = points3D[:, 1] # Easting
+            las.z = points3D[:, 2] # Elevation
+            las.red = colors[:, 0] * 257    # Scale 0-255 to 0-65535 (LAS uses 16-bit RGB)
+            las.green = colors[:, 1] * 257
+            las.blue = colors[:, 2] * 257
+
+            las.write(las_path)
 
         print(f"Processed {i+1}/{n}")
 

@@ -15,6 +15,7 @@ import json
 import numpy as np
 from pyproj import CRS, Transformer
 import open3d as o3d
+import laspy
 
 # ------------------------------ Utilities ------------------------------
 def pick_file_gui(title="Select calib .npz", filetypes=(("NPZ files","*.npz"), ("All","*.*"))):
@@ -356,21 +357,42 @@ def lla2ned(lla, lla0):
 
 def genL3ptCloud(waveDir):
     """
-    Concatenates all point clouds from L2 .ply files into a single .ply and saves as L3ptCloud.ply.
+    Concatenates all point clouds from L2 .las files into a single .las and saves as L3ptCloud.las.
     """
     l2_dir = os.path.join(waveDir, 'L2')
-    ply_files = [f for f in os.listdir(l2_dir) if f.endswith('.ply')]
+    las_files = [f for f in os.listdir(l2_dir) if f.endswith('.las')]
     
-    if not ply_files:
-        raise FileNotFoundError(f"No .ply files found in {l2_dir}")
+    if not las_files:
+        raise FileNotFoundError(f"No .las files found in {l2_dir}")
     
-    # Load and concatenate
-    combined_pcd = o3d.geometry.PointCloud()
-    for ply_file in ply_files:
-        pcd = o3d.io.read_point_cloud(os.path.join(l2_dir, ply_file))
-        combined_pcd += pcd
+    # Initialize lists to collect all points and colors
+    all_x, all_y, all_z = [], [], []
+    all_red, all_green, all_blue = [], [], []
+    
+    # Load and concatenate all LAS files
+    for las_file in las_files:
+        las_path = os.path.join(l2_dir, las_file)
+        las = laspy.read(las_path)
+        
+        all_x.extend(las.x)
+        all_y.extend(las.y)
+        all_z.extend(las.z)
+        all_red.extend(las.red)
+        all_green.extend(las.green)
+        all_blue.extend(las.blue)
+    
+    # Create new LAS file with all concatenated points
+    header = laspy.LasHeader(point_format=3, version="1.2")
+    combined_las = laspy.LasData(header)
+    
+    combined_las.x = np.array(all_x)
+    combined_las.y = np.array(all_y)
+    combined_las.z = np.array(all_z)
+    combined_las.red = np.array(all_red, dtype=np.uint16)
+    combined_las.green = np.array(all_green, dtype=np.uint16)
+    combined_las.blue = np.array(all_blue, dtype=np.uint16)
     
     # Save
-    output_path = os.path.join(waveDir, 'L3ptCloud.ply')
-    o3d.io.write_point_cloud(output_path, combined_pcd)
+    output_path = os.path.join(waveDir, 'L3ptCloud.las')
+    combined_las.write(output_path)
     print(f"Saved concatenated point cloud to {output_path}")

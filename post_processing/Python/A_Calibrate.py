@@ -13,7 +13,7 @@ from utils import *
 
 # ======================= DEFAULT INPUT PARAMETERS  =====================
 INPUTS = {
-    "calib_path"      : "C:\\Users\\drew\\OneDrive - UC San Diego\\FSR\\stereo_cam\\DATA\\calibrations\\calib_f8",       # Leave empty to get a GUI folder picker
+    "calib_path"      : "C:\\Users\\drew\\OneDrive - UC San Diego\\FSR\\stereo_cam\\DATA\\calibrations\\calib12_SIO_f8",       # Leave empty to get a GUI folder picker
     "square_size_mm"  : 45.0,     # Size of a checkerboard square (mm)
     "focal_length_mm" : 6.0,      # Lens focal length (mm)
     "pixel_pitch_um"  : 3.45,   # Sony IMX296 pixel pitch (micrometers)
