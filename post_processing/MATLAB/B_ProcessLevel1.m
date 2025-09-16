@@ -34,7 +34,7 @@ figs = 0;
 res = 600; % Figure resolution
 
 % Define calibration path
-calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib_f8';
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib12_SIO_f8';
 load([calib_path '/calib.mat']); 
 
 %% Process Level 1

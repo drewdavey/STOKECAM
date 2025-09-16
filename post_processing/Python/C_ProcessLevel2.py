@@ -10,25 +10,22 @@ import os
 import scipy.io
 import pygeodesy
 import numpy as np
+import laspy
 from utils import *
-import open3d as o3d
-# from pathlib import Path
-# from pygeodesy.ellipsoidalKarney import LatLon
 
 # ======================= INPUTS ============================
 # ---- Wave/session folder ----
-# wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/pres_reports/paper1/data/wave1"
-wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250429/003014_session_auto/wave6"
-# wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250814/141908_session_bright/wave1"
+wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250913/164253_session_bright/wave2"
 
 # ---- Geoid file (EGM2008 1' grid) ----
 geoid_file = "C:/ProgramData/GeographicLib/geoids/egm2008-1.pgm"
 
 # ---- Origin presets [lat, lon] ----
 # origin = None               # Uses local mean if None
-origin = [32.866277163888888, -117.2542791472222] # SIO
+# origin = [32.866277163888888, -117.2542791472222] # SIO
 # origin = [33.219778, -117.406497] # DMJs
 # origin = [32.836786, -117.281222] # Marine St.
+origin = [33.588303, -117.879581] # Wedge
 
 # ---- Run behavior ----
 save_params = True       # write params.json to output folder
@@ -82,12 +79,14 @@ def main(origin=None):
         rotationMatrices[i] = quat2rotm(q)
 
     # ---- Process each L1 point cloud ----
-    ply_files = sorted([f for f in os.listdir(l1_dir) if f.endswith('.ply')])
-    for i, ply_file in enumerate(ply_files):
-        ply_path = os.path.join(l1_dir, ply_file)
-        pcd = o3d.io.read_point_cloud(ply_path)
-        xyz_cam = np.asarray(pcd.points)
-        colors = np.asarray(pcd.colors) * 255  # Open3D colors are 0-1
+    las_files = sorted([f for f in os.listdir(l1_dir) if f.endswith('.las')])
+    for i, las_file in enumerate(las_files):
+        las_path = os.path.join(l1_dir, las_file)
+        
+        # Read LAS file
+        las = laspy.read(las_path)
+        xyz_cam = np.column_stack([las.x, las.y, las.z])
+        colors = np.column_stack([las.red, las.green, las.blue]) / 257  # Scale 16-bit to 8-bit
 
         # Camera to IMU coords
         xyz_imu = (np.array([[0,0,1],[1,0,0],[0,1,0]]) @ xyz_cam.T).T
@@ -100,10 +99,21 @@ def main(origin=None):
         cam_origin = np.array([N[i], E[i], D[i]])
         xyz_world = xyz_NED + cam_origin
 
-        # ---- Save as PLY ----
-        pcd.points = o3d.utility.Vector3dVector(xyz_world)
-        output_path = os.path.join(l2_dir, ply_file)
-        o3d.io.write_point_cloud(output_path, pcd)
+        # ---- Save as LAS ----
+        output_path = os.path.join(l2_dir, las_file)
+        
+        # Create new LAS file with transformed coordinates
+        header = laspy.LasHeader(point_format=3, version="1.2")
+        las_out = laspy.LasData(header)
+        
+        las_out.x = xyz_world[:, 0] # Northing
+        las_out.y = xyz_world[:, 1] # Easting
+        las_out.z = xyz_world[:, 2] # Down
+        las_out.red = (colors[:, 0] * 257).astype(np.uint16)    # Scale back to 16-bit
+        las_out.green = (colors[:, 1] * 257).astype(np.uint16)
+        las_out.blue = (colors[:, 2] * 257).astype(np.uint16)
+        
+        las_out.write(output_path)
         print(f"Processed and saved: {output_path}")
         
     # ---- Generate L3 concatenated ptCloud from all L2 ptClouds ----
