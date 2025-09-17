@@ -34,17 +34,17 @@ clahe_tiles   = (5, 5)
 # ---- Disparity (StereoSGBM) ----
 sgbm_min_disparity   = 0      # inclusive
 sgbm_num_disparities = 64    # multiple of 16
-sgbm_block_size      = 7      # odd, >=3
+sgbm_block_size      = 1      # odd, >=3
 sgbm_uniqueness      = 15
 sgbm_speckle_window  = 120
 sgbm_speckle_range   = 2
 sgbm_disp12_maxdiff  = 1
 sgbm_prefilter_cap   = 31
 sgbm_mode            = "HH"  # "SGBM", "SGBM_3WAY", "HH", "HH4"
-sgbm_P1              = 8 * 3 * (5 ** 2)  # OpenCV format
-sgbm_P2              = 48 * 3 * (5 ** 2)
-# sgbm_P1              = 15  # Copying MATLAB
-# sgbm_P2              = 200 # Copying MATLAB
+# sgbm_P1              = 8 * 3 * (5 ** 2)  # OpenCV format
+# sgbm_P2              = 48 * 3 * (5 ** 2)
+sgbm_P1              = 15  # Copying MATLAB
+sgbm_P2              = 200 # Copying MATLAB
 
 # ---- Post-masking / refinement ----
 use_texture_mask = True    # gradient-based low-texture suppression
@@ -56,7 +56,7 @@ wls_lambda = 2000.0        # 2000–12000 typical
 wls_sigma  = 0.8           # 0.8–1.5 typical
 
 # ---- Outputs ----
-write_ptcloud   = True 
+write_ptcloud   = False
 
 use_xyz_bounds  = True
 xyz_bounds_x    = (-20, 20)   # keep xmin <= X <= xmax
