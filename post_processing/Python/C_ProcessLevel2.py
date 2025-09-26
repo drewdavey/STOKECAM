@@ -15,7 +15,9 @@ from utils import *
 
 # ======================= INPUTS ============================
 # ---- Wave/session folder ----
-wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250913/164253_session_bright/wave2"
+# wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/20250913/164253_session_bright/wave2"
+wave = "C:/Users/drew/OneDrive - UC San Diego/FSR/paper1/data/wave3"
+
 
 # ---- Geoid file (EGM2008 1' grid) ----
 geoid_file = "C:/ProgramData/GeographicLib/geoids/egm2008-1.pgm"
@@ -24,8 +26,8 @@ geoid_file = "C:/ProgramData/GeographicLib/geoids/egm2008-1.pgm"
 # origin = None               # Uses local mean if None
 # origin = [32.866277163888888, -117.2542791472222] # SIO
 # origin = [33.219778, -117.406497] # DMJs
-# origin = [32.836786, -117.281222] # Marine St.
-origin = [33.588303, -117.879581] # Wedge
+origin = [32.836786, -117.281222] # Marine St.
+# origin = [33.588303, -117.879581] # Wedge
 
 # ---- Run behavior ----
 save_params = True       # write params.json to output folder
@@ -99,6 +101,9 @@ def main(origin=None):
         cam_origin = np.array([N[i], E[i], D[i]])
         xyz_world = xyz_NED + cam_origin
 
+        # Convert NED to ENU: East, North, Up
+        xyz_ENU = np.column_stack([xyz_world[:, 1], xyz_world[:, 0], -xyz_world[:, 2]])
+
         # ---- Save as LAS ----
         output_path = os.path.join(l2_dir, las_file)
         
@@ -106,9 +111,9 @@ def main(origin=None):
         header = laspy.LasHeader(point_format=3, version="1.2")
         las_out = laspy.LasData(header)
         
-        las_out.x = xyz_world[:, 0] # Northing
-        las_out.y = xyz_world[:, 1] # Easting
-        las_out.z = xyz_world[:, 2] # Down
+        las_out.x = xyz_ENU[:, 0]  # Easting
+        las_out.y = xyz_ENU[:, 1]  # Northing
+        las_out.z = xyz_ENU[:, 2]  # Up
         las_out.red = (colors[:, 0] * 257).astype(np.uint16)    # Scale back to 16-bit
         las_out.green = (colors[:, 1] * 257).astype(np.uint16)
         las_out.blue = (colors[:, 2] * 257).astype(np.uint16)

@@ -12,11 +12,11 @@ addpath('functions/');
 processAll = 0;
 
 % Set disparity range [20 200], but diff < 128 and divisible by 8
-disparityRange = [0 64];
+disparityRange = [0 128];
 
 % Manually clean ptClouds
 % else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
-manual_clean = 0;
+manual_clean = 1;
 
 % Bounds for trimBounds [xmin xmax ymin ymax zmin zmax] (meters)
 bounds = [-20 20 -20 20 0 50];
@@ -40,7 +40,7 @@ load([calib_path '/calib.mat']);
 %% Process Level 1
 
 % Load path to dir to reconstruct
-session = uigetdir('../../../FSR/stereo_cam/DATA/','Select path to session containing wave subfolders'); 
+session = uigetdir('C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA','Select path to session containing wave subfolders'); 
 
 %%% Session QC figs %%%
 if figs
@@ -133,9 +133,9 @@ for m = 1:length(waves)
         frameLeftGray  = im2gray(J1);
         frameRightGray = im2gray(J2);
 
-        % Adaptive histogram equalization
-        frameLeftGray = adapthisteq(frameLeftGray);
-        frameRightGray = adapthisteq(frameRightGray);
+        % % Adaptive histogram equalization
+        % frameLeftGray = adapthisteq(frameLeftGray);
+        % frameRightGray = adapthisteq(frameRightGray);
 
         %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
         disparityMap = disparitySGM(frameLeftGray, frameRightGray); 
