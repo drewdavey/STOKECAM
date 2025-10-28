@@ -16,7 +16,7 @@ disparityRange = [0 128];
 
 % Manually clean ptClouds
 % else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
-manual_clean = 1;
+manual_clean = 0;
 
 % Bounds for trimBounds [xmin xmax ymin ymax zmin zmax] (meters)
 bounds = [-20 20 -20 20 0 50];
@@ -34,7 +34,7 @@ figs = 0;
 res = 600; % Figure resolution
 
 % Define calibration path
-calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib12_SIO_f8';
+calib_path = 'C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA\calibrations\calib13_SIO_f8';
 load([calib_path '/calib.mat']); 
 
 %% Process Level 1
