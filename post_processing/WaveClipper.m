@@ -11,7 +11,7 @@ addpath('MATLAB/functions/');
 clipWaves = 1;
 while clipWaves
     
-    session = uigetdir('../../FSR/stereo_cam/DATA/','Select path to session'); % load path to session
+    session = uigetdir('C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA','Select path to session'); % load path to session
     
     % WasteMgmtAuto(session); % clean out deleted images from both cam dirs
     

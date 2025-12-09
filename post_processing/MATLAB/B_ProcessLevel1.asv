@@ -14,12 +14,9 @@ processAll = 0;
 % Set disparity range [20 200], but diff < 128 and divisible by 8
 disparityRange = [0 128];
 
-% Uniqueness threshold
-uniquenessThreshold = 5;
-
 % Manually clean ptClouds
 % else: auto clean ptClouds (RGB and HSV thresholding + refinedTrim)
-manual_clean = 1;
+manual_clean = 0;
 
 % Bounds for trimBounds [xmin xmax ymin ymax zmin zmax] (meters)
 bounds = [-10 10 -10 10 0 30];
@@ -142,7 +139,7 @@ for m = 1:length(waves)
 
         %%%%%%%%%%%%% Semi-Global Block Matching %%%%%%%%%%%%%
         % disparityMap = disparitySGM(frameLeftGray, frameRightGray); 
-        disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', disparityRange, 'UniquenessThreshold', uniquenessThreshold); 
+        disparityMap = disparitySGM(frameLeftGray, frameRightGray, 'DisparityRange', disparityRange, 'UniquenessThreshold', 5); 
     
         % Extract timestamp and image number from selected file
         [cameraID, timestamp, imageNum] = parse_filename(imageFileNames1{i}(end-24:end));

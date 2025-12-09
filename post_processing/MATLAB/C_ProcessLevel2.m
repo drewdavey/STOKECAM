@@ -12,10 +12,10 @@ addpath('functions/');
 processAll = 0;
 
 % Input origin [lat, lon]. Defaults to local origin if none specified.
-% origin = [32.866277163888888, -117.2542791472222]; % SIO
+origin = [32.866277163888888, -117.2542791472222]; % SIO
 % origin = [33.219778, -117.406497]; % DMJs
 % origin = [32.836786, -117.281222]; % Marine St.
-origin = [33.588303, -117.879581]; % Wedge
+% origin = [33.588303, -117.879581]; % Wedge
 
 % Rotate wave field?
 rotate = 0;
@@ -47,7 +47,7 @@ dZ = 0.1;     % Z step size for plotting (meters)
 %% Filepath
 
 % Load path to dir to reconstruct
-session = uigetdir('../../../FSR/stereo_cam/DATA','Select path to session containing wave subfolders'); 
+session = uigetdir('C:\Users\drew\OneDrive - UC San Diego\FSR\stereo_cam\DATA','Select path to session containing wave subfolders'); 
 
 % Initialize waves array
 waves = {};
@@ -184,7 +184,7 @@ for m = 1:length(waves)
         cam_origin = [N(i), E(i), D(i)]; % NED Origin (uses each elev)
         % cam_origin = [mean(N), mean(E), mean(D)]; % NED Origin (uses mean NED)
 
-        % Need to invert E, N to account for ptCloud-->cam displacement
+        % Need to invert E, N 
         xyz_NED = [-xyz_NED(:,1), -xyz_NED(:,2), xyz_NED(:,3)] + cam_origin;
         % xyz_NED = xyz_NED + cam_origin;
 

@@ -177,9 +177,9 @@ def build_sgbm(cfg):
     num_disp = int(cfg["num_disparities"])  # exclusive upper bound
 
     block = int(cfg["block_size"])
-    if block % 2 == 0:
-        block += 1
-    block = max(block, 3)
+    # if block % 2 == 0:
+    #     block += 1
+    # block = max(block, 3)
 
     # allow P1/P2 override; otherwise defaults
     P1 = int(cfg.get("P1", 8 * 3 * (block ** 2)))
@@ -191,7 +191,7 @@ def build_sgbm(cfg):
         "HH": cv2.STEREO_SGBM_MODE_HH,
         "HH4": cv2.STEREO_SGBM_MODE_HH4,
     }
-    mode = mode_map.get(cfg.get("mode","SGBM_3WAY"), cv2.STEREO_SGBM_MODE_SGBM_3WAY)
+    mode = mode_map.get(cfg.get("mode","HH"), cv2.STEREO_SGBM_MODE_HH)
 
     matcher = cv2.StereoSGBM_create(
         minDisparity=min_d,
