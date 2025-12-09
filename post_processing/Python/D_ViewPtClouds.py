@@ -13,6 +13,14 @@ import laspy
 from tkinter import filedialog, simpledialog
 from utils import genL3ptCloud 
 
+
+def ask_yes(title, prompt):
+    """Return True if the user answers yes; handle cancel/empty safely."""
+    response = simpledialog.askstring(title, prompt)
+    if not response:
+        return False
+    return response.strip().lower() == 'yes'
+
 def las_to_o3d(las_path):
     """Convert LAS file to Open3D point cloud"""
     las = laspy.read(las_path)
@@ -62,8 +70,7 @@ def main():
                 o3d.visualization.draw_geometries([pcd])
 
         elif level == 'L2':
-            animate = simpledialog.askstring("Animate L2?", "Yes or No:")
-            if animate.lower() == 'yes':
+            if ask_yes("Animate L2?", "Yes or No:"):
                 las_files = sorted([f for f in os.listdir(os.path.join(wave, 'L2')) if f.endswith('.las')])
                 cumulative_pcd = o3d.geometry.PointCloud()
                 for las_file in las_files:
@@ -77,16 +84,14 @@ def main():
                     o3d.visualization.draw_geometries([pcd])
 
                     # Manual cleaning option
-                    clean = simpledialog.askstring("Manually clean?", "Yes or No:")
-                    if clean.lower() == 'yes':
+                    if ask_yes("Manually clean?", "Yes or No:"):
                         # Use open3d's crop tool for selection
                         print("Use the cropping tool in the viewer to select points.")
                         cropped_pcd = o3d.visualization.draw_geometries_with_editing([pcd])[0]
                         o3d_to_las(cropped_pcd, las_file)
 
                     # Export to transect
-                    export = simpledialog.askstring("Export selected to transect?", "Yes or No:")
-                    if export.lower() == 'yes':
+                    if ask_yes("Export selected to transect?", "Yes or No:"):
                         transect_dir = os.path.join(wave, 'transect')
                         os.makedirs(transect_dir, exist_ok=True)
                         pts = np.asarray(pcd.points)
@@ -105,8 +110,7 @@ def main():
                     o3d.visualization.draw_geometries([pcd])
 
         # Continue viewing?
-        cont = simpledialog.askstring("View another?", "Yes or No:")
-        if cont.lower() != 'yes':
+        if not ask_yes("View another?", "Yes or No:"):
             viewFlag = False
             if level == 'L2':
                 genL3ptCloud(wave)  # Generate L3 after L2 viewing

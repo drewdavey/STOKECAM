@@ -12,10 +12,10 @@ addpath('functions/');
 processAll = 0;
 
 % Input origin [lat, lon]. Defaults to local origin if none specified.
-% origin = [32.866277163888888, -117.2542791472222]; % SIO
+origin = [32.866277163888888, -117.2542791472222]; % SIO
 % origin = [33.219778, -117.406497]; % DMJs
 % origin = [32.836786, -117.281222]; % Marine St.
-origin = [33.588303, -117.879581]; % Wedge
+% origin = [33.588303, -117.879581]; % Wedge
 
 % Rotate wave field?
 rotate = 0;

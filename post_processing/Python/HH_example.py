@@ -24,10 +24,11 @@ from utils import load_calibration, stereo_rectify_maps, sorted_images
 # %%
 # ======================= INPUTS ============================
 # Wave directory containing cam0/ and cam1/ subdirectories
-wave_path = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/testing/static/staticStairs/wave1"
+# wave_path = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/testing/static/staticStairs/wave1"
+wave_path = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/testing/static/staticStairsv2/wave2"
 
 # Calibration directory
-calib_path = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/calibrations/calib4_SIO"
+calib_path = "C:/Users/drew/OneDrive - UC San Diego/FSR/stereo_cam/DATA/calibrations/calib13_SIO_f8"
 calib_choice = "python"  # or "matlab"
 
 # SGM Parameters
