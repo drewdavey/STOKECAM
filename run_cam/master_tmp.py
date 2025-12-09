@@ -288,8 +288,8 @@ global cam0, cam1, mode, standby, exposure, dt
 frame_rate, calib_dt, calib_frames, shooting_modes, exposure_times = parse_inputs(fname_log)
 mode = shooting_modes[0]                        # Default mode
 exposure_us = exposure_times[0]                 # Default exposure time
-configure_cameras(fname_log, mode, exposure_us) # Configure the cameras
-exposure, dt = calc_dt(frame_rate, exposure_us) # Calculate dt
+# configure_cameras(fname_log, mode, exposure_us) # Configure the cameras
+# exposure, dt = calc_dt(frame_rate, exposure_us) # Calculate dt
 
 standby = False         # Flag to indicate standby mode 
 monitor_gps(portName)   # Monitor GPS status
